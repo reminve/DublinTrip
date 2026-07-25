@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Square, CornerDownRight } from 'lucide-react';
+import { Play, Square, CornerDownRight, Crosshair } from 'lucide-react';
 import L from 'leaflet';
 import { getSupabase } from '../supabase';
 
@@ -17,6 +17,7 @@ export default function TrackingTab({ userProfile }) {
   const watchIdRef = useRef(null);
   const wakeLockRef = useRef(null);
   const trackingPointsRef = useRef([]);
+  const lastPositionRef = useRef(null); // last known [lat, lng] of the admin
 
   const supabase = getSupabase();
 
@@ -172,6 +173,7 @@ export default function TrackingTab({ userProfile }) {
     updateGPSCard(lat, lng, accuracy, coords.altitude, coords.speed, timestamp);
     
     const point = [lat, lng];
+    lastPositionRef.current = point;
     trackingPointsRef.current.push(point);
     
     if (trackLineRef.current) {
@@ -250,6 +252,24 @@ export default function TrackingTab({ userProfile }) {
       <div className="relative rounded-3xl border border-slate-900/60 overflow-hidden shadow-2xl bg-slate-950 h-[500px] w-full">
         {/* Leaflet Map */}
         <div ref={mapContainerRef} className="w-full h-full z-10"></div>
+
+        {/* Recenter Button */}
+        <button
+          type="button"
+          title="Recentrer sur l'administrateur"
+          onClick={() => {
+            if (!mapInstanceRef.current) return;
+            const pos = lastPositionRef.current;
+            if (pos) {
+              mapInstanceRef.current.flyTo(pos, 16, { animate: true, duration: 0.8 });
+            } else {
+              mapInstanceRef.current.flyTo(DUBLIN_CENTER, 14, { animate: true, duration: 0.8 });
+            }
+          }}
+          className="absolute bottom-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-xl bg-slate-950/90 border border-slate-800 shadow-xl backdrop-blur hover:bg-emerald-500/10 hover:border-emerald-500/30 hover:text-emerald-400 text-slate-300 transition-all cursor-pointer"
+        >
+          <Crosshair className="w-5 h-5" />
+        </button>
 
         {/* Floating Telemetry Stats Overlay */}
         <div className="absolute top-4 left-4 z-20 max-w-xs w-[calc(100%-2rem)] sm:w-64 bg-slate-950/80 border border-slate-900 rounded-2xl p-4 shadow-xl backdrop-blur-md space-y-3 pointer-events-auto">
