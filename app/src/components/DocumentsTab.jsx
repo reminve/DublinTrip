@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { getSupabase } from '../supabase';
 import { 
   FileText, CreditCard, Link, FileDown, UploadCloud, 
-  File, Image as ImageIcon, Trash2, Smile
+  File, Image as ImageIcon, Trash2, X, ZoomIn, ExternalLink
 } from 'lucide-react';
 
 export default function DocumentsTab({ userProfile }) {
   const [documents, setDocuments] = useState([]);
   const [docTitle, setDocTitle] = useState('');
-  const [docType, setDocType] = useState('pdf'); // 'pdf' | 'image' | 'wallet'
+  const [docType, setDocType] = useState('pdf');
   const [docUrl, setDocUrl] = useState('');
   const [docNotes, setDocNotes] = useState('');
   const [docLoading, setDocLoading] = useState(false);
   const [fileBase64, setFileBase64] = useState('');
+
+  // Viewer state
+  const [previewDoc, setPreviewDoc] = useState(null); // { title, type, file_data }
 
   const supabase = getSupabase();
 
@@ -129,6 +133,14 @@ export default function DocumentsTab({ userProfile }) {
     } else {
       localStorage.setItem('dublin_documents_list', JSON.stringify(updated));
     }
+  };
+
+  // Download helper (explicit user action only)
+  const handleDownload = (doc) => {
+    const a = document.createElement('a');
+    a.href = doc.file_data;
+    a.download = doc.title;
+    a.click();
   };
 
   return (
@@ -267,6 +279,24 @@ export default function DocumentsTab({ userProfile }) {
                     </span>
                   </div>
 
+                  {/* Inline preview thumbnail for images */}
+                  {doc.type === 'image' && doc.file_data && (
+                    <button
+                      type="button"
+                      onClick={() => setPreviewDoc(doc)}
+                      className="w-full h-32 rounded-xl overflow-hidden border border-slate-800 cursor-zoom-in relative group/thumb"
+                    >
+                      <img
+                        src={doc.file_data}
+                        alt={doc.title}
+                        className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover/thumb:bg-black/30 transition-colors flex items-center justify-center">
+                        <ZoomIn className="w-6 h-6 text-white opacity-0 group-hover/thumb:opacity-100 transition-opacity" />
+                      </div>
+                    </button>
+                  )}
+
                   <div className="space-y-1">
                     <h4 className="text-xs font-bold text-slate-200 leading-normal">{doc.title}</h4>
                     {doc.notes && <p className="text-[10px] text-slate-400 leading-relaxed bg-slate-950/20 p-2.5 rounded-xl border border-slate-900/20">{doc.notes}</p>}
@@ -275,13 +305,14 @@ export default function DocumentsTab({ userProfile }) {
 
                 <div className="flex items-center justify-between pt-2 border-t border-slate-900/40 mt-auto">
                   <span className="text-[8px] font-bold text-slate-500 uppercase">
-                    Mis en ligne le {new Date(doc.created_at).toLocaleDateString('fr-FR', {
-                      day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                    {new Date(doc.created_at).toLocaleDateString('fr-FR', {
+                      day: 'numeric', month: 'short'
                     })}
                   </span>
 
                   <div className="flex items-center gap-1.5">
-                    {['wallet', 'link'].includes(doc.type) ? (
+                    {/* Wallet / external link */}
+                    {['wallet', 'link'].includes(doc.type) && (
                       <a 
                         href={doc.file_data} 
                         target="_blank" 
@@ -290,14 +321,29 @@ export default function DocumentsTab({ userProfile }) {
                       >
                         <CreditCard className="w-3.5 h-3.5" /> Google Wallet
                       </a>
-                    ) : (
-                      <a 
-                        href={doc.file_data} 
-                        download={doc.title}
-                        className="text-[10px] font-black uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-slate-950 px-3 py-2 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 shadow"
+                    )}
+
+                    {/* Preview button for PDF & image */}
+                    {['pdf', 'image'].includes(doc.type) && doc.file_data && (
+                      <button
+                        type="button"
+                        onClick={() => setPreviewDoc(doc)}
+                        className="text-[10px] font-black uppercase tracking-wider bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30 text-indigo-300 px-3 py-2 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
                       >
-                        <FileDown className="w-3.5 h-3.5" /> Ouvrir / Télécharger
-                      </a>
+                        <ZoomIn className="w-3.5 h-3.5" /> Aperçu
+                      </button>
+                    )}
+
+                    {/* Explicit download (admin only) */}
+                    {userProfile?.is_admin && ['pdf', 'image'].includes(doc.type) && doc.file_data && (
+                      <button
+                        type="button"
+                        onClick={() => handleDownload(doc)}
+                        className="p-2 bg-slate-950 border border-slate-900 text-slate-500 hover:text-emerald-400 rounded-xl transition-colors cursor-pointer"
+                        title="Télécharger"
+                      >
+                        <FileDown className="w-3.5 h-3.5" />
+                      </button>
                     )}
 
                     {userProfile?.is_admin && (
@@ -316,7 +362,89 @@ export default function DocumentsTab({ userProfile }) {
           </div>
         )}
       </div>
-      
+
+      {/* ==================== DOCUMENT VIEWER MODAL (Portal) ==================== */}
+      {previewDoc && createPortal(
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex flex-col"
+          onClick={() => setPreviewDoc(null)}
+        >
+          {/* Toolbar */}
+          <div
+            className="flex items-center justify-between px-5 py-3 bg-slate-950/80 border-b border-slate-800 flex-shrink-0"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              {previewDoc.type === 'pdf'
+                ? <FileText className="w-4 h-4 text-red-400 flex-shrink-0" />
+                : <ImageIcon className="w-4 h-4 text-sky-400 flex-shrink-0" />
+              }
+              <span className="text-sm font-bold text-slate-200 truncate">{previewDoc.title}</span>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Open in new tab */}
+              <a
+                href={previewDoc.file_data}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] font-black uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-300 hover:text-white px-3 py-2 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ExternalLink className="w-3.5 h-3.5" /> Ouvrir
+              </a>
+              {/* Download */}
+              {userProfile?.is_admin && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); handleDownload(previewDoc); }}
+                  className="text-[10px] font-black uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-slate-900 px-3 py-2 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <FileDown className="w-3.5 h-3.5" /> Télécharger
+                </button>
+              )}
+              {/* Close */}
+              <button
+                type="button"
+                onClick={() => setPreviewDoc(null)}
+                className="w-9 h-9 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Viewer body */}
+          <div
+            className="flex-1 overflow-auto flex items-center justify-center p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {previewDoc.type === 'pdf' ? (
+              <iframe
+                src={previewDoc.file_data}
+                title={previewDoc.title}
+                className="w-full max-w-4xl h-full min-h-[70vh] rounded-xl border border-slate-800 bg-white"
+              />
+            ) : (
+              <img
+                src={previewDoc.file_data}
+                alt={previewDoc.title}
+                className="max-w-full max-h-[80vh] rounded-xl object-contain shadow-2xl"
+              />
+            )}
+          </div>
+
+          {/* Notes footer */}
+          {previewDoc.notes && (
+            <div
+              className="px-5 py-3 bg-slate-950/80 border-t border-slate-800 text-xs text-slate-400 text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {previewDoc.notes}
+            </div>
+          )}
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
