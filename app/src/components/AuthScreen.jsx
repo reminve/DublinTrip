@@ -39,12 +39,12 @@ export default function AuthScreen({ onAuthenticated, onShowSetup }) {
           .single();
 
         if (profileErr || !profile) {
-          // Profile entry missing: create a draft (unapproved)
-          await supabase.from('profiles').insert([
+          // Profile entry missing: create a draft via upsert (fallback)
+          await supabase.from('profiles').upsert([
             { id: data.user.id, email: email, approved: false, is_admin: false }
           ]);
           await supabase.auth.signOut();
-          setErrorMsg("Votre compte est en cours de création. Veuillez patienter pour l'approbation de l'administrateur.");
+          setErrorMsg("Votre compte est en attente d'approbation par l'administrateur.");
         } else if (!profile.approved) {
           await supabase.auth.signOut();
           setErrorMsg("Votre compte est en attente d'approbation par l'administrateur.");
@@ -58,12 +58,8 @@ export default function AuthScreen({ onAuthenticated, onShowSetup }) {
         if (error) throw error;
 
         if (data && data.user) {
-          // Insert profile record
-          const { error: profileErr } = await supabase.from('profiles').insert([
-            { id: data.user.id, email: email, approved: false, is_admin: false }
-          ]);
-          if (profileErr) throw profileErr;
-
+          // The database trigger public.handle_new_user() automatically
+          // creates the profile row. We don't need to manually insert it anymore.
           alert("Compte créé ! Veuillez patienter pendant que l'administrateur valide votre demande.");
           setAuthMode('login');
           setEmail('');

@@ -35,12 +35,10 @@ export default function App() {
           .single();
 
         if (error || !profile) {
-          // Profile entry missing: create it (not approved by default)
-          const { data: newProfile } = await supabase
+          // Profile entry missing: create it via upsert (fallback)
+          await supabase
             .from('profiles')
-            .insert([{ id: session.user.id, email: session.user.email, approved: false, is_admin: false }])
-            .select()
-            .single();
+            .upsert([{ id: session.user.id, email: session.user.email, approved: false, is_admin: false }]);
             
           await supabase.auth.signOut();
           setUserProfile(null);
