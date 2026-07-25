@@ -28,7 +28,13 @@ export default function DashboardTab({ userProfile }) {
   const [currentDayIndex, setCurrentDayIndex] = useState(1);
 
   // Weather State
-  const [weather, setWeather] = useState({ temp: '--', desc: 'Chargement...', wind: '--', humidity: '--', emoji: '☁️', loading: false });
+  const [weather, setWeather] = useState({
+    temp: '--', feelsLike: '--', desc: 'Chargement...', wind: '--',
+    humidity: '--', precipitation: '--', emoji: '☁️',
+    location: 'Dublin, Irlande', isLive: false, loading: true,
+    forecast: [], lat: 53.3498, lng: -6.2603
+  });
+  const [showRadar, setShowRadar] = useState(false);
 
   // Expenses States
   const [expenses, setExpenses] = useState(DEFAULT_EXPENSES);
@@ -235,53 +241,94 @@ export default function DashboardTab({ userProfile }) {
     };
   }, [expenses]);
 
-  // 3. Weather Fetch
-  const fetchWeather = async () => {
-    setWeather(prev => ({ ...prev, loading: true }));
+  // 3. Weather Fetch — geo-aware
+  const CODE_MAP = {
+    0: { desc: 'Ciel Dégagé', emoji: '☀️' },
+    1: { desc: 'Principalement Dégagé', emoji: '🌤️' },
+    2: { desc: 'Partiellement Nuageux', emoji: '⛅' },
+    3: { desc: 'Couvert', emoji: '☁️' },
+    45: { desc: 'Brouillard', emoji: '🌫️' },
+    48: { desc: 'Brouillard givrant', emoji: '🌫️' },
+    51: { desc: 'Bruine Légère', emoji: '🌦️' },
+    53: { desc: 'Bruine Modérée', emoji: '🌦️' },
+    55: { desc: 'Bruine Dense', emoji: '🌦️' },
+    61: { desc: 'Pluie Faible', emoji: '🌧️' },
+    63: { desc: 'Pluie Modérée', emoji: '🌧️' },
+    65: { desc: 'Pluie Forte', emoji: '🌧️' },
+    80: { desc: 'Averses Faibles', emoji: '🌦️' },
+    81: { desc: 'Averses Modérées', emoji: '🌦️' },
+    82: { desc: 'Averses Violentes', emoji: '🌧️' },
+    95: { desc: 'Orage', emoji: '⛈️' },
+    96: { desc: 'Orage avec grêle', emoji: '⛈️' },
+    99: { desc: 'Orage violent', emoji: '🌩️' },
+  };
+
+  const fetchWeatherForCoords = async (lat, lng, locationLabel, isLive) => {
     try {
-      const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=53.3498&longitude=-6.2603&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&timezone=Europe/Dublin");
-      if (!response.ok) throw new Error("Request failed");
-      const data = await response.json();
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}` +
+        `&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m` +
+        `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum` +
+        `&timezone=auto&forecast_days=7`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('fetch failed');
+      const data = await res.json();
       const cur = data.current;
+      const daily = data.daily;
+      const mapped = CODE_MAP[cur.weather_code] || { desc: 'Nuageux', emoji: '☁️' };
 
-      const codeMapping = {
-        0: { desc: 'Ciel Dégagé', emoji: '☀️' },
-        1: { desc: 'Principalement Dégagé', emoji: '🌤️' },
-        2: { desc: 'Partiellement Nuageux', emoji: '⛅' },
-        3: { desc: 'Couvert', emoji: '☁️' },
-        45: { desc: 'Brouillard', emoji: '🌫️' },
-        48: { desc: 'Brouillard givrant', emoji: '🌫️' },
-        51: { desc: 'Bruine Légère', emoji: '🌦️' },
-        53: { desc: 'Bruine Modérée', emoji: '🌦️' },
-        55: { desc: 'Bruine Dense', emoji: '🌦️' },
-        61: { desc: 'Pluie Faible', emoji: '🌧️' },
-        63: { desc: 'Pluie Modérée', emoji: '🌧️' },
-        65: { desc: 'Pluie Forte', emoji: '🌧️' },
-        80: { desc: 'Averses Faibles', emoji: '🌦️' },
-        81: { desc: 'Averses Modérées', emoji: '🌦️' },
-        82: { desc: 'Averses Violentes', emoji: '🌧️' }
-      };
-
-      const mapped = codeMapping[cur.weather_code] || { desc: 'Nuageux', emoji: '☁️' };
+      const forecast = daily.time.map((date, i) => ({
+        date,
+        emoji: (CODE_MAP[daily.weather_code[i]] || { emoji: '☁️' }).emoji,
+        min: Math.round(daily.temperature_2m_min[i]),
+        max: Math.round(daily.temperature_2m_max[i]),
+        rain: daily.precipitation_sum[i].toFixed(1)
+      }));
 
       setWeather({
-        temp: `${cur.temperature_2m.toFixed(0)}°C`,
+        temp: `${Math.round(cur.temperature_2m)}°C`,
+        feelsLike: `${Math.round(cur.apparent_temperature)}°C`,
         desc: mapped.desc,
-        wind: `${cur.wind_speed_10m.toFixed(0)} km/h`,
+        wind: `${Math.round(cur.wind_speed_10m)} km/h`,
         humidity: `${cur.relative_humidity_2m}%`,
+        precipitation: `${cur.precipitation} mm`,
         emoji: mapped.emoji,
-        loading: false
+        location: locationLabel,
+        isLive,
+        loading: false,
+        forecast,
+        lat,
+        lng
       });
     } catch (err) {
-      setWeather({
-        temp: '--',
-        desc: 'Météo indisponible',
-        wind: '--',
-        humidity: '--',
-        emoji: '⚠️',
-        loading: false
-      });
+      setWeather(prev => ({ ...prev, loading: false, desc: 'Météo indisponible', emoji: '⚠️' }));
     }
+  };
+
+  const fetchWeather = () => {
+    setWeather(prev => ({ ...prev, loading: true }));
+    if (!navigator.geolocation) {
+      // No geolocation → always show Dublin
+      fetchWeatherForCoords(53.3498, -6.2603, 'Dublin, Irlande', false);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        // Ireland bounding box: lng roughly -10.5 to -5.4, lat 51.3 to 55.5
+        const isInIreland = longitude < -5.4 && longitude > -10.5 && latitude > 51.3 && latitude < 55.5;
+        if (isInIreland) {
+          fetchWeatherForCoords(latitude, longitude, '📍 Position actuelle', true);
+        } else {
+          // In France or elsewhere → show Dublin destination weather
+          fetchWeatherForCoords(53.3498, -6.2603, 'Dublin, Irlande 🇮🇪', false);
+        }
+      },
+      () => {
+        // Permission denied or error → fallback to Dublin
+        fetchWeatherForCoords(53.3498, -6.2603, 'Dublin, Irlande 🇮🇪', false);
+      },
+      { timeout: 6000, maximumAge: 300000 }
+    );
   };
 
   useEffect(() => {
@@ -416,31 +463,103 @@ export default function DashboardTab({ userProfile }) {
         {/* Right Side (1 Column on Desktop) */}
         <div className="space-y-6">
           
-          {/* Dublin Live Weather */}
-          <div className="bg-slate-900/20 border border-slate-900/60 rounded-2xl p-5 shadow-lg backdrop-blur transition-all duration-300 hover:border-slate-800 hover:-translate-y-0.5">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider">Météo à Dublin</h3>
-              <button 
-                type="button"
-                onClick={fetchWeather} 
-                className="text-slate-400 hover:text-emerald-400 transition-colors cursor-pointer"
-              >
-                <RefreshCw className={`w-4 h-4 ${weather.loading ? 'animate-spin' : ''}`} />
-              </button>
+          {/* === WEATHER CARD === */}
+          <div className="bg-slate-900/20 border border-slate-900/60 rounded-2xl overflow-hidden shadow-lg backdrop-blur">
+
+            {/* Header */}
+            <div className="flex justify-between items-center p-4 border-b border-slate-900/60">
+              <div className="flex items-center gap-2">
+                <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider">Météo</h3>
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full border"
+                  style={weather.isLive
+                    ? { background: 'rgba(16,185,129,0.1)', color: '#34d399', borderColor: 'rgba(16,185,129,0.2)' }
+                    : { background: 'rgba(99,102,241,0.1)', color: '#a5b4fc', borderColor: 'rgba(99,102,241,0.2)' }}
+                >
+                  {weather.isLive ? '📍 Live' : '🇮🇪 Dublin'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button type="button" onClick={() => setShowRadar(v => !v)}
+                  className={`text-[9px] font-bold px-2 py-1 rounded-lg border transition-colors cursor-pointer ${
+                    showRadar
+                      ? 'bg-sky-500/20 border-sky-500/30 text-sky-400'
+                      : 'bg-slate-950 border-slate-900 text-slate-450 hover:text-sky-400'
+                  }`}
+                >
+                  🛰️ Radar
+                </button>
+                <button type="button" onClick={fetchWeather}
+                  className="text-slate-400 hover:text-emerald-400 transition-colors cursor-pointer"
+                >
+                  <RefreshCw className={`w-4 h-4 ${weather.loading ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-4xl">{weather.emoji}</span>
-                <div>
-                  <h4 className="text-2xl font-extrabold text-slate-100">{weather.temp}</h4>
-                  <p className="text-[10px] text-slate-500 font-semibold uppercase">{weather.desc}</p>
+
+            {/* Main condition */}
+            {!showRadar && (
+              <div className="p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-5xl">{weather.emoji}</span>
+                    <div>
+                      <div className="flex items-end gap-1.5">
+                        <h4 className="text-3xl font-extrabold text-slate-100">{weather.temp}</h4>
+                        <span className="text-xs text-slate-500 mb-1 font-medium">Ressenti {weather.feelsLike}</span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">{weather.desc}</p>
+                      <p className="text-[9px] text-slate-600 mt-0.5">{weather.location}</p>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Detail pills */}
+                <div className="grid grid-cols-3 gap-2">
+                  {[['💨', 'Vent', weather.wind], ['💧', 'Humidité', weather.humidity], ['🌧️', 'Précip.', weather.precipitation]].map(([icon, label, val]) => (
+                    <div key={label} className="bg-slate-950/40 border border-slate-900/60 rounded-xl p-2 text-center">
+                      <p className="text-base">{icon}</p>
+                      <p className="text-[8px] text-slate-500 uppercase tracking-wide font-bold">{label}</p>
+                      <p className="text-xs font-extrabold text-slate-200">{val}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* 7-day forecast */}
+                {weather.forecast.length > 0 && (
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-2">Prévisions 7 jours</p>
+                    <div className="grid grid-cols-7 gap-1">
+                      {weather.forecast.map((day) => {
+                        const d = new Date(day.date + 'T00:00:00');
+                        const label = d.toLocaleDateString('fr-FR', { weekday: 'short' });
+                        return (
+                          <div key={day.date} className="flex flex-col items-center bg-slate-950/40 border border-slate-900/40 rounded-xl py-2 px-1 gap-0.5">
+                            <span className="text-[8px] font-bold text-slate-500 uppercase">{label.slice(0,3)}</span>
+                            <span className="text-sm">{day.emoji}</span>
+                            <span className="text-[9px] font-bold text-slate-200">{day.max}°</span>
+                            <span className="text-[8px] text-slate-500">{day.min}°</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="text-right text-[10px] text-slate-450 space-y-0.5 font-medium">
-                <p>💨 Vent : {weather.wind}</p>
-                <p>💧 Humidité : {weather.humidity}</p>
+            )}
+
+            {/* Radar */}
+            {showRadar && (
+              <div className="relative">
+                <div className="text-[9px] text-slate-500 text-center py-1 font-medium">Radar précipitations — Windy.com</div>
+                <iframe
+                  src={`https://embed.windy.com/embed2.html?lat=${weather.lat}&lon=${weather.lng}&detailLat=${weather.lat}&detailLon=${weather.lng}&width=650&height=320&zoom=7&level=surface&overlay=rain&product=ecmwf&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`}
+                  className="w-full h-64 border-0"
+                  title="Radar météo"
+                  allow="fullscreen"
+                />
               </div>
-            </div>
+            )}
+
           </div>
 
           {/* Quick flight details */}
