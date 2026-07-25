@@ -14,6 +14,7 @@ import TrackingTab from './components/TrackingTab';
 import JournalTab from './components/JournalTab';
 import ToolsTab from './components/ToolsTab';
 import DocumentsTab from './components/DocumentsTab';
+import TransportTab from './components/TransportTab';
 import AdminTab from './components/AdminTab';
 import SettingsTab from './components/SettingsTab';
 
@@ -320,6 +321,15 @@ export default function App() {
             </button>
 
             <button 
+              onClick={() => setActiveTab('transport')} 
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'transport' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              style={getActiveStyle('transport')}
+            >
+              <Plane className="w-4 h-4" />
+              <span>Vols &amp; Transports</span>
+            </button>
+
+            <button 
               onClick={() => setActiveTab('tools')} 
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'tools' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('tools')}
@@ -405,6 +415,7 @@ export default function App() {
           {activeTab === 'journal' && <JournalTab userProfile={userProfile} />}
           {activeTab === 'gallery' && <GalleryTab userProfile={userProfile} />}
           {activeTab === 'tracking' && <TrackingTab userProfile={userProfile} />}
+          {activeTab === 'transport' && <TransportTab />}
           {activeTab === 'tools' && <ToolsTab userProfile={userProfile} />}
           {activeTab === 'documents' && <DocumentsTab userProfile={userProfile} />}
           {activeTab === 'admin' && userProfile?.is_admin && (
@@ -465,7 +476,7 @@ export default function App() {
           <button 
             onClick={() => setShowPlusMenu(prev => !prev)} 
             className={`flex flex-col items-center gap-1.5 transition-all cursor-pointer ${showPlusMenu ? 'text-slate-200' : 'text-slate-500'}`}
-            style={['tracking', 'tools', 'documents', 'admin', 'settings'].includes(activeTab) && !showPlusMenu ? { color: 'rgb(var(--accent-color))' } : {}}
+            style={['tracking', 'transport', 'tools', 'documents', 'admin', 'settings'].includes(activeTab) && !showPlusMenu ? { color: 'rgb(var(--accent-color))' } : {}}
           >
             <Plus className={`w-5 h-5 transition-transform duration-300 ${showPlusMenu ? 'rotate-45 text-rose-400' : ''}`} />
             <span className="text-[9px] font-bold uppercase tracking-wider">{showPlusMenu ? "Fermer" : "Plus"}</span>
@@ -501,6 +512,14 @@ export default function App() {
               >
                 <MapPin className="w-5 h-5 text-emerald-400" />
                 <span className="text-[10px] font-bold uppercase text-slate-300">Suivi GPS</span>
+              </button>
+
+              <button 
+                onClick={() => { setActiveTab('transport'); setShowPlusMenu(false); }}
+                className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer gap-2"
+              >
+                <Plane className="w-5 h-5 text-emerald-400" />
+                <span className="text-[10px] font-bold uppercase text-slate-300">Vols &amp; Trains</span>
               </button>
               
               <button 
