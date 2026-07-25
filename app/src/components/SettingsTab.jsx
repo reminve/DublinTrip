@@ -79,13 +79,24 @@ export default function SettingsTab({ onLogout, onShowSetup }) {
               &nbsp;&nbsp;notes TEXT,<br />
               &nbsp;&nbsp;user_id UUID DEFAULT auth.uid()<br />
               );<br /><br />
+              CREATE TABLE IF NOT EXISTS public.dublin_expenses (<br />
+              &nbsp;&nbsp;id UUID PRIMARY KEY DEFAULT gen_random_uuid(),<br />
+              &nbsp;&nbsp;created_at TIMESTAMPTZ DEFAULT NOW(),<br />
+              &nbsp;&nbsp;title TEXT NOT NULL,<br />
+              &nbsp;&nbsp;amount NUMERIC(8,2) NOT NULL,<br />
+              &nbsp;&nbsp;category TEXT NOT NULL,<br />
+              &nbsp;&nbsp;date DATE DEFAULT CURRENT_DATE,<br />
+              &nbsp;&nbsp;note TEXT,<br />
+              &nbsp;&nbsp;user_id UUID DEFAULT auth.uid()<br />
+              );<br /><br />
               ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;<br />
               ALTER TABLE public.dublin_gps ENABLE ROW LEVEL SECURITY;<br />
               ALTER TABLE public.dublin_photos ENABLE ROW LEVEL SECURITY;<br />
               ALTER TABLE public.dublin_journal ENABLE ROW LEVEL SECURITY;<br />
               ALTER TABLE public.dublin_pints ENABLE ROW LEVEL SECURITY;<br />
               ALTER TABLE public.dublin_suggestions ENABLE ROW LEVEL SECURITY;<br />
-              ALTER TABLE public.dublin_documents ENABLE ROW LEVEL SECURITY;<br /><br />
+              ALTER TABLE public.dublin_documents ENABLE ROW LEVEL SECURITY;<br />
+              ALTER TABLE public.dublin_expenses ENABLE ROW LEVEL SECURITY;<br /><br />
               -- Politiques RLS (Corrigées sans récursion)<br />
               CREATE POLICY "Tout le monde peut s'inscrire" ON public.profiles FOR INSERT WITH CHECK (true);<br />
               CREATE POLICY "Les membres connectés voient tous les profils" ON public.profiles FOR SELECT USING (auth.role() = 'authenticated');<br />
@@ -108,7 +119,10 @@ export default function SettingsTab({ onLogout, onShowSetup }) {
               CREATE POLICY "Suppr Suggestions" ON public.dublin_suggestions FOR DELETE USING (auth.role() = 'authenticated');<br /><br />
               CREATE POLICY "Les admins écrivent Documents" ON public.dublin_documents FOR INSERT WITH CHECK ((SELECT is_admin FROM public.profiles WHERE id = auth.uid()) = true);<br />
               CREATE POLICY "Les membres voient Documents" ON public.dublin_documents FOR SELECT USING ((SELECT approved FROM public.profiles WHERE id = auth.uid()) = true);<br />
-              CREATE POLICY "Les admins suppriment Documents" ON public.dublin_documents FOR DELETE USING ((SELECT is_admin FROM public.profiles WHERE id = auth.uid()) = true);
+              CREATE POLICY "Les admins suppriment Documents" ON public.dublin_documents FOR DELETE USING ((SELECT is_admin FROM public.profiles WHERE id = auth.uid()) = true);<br /><br />
+              CREATE POLICY "Membres écrivent Dépenses" ON public.dublin_expenses FOR INSERT WITH CHECK (auth.role() = 'authenticated');<br />
+              CREATE POLICY "Membres voient Dépenses" ON public.dublin_expenses FOR SELECT USING ((SELECT approved FROM public.profiles WHERE id = auth.uid()) = true);<br />
+              CREATE POLICY "Les admins suppriment Dépenses" ON public.dublin_expenses FOR DELETE USING ((SELECT is_admin FROM public.profiles WHERE id = auth.uid()) = true);
             </div>
           </div>
         )}
