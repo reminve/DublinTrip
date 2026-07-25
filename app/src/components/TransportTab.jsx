@@ -4,7 +4,7 @@ import {
   RefreshCw, ExternalLink, ChevronRight, Navigation, Wifi, WifiOff
 } from 'lucide-react';
 
-// ─── Journey Data ──────────────────────────────────────────────────────────────
+// ─── Journey Data (source : Feuille de Route ItineraryTab) ────────────────────
 const JOURNEYS = {
   outbound: {
     label: 'Aller — 6 août 2026',
@@ -14,13 +14,13 @@ const JOURNEYS = {
         id: 'sncf-out',
         type: 'train',
         icon: '🚄',
-        operator: 'SNCF',
-        line: 'TGV Inouï',
-        from: 'Domicile → Gare Part-Dieu',
+        operator: 'SNCF — TER',
+        line: 'Train TER',
+        from: 'Clermont-Ferrand',
         to: 'Lyon Part-Dieu',
-        dep: '07:30',
-        arr: '--',
-        note: 'Vérifier horaire sur billet SNCF',
+        dep: '09:00',
+        arr: '11:30',
+        note: 'Vérifier horaire exact sur votre billet SNCF',
         statusLink: 'https://www.sncf-connect.com/app/trains/mes-voyages',
         color: 'indigo',
       },
@@ -29,12 +29,12 @@ const JOURNEYS = {
         type: 'bus',
         icon: '🚌',
         operator: 'Rhônexpress',
-        line: 'Tram-Train Express',
+        line: 'Navette express',
         from: 'Lyon Part-Dieu',
-        to: 'Lyon-Saint-Exupéry T1 (LYS)',
-        dep: '09:45',
-        arr: '10:15',
-        note: '~30 min — départ toutes les 15 min',
+        to: 'Aéroport Lyon-Saint-Exupéry (LYS)',
+        dep: '12:30',
+        arr: '13:10',
+        note: '~40 min — départs toutes les 15 min depuis la gare Part-Dieu',
         statusLink: 'https://www.rhonexpress.fr/fr_FR/page/horaires',
         color: 'amber',
       },
@@ -45,27 +45,25 @@ const JOURNEYS = {
         operator: 'Aer Lingus',
         flightNumber: 'EI 553',
         iata: 'EI553',
-        icao24: 'EIN',
-        from: 'Lyon Saint-Exupéry (LYS) T1',
-        to: 'Dublin (DUB)',
-        dep: '11:30',
-        arr: '13:00',
-        note: 'Heure locale Dublin (GMT+1) — 1h30 de vol',
+        from: 'Lyon Saint-Exupéry T1 (LYS)',
+        to: 'Dublin T2 (DUB)',
+        dep: '16:45',
+        arr: '18:05',
+        note: 'Arrivée en heure locale Dublin (GMT+1)',
         statusLink: 'https://www.aerlingus.com/my-booking/',
-        fr24Link: 'https://www.flightradar24.com/flight/EI553',
         color: 'emerald',
       },
       {
         id: 'dublinexpress-out',
         type: 'bus',
         icon: '🚌',
-        operator: 'Dublin Express',
+        operator: 'Dublin Express 782',
         line: 'Airport Coach',
-        from: 'Dublin Airport',
-        to: 'City Centre (D\'Olier Street)',
-        dep: 'À l\'arrivée',
-        arr: '+35 min',
-        note: 'Départs fréquents, pas de réservation',
+        from: 'Dublin Airport T2',
+        to: "Usher's Quay (3 min à pied du logement)",
+        dep: '18:30',
+        arr: '19:30',
+        note: 'Départs fréquents depuis T2 — arrivée prévu 19h30 pour check-in',
         statusLink: 'https://www.dublinexpress.ie/',
         color: 'sky',
       },
@@ -76,16 +74,30 @@ const JOURNEYS = {
     date: '2026-08-12',
     legs: [
       {
+        id: 'checkout',
+        type: 'hotel',
+        icon: '🏨',
+        operator: 'aparto Binary Hub',
+        line: 'Check-out',
+        from: 'aparto Binary Hub Apartments',
+        to: "Usher's Quay",
+        dep: '03:30',
+        arr: '03:45',
+        note: "Dépôt des clés dans la Key Drop Box — départ très matinal",
+        statusLink: 'https://apartobinaryhub.com/',
+        color: 'indigo',
+      },
+      {
         id: 'dublinexpress-ret',
         type: 'bus',
         icon: '🚌',
-        operator: 'Dublin Express',
+        operator: 'Dublin Express 782',
         line: 'Airport Coach',
-        from: 'City Centre (D\'Olier Street)',
-        to: 'Dublin Airport',
-        dep: '07:00',
-        arr: '07:35',
-        note: 'Départs fréquents, prévoir 2h avant vol',
+        from: "Usher's Quay",
+        to: 'Dublin Airport T2',
+        dep: '03:45',
+        arr: '~04:30',
+        note: 'Navette depuis Usher\'s Quay vers T2 pour le vol retour',
         statusLink: 'https://www.dublinexpress.ie/',
         color: 'sky',
       },
@@ -96,14 +108,12 @@ const JOURNEYS = {
         operator: 'Aer Lingus',
         flightNumber: 'EI 550',
         iata: 'EI550',
-        icao24: 'EIN',
-        from: 'Dublin (DUB)',
-        to: 'Lyon Saint-Exupéry (LYS) T1',
-        dep: '09:40',
-        arr: '13:10',
-        note: 'Heure locale Lyon (GMT+2) — 2h30 de vol',
+        from: 'Dublin T2 (DUB)',
+        to: 'Lyon Saint-Exupéry T1 (LYS)',
+        dep: '06:15',
+        arr: '09:30',
+        note: 'Heure locale Lyon (GMT+2) — prévoir dépôt soute + sécurité à l\'avance',
         statusLink: 'https://www.aerlingus.com/my-booking/',
-        fr24Link: 'https://www.flightradar24.com/flight/EI550',
         color: 'emerald',
       },
       {
@@ -111,12 +121,12 @@ const JOURNEYS = {
         type: 'bus',
         icon: '🚌',
         operator: 'Rhônexpress',
-        line: 'Tram-Train Express',
-        from: 'Lyon-Saint-Exupéry T1 (LYS)',
+        line: 'Navette express',
+        from: 'Aéroport Lyon-Saint-Exupéry (LYS)',
         to: 'Lyon Part-Dieu',
-        dep: 'À l\'arrivée',
-        arr: '+30 min',
-        note: '~30 min — départ toutes les 15 min',
+        dep: '10:15',
+        arr: '10:55',
+        note: '~40 min — départs fréquents depuis l\'aéroport',
         statusLink: 'https://www.rhonexpress.fr/fr_FR/page/horaires',
         color: 'amber',
       },
@@ -124,13 +134,13 @@ const JOURNEYS = {
         id: 'sncf-ret',
         type: 'train',
         icon: '🚄',
-        operator: 'SNCF',
-        line: 'TGV Inouï',
+        operator: 'SNCF — TER',
+        line: 'Train TER',
         from: 'Lyon Part-Dieu',
-        to: 'Domicile',
-        dep: '14:00',
-        arr: '--',
-        note: 'Vérifier horaire sur billet SNCF',
+        to: 'Clermont-Ferrand',
+        dep: '11:34',
+        arr: '13:59',
+        note: 'Fin du voyage ! Vérifier horaire exact sur votre billet SNCF.',
         statusLink: 'https://www.sncf-connect.com/app/trains/mes-voyages',
         color: 'indigo',
       },
@@ -208,31 +218,35 @@ function StatusBadge({ status, isToday }) {
   );
 }
 
-// ─── Flight Radar Embed ─────────────────────────────────────────────────────────
+// ─── Flight Radar Embed (ADS-B Exchange — open source, allows iframes) ─────────
 function FlightRadar({ leg }) {
-  // Center map on Irish Sea
-  const lat = 52.5, lon = -6.0;
-  const src = `https://www.flightradar24.com/simple?lat=${lat}&lon=${lon}&z=6`;
+  // Center on Irish Sea midpoint between LYS and DUB
+  const lat = 52.0, lon = -5.5;
+  // Filter by Aer Lingus callsign prefix when possible
+  const callsign = leg.iata?.replace('EI', 'EIN') || '';
+  const src = `https://globe.adsbexchange.com/?lat=${lat}&lon=${lon}&zoom=5.5${callsign ? `&showonly=${callsign}` : ''}`;
+
   return (
     <div className="rounded-xl overflow-hidden border border-slate-800">
       <div className="flex items-center justify-between px-3 py-2 bg-slate-950/60 border-b border-slate-800">
         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-          🛰️ Radar live — Flightradar24
+          🛰️ Radar live — ADS-B Exchange
         </span>
         <a
-          href={leg.fr24Link}
+          href={src}
           target="_blank"
           rel="noopener noreferrer"
           className="text-[9px] font-bold text-sky-400 hover:text-sky-300 flex items-center gap-1 transition-colors"
         >
-          <ExternalLink className="w-3 h-3" /> Suivre {leg.flightNumber}
+          <ExternalLink className="w-3 h-3" /> Plein écran {leg.flightNumber}
         </a>
       </div>
       <iframe
         src={src}
-        title="Flightradar24"
+        title={`Radar ${leg.flightNumber}`}
         className="w-full h-52 border-0"
         allow="fullscreen"
+        referrerPolicy="no-referrer"
       />
     </div>
   );

@@ -389,21 +389,21 @@ export default function App() {
       </aside>
 
       {/* ==================== HEADER (MOBILE ONLY) ==================== */}
-      <header className="md:hidden flex items-center justify-between p-4 border-b border-slate-900/60 bg-slate-950/60 backdrop-blur sticky top-0 z-35">
+      <header className="md:hidden flex items-center justify-between p-4 border-b border-slate-200/60 dark:border-slate-900/60 bg-white/80 dark:bg-slate-950/80 backdrop-blur sticky top-0 z-35">
         <div className="flex items-center gap-2.5">
           <span className="text-2xl">☘️</span>
           <div>
-            <h2 className="text-base font-bold bg-gradient-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent">Dublin 2026</h2>
-            <p className="text-[9px] text-slate-500 font-mono tracking-wider overflow-hidden text-ellipsis whitespace-nowrap max-w-[120px]">{userProfile?.email}</p>
+            <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Dublin 2026</h2>
+            <p className="text-[9px] text-slate-400 dark:text-slate-500 font-mono tracking-wider overflow-hidden text-ellipsis whitespace-nowrap max-w-[120px]">{userProfile?.email}</p>
           </div>
         </div>
         
-        <div className="flex items-center gap-2 bg-slate-900/90 border border-slate-800 rounded-full px-3 py-1 shadow-md backdrop-blur">
+        <div className="flex items-center gap-2 bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-full px-3 py-1 shadow-md backdrop-blur">
           <span className="relative flex h-1.5 w-1.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
           </span>
-          <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">Live</span>
+          <span className="text-[9px] font-bold text-emerald-500 dark:text-emerald-400 uppercase tracking-wider">Live</span>
         </div>
       </header>
 

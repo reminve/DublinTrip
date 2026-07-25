@@ -83,7 +83,7 @@ const ITINERARY_DATA = [
       { time: "03:45", desc: "Navette Dublin Express 782 depuis Usher's Quay ➔ Aéroport (T2)", type: "transport" },
       { time: "06:15 - 09:30", desc: "Vol retour Aer Lingus DUB T2 ➔ Lyon T1. Dépôt soute et passage sécurité.", type: "flight", badge: "Vol EI 550" },
       { time: "10:15 - 10:55", desc: "Navette Rhônexpress Aéroport LYS ➔ Lyon Part-Dieu", type: "transport" },
-      { time: "12:00 - 14:30", desc: "Train TER Lyon Part-Dieu ➔ Clermont-Ferrand. Fin du voyage !", type: "transport" }
+      { time: "11:34 - 13:59", desc: "Train TER Lyon Part-Dieu ➔ Clermont-Ferrand. Fin du voyage !", type: "transport" }
     ]
   }
 ];
