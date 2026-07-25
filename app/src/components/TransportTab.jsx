@@ -21,7 +21,7 @@ const JOURNEYS = {
         dep: '09:00',
         arr: '11:30',
         note: 'Vérifier horaire exact sur votre billet SNCF',
-        statusLink: 'https://www.sncf-connect.com/app/trains/mes-voyages',
+        statusLink: 'https://www.ter.sncf.com/auvergne-rhone-alpes/order-consultation',
         color: 'indigo',
       },
       {
@@ -50,7 +50,7 @@ const JOURNEYS = {
         dep: '16:45',
         arr: '18:05',
         note: 'Arrivée en heure locale Dublin (GMT+1)',
-        statusLink: 'https://www.aerlingus.com/my-booking/',
+        statusLink: 'https://www.aerlingus.com/app/user-profile/my-trips',
         color: 'emerald',
       },
       {
@@ -84,7 +84,6 @@ const JOURNEYS = {
         dep: '03:30',
         arr: '03:45',
         note: "Dépôt des clés dans la Key Drop Box — départ très matinal",
-        statusLink: 'https://apartobinaryhub.com/',
         color: 'indigo',
       },
       {
@@ -113,7 +112,7 @@ const JOURNEYS = {
         dep: '06:15',
         arr: '09:30',
         note: 'Heure locale Lyon (GMT+2) — prévoir dépôt soute + sécurité à l\'avance',
-        statusLink: 'https://www.aerlingus.com/my-booking/',
+        statusLink: 'https://www.aerlingus.com/app/user-profile/my-trips',
         color: 'emerald',
       },
       {
@@ -141,7 +140,7 @@ const JOURNEYS = {
         dep: '11:34',
         arr: '13:59',
         note: 'Fin du voyage ! Vérifier horaire exact sur votre billet SNCF.',
-        statusLink: 'https://www.sncf-connect.com/app/trains/mes-voyages',
+        statusLink: 'https://www.ter.sncf.com/auvergne-rhone-alpes/order-consultation',
         color: 'indigo',
       },
     ]
@@ -337,15 +336,17 @@ function LegCard({ leg, journeyDate, isLast }) {
             {/* Action buttons */}
             <div className="flex items-center gap-2 flex-wrap pt-1">
               {/* Status / Booking link */}
-              <a
-                href={leg.statusLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[9px] font-black uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
-              >
-                <ExternalLink className="w-3 h-3" />
-                {leg.type === 'flight' ? 'Ma réservation' : leg.type === 'train' ? 'Mes billets SNCF' : 'Horaires'}
-              </a>
+              {leg.statusLink && (
+                <a
+                  href={leg.statusLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[9px] font-black uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  {leg.type === 'flight' ? 'Ma réservation' : leg.type === 'train' ? 'Mes billets SNCF' : 'Horaires'}
+                </a>
+              )}
 
               {/* Flight radar toggle */}
               {leg.type === 'flight' && leg.fr24Link && (
@@ -365,7 +366,7 @@ function LegCard({ leg, journeyDate, isLast }) {
               {/* SNCF live status link */}
               {leg.type === 'train' && (
                 <a
-                  href="https://www.sncf-connect.com/app/trains/mes-voyages"
+                  href="https://www.sncf-connect.com/trafficInfo"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[9px] font-black uppercase tracking-wider bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
@@ -406,19 +407,19 @@ export default function TransportTab() {
     <div className="space-y-5">
 
       {/* Header */}
-      <div className="relative rounded-2xl overflow-hidden border border-slate-900/80 shadow-lg h-32">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-slate-900 to-emerald-950" />
+      <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-900/80 shadow-lg h-32">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-emerald-50 dark:from-indigo-950 dark:via-slate-900 dark:to-emerald-950" />
         <div className="absolute inset-0 flex flex-col justify-end p-5">
           <div className="flex items-end justify-between">
             <div>
-              <h2 className="text-lg font-extrabold text-slate-50 flex items-center gap-2">
-                <Plane className="w-5 h-5 text-emerald-400" /> Suivi des Transports
+              <h2 className="text-lg font-extrabold text-slate-800 dark:text-slate-50 flex items-center gap-2">
+                <Plane className="w-5 h-5 text-emerald-500 dark:text-emerald-400" /> Suivi des Transports
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">Vols, trains et navettes — Lyon ↔ Dublin</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Vols, trains et navettes — Lyon ↔ Dublin</p>
             </div>
-            <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400">
+            <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-500 dark:text-slate-400">
               {isToday
-                ? <><Wifi className="w-3 h-3 text-emerald-400 animate-pulse" /><span className="text-emerald-400">Suivi live actif</span></>
+                ? <><Wifi className="w-3 h-3 text-emerald-500 dark:text-emerald-400 animate-pulse" /><span className="text-emerald-500 dark:text-emerald-400">Suivi live actif</span></>
                 : <><WifiOff className="w-3 h-3" />Données programmées</>
               }
             </div>
