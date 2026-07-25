@@ -31,7 +31,7 @@ export default function DashboardTab({ userProfile }) {
   const [weather, setWeather] = useState({ temp: '--', desc: 'Chargement...', wind: '--', humidity: '--', emoji: '☁️', loading: false });
 
   // Expenses States
-  const [expenses, setExpenses] = useState([]);
+  const [expenses, setExpenses] = useState(DEFAULT_EXPENSES);
   const [expenseTitle, setExpenseTitle] = useState('');
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseCategory, setExpenseCategory] = useState('on_site'); // 'reserved' | 'on_site'
@@ -53,45 +53,35 @@ export default function DashboardTab({ userProfile }) {
 
   const loadExpenses = async () => {
     setExpensesLoading(true);
-    let loaded = [];
+
+    // 1. Always start with DEFAULT_EXPENSES as the baseline
+    let loaded = DEFAULT_EXPENSES;
+
+    // 2. Try to load from Supabase — only override defaults if real rows exist
     if (supabase) {
       try {
         const { data, error } = await supabase
           .from('dublin_expenses')
           .select('*')
           .order('date', { ascending: false });
-        if (!error && data) {
-          loaded = data;
-        } else {
-          // Table or fetch error: fallback to local storage
-          const local = localStorage.getItem('dublin_expenses_list');
-          if (local) loaded = JSON.parse(local);
+        if (!error && data && data.length > 0) {
+          loaded = data; // Real data found in DB, use it
+        } else if (!error && data && data.length === 0) {
+          // Table exists but is empty — seed it with defaults in background
+          const isCleared = localStorage.getItem('dublin_expenses_cleared') === 'true';
+          if (!isCleared) {
+            const seedData = DEFAULT_EXPENSES.map(e => ({
+              title: e.title, amount: e.amount,
+              category: e.category, date: e.date, note: e.note
+            }));
+            supabase.from('dublin_expenses').insert(seedData).catch(() => {});
+          } else {
+            loaded = []; // User intentionally cleared, respect that
+          }
         }
+        // If error (table not found etc.) — keep defaults
       } catch (err) {
-        const local = localStorage.getItem('dublin_expenses_list');
-        if (local) loaded = JSON.parse(local);
-      }
-    } else {
-      const local = localStorage.getItem('dublin_expenses_list');
-      if (local) loaded = JSON.parse(local);
-    }
-
-    // IF nothing was loaded (length is 0), check if the user intentionally cleared it
-    if (loaded.length === 0) {
-      const isCleared = localStorage.getItem('dublin_expenses_cleared') === 'true';
-      if (!isCleared) {
-        loaded = DEFAULT_EXPENSES;
-        // Optionally seed Supabase in background if table exists but empty
-        if (supabase) {
-          const seedData = DEFAULT_EXPENSES.map(e => ({
-            title: e.title,
-            amount: e.amount,
-            category: e.category,
-            date: e.date,
-            note: e.note
-          }));
-          supabase.from('dublin_expenses').insert(seedData).catch(() => {});
-        }
+        // Network error etc. — keep defaults
       }
     }
 
