@@ -1,14 +1,57 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { getSupabase } from '../supabase';
-import { Beer, Edit3, Trash2, Calendar, Smile, Compass, MapPin } from 'lucide-react';
+import { 
+  Beer, Edit3, Trash2, Calendar, Smile, Compass, MapPin, 
+  Heart, MessageSquare, Send, Camera, Image as ImageIcon, X, ZoomIn
+} from 'lucide-react';
+
+// Image compression helper
+const compressImage = (file, maxSize = 800, quality = 0.7) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.src = e.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxSize) {
+            height *= maxSize / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width *= maxSize / height;
+            height = maxSize;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+    };
+    reader.onerror = reject;
+  });
+};
 
 export default function JournalTab({ userProfile }) {
   const [activeSubTab, setActiveSubTab] = useState('pints'); // 'journal' | 'pints'
   
+  // Current user identifier
+  const currentUser = userProfile?.email || userProfile?.full_name || 'Voyageur';
+
   // States for Journal
   const [journalEntries, setJournalEntries] = useState([]);
   const [newEntryText, setNewEntryText] = useState('');
   const [newEntryEmoji, setNewEntryEmoji] = useState('☘️');
+  const [newEntryPhoto, setNewEntryPhoto] = useState(null);
   const [journalLoading, setJournalLoading] = useState(false);
 
   // States for Pints
@@ -17,7 +60,16 @@ export default function JournalTab({ userProfile }) {
   const [pintPrice, setPintPrice] = useState('');
   const [pintRating, setPintRating] = useState(5);
   const [pintNote, setPintNote] = useState('');
+  const [newPintPhoto, setNewPintPhoto] = useState(null);
   const [pintLoading, setPintLoading] = useState(false);
+
+  // Expanded comments state: { [postId]: boolean }
+  const [expandedComments, setExpandedComments] = useState({});
+  // Comment inputs: { [postId]: { text: string, photo: string|null } }
+  const [commentInputs, setCommentInputs] = useState({});
+
+  // Lightbox state for photo preview
+  const [lightboxImage, setLightboxImage] = useState(null);
 
   const supabase = getSupabase();
 
@@ -39,7 +91,6 @@ export default function JournalTab({ userProfile }) {
           throw new Error(error?.message || "Table not found");
         }
       } catch (err) {
-        // Fallback to localStorage
         const local = localStorage.getItem('dublin_journal_entries');
         if (local) loadedEntries = JSON.parse(local);
       }
@@ -48,7 +99,14 @@ export default function JournalTab({ userProfile }) {
       if (local) loadedEntries = JSON.parse(local);
     }
     
-    setJournalEntries(loadedEntries);
+    // Normalize likes & comments
+    const normalized = loadedEntries.map(e => ({
+      ...e,
+      likes: Array.isArray(e.likes) ? e.likes : (e.likes ? JSON.parse(e.likes) : []),
+      comments: Array.isArray(e.comments) ? e.comments : (e.comments ? JSON.parse(e.comments) : [])
+    }));
+    
+    setJournalEntries(normalized);
     setJournalLoading(false);
   };
 
@@ -70,7 +128,6 @@ export default function JournalTab({ userProfile }) {
           throw new Error(error?.message || "Table not found");
         }
       } catch (err) {
-        // Fallback to localStorage
         const local = localStorage.getItem('dublin_pints_list');
         if (local) loadedPints = JSON.parse(local);
       }
@@ -78,8 +135,15 @@ export default function JournalTab({ userProfile }) {
       const local = localStorage.getItem('dublin_pints_list');
       if (local) loadedPints = JSON.parse(local);
     }
+
+    // Normalize likes & comments
+    const normalized = loadedPints.map(p => ({
+      ...p,
+      likes: Array.isArray(p.likes) ? p.likes : (p.likes ? JSON.parse(p.likes) : []),
+      comments: Array.isArray(p.comments) ? p.comments : (p.comments ? JSON.parse(p.comments) : [])
+    }));
     
-    setPints(loadedPints);
+    setPints(normalized);
     setPintLoading(false);
   };
 
@@ -98,21 +162,24 @@ export default function JournalTab({ userProfile }) {
       created_at: new Date().toISOString(),
       content: newEntryText,
       emoji: newEntryEmoji,
+      photo: newEntryPhoto,
+      likes: [],
+      comments: [],
       user_id: userProfile?.id || null
     };
 
     const updatedEntries = [newEntry, ...journalEntries];
     setJournalEntries(updatedEntries);
     setNewEntryText('');
+    setNewEntryPhoto(null);
 
     if (supabase) {
       try {
         const { error } = await supabase.from('dublin_journal').insert([
-          { content: newEntry.content, emoji: newEntry.emoji }
+          { content: newEntry.content, emoji: newEntry.emoji, photo: newEntry.photo, likes: [], comments: [] }
         ]);
         if (error) throw error;
       } catch (err) {
-        // Safe inside localStorage if db fails
         localStorage.setItem('dublin_journal_entries', JSON.stringify(updatedEntries));
       }
     } else {
@@ -132,6 +199,9 @@ export default function JournalTab({ userProfile }) {
       price: parseFloat(pintPrice) || 0,
       rating: parseInt(pintRating),
       note: pintNote,
+      photo: newPintPhoto,
+      likes: [],
+      comments: [],
       user_id: userProfile?.id || null
     };
 
@@ -140,11 +210,12 @@ export default function JournalTab({ userProfile }) {
     setPubName('');
     setPintPrice('');
     setPintNote('');
+    setNewPintPhoto(null);
 
     if (supabase) {
       try {
         const { error } = await supabase.from('dublin_pints').insert([
-          { pub: newPint.pub, price: newPint.price, rating: newPint.rating, note: newPint.note }
+          { pub: newPint.pub, price: newPint.price, rating: newPint.rating, note: newPint.note, photo: newPint.photo, likes: [], comments: [] }
         ]);
         if (error) throw error;
       } catch (err) {
@@ -185,6 +256,135 @@ export default function JournalTab({ userProfile }) {
     } else {
       localStorage.setItem('dublin_pints_list', JSON.stringify(updated));
     }
+  };
+
+  // Like / Unlike Toggle for Journal or Pint
+  const handleToggleLike = async (id, type) => {
+    const list = type === 'journal' ? journalEntries : pints;
+    const updated = list.map(item => {
+      if (item.id === id) {
+        const likes = Array.isArray(item.likes) ? item.likes : [];
+        const hasLiked = likes.includes(currentUser);
+        const newLikes = hasLiked ? likes.filter(u => u !== currentUser) : [...likes, currentUser];
+        return { ...item, likes: newLikes };
+      }
+      return item;
+    });
+
+    if (type === 'journal') {
+      setJournalEntries(updated);
+      localStorage.setItem('dublin_journal_entries', JSON.stringify(updated));
+    } else {
+      setPints(updated);
+      localStorage.setItem('dublin_pints_list', JSON.stringify(updated));
+    }
+
+    // Attempt DB update
+    if (supabase) {
+      const target = updated.find(i => i.id === id);
+      const table = type === 'journal' ? 'dublin_journal' : 'dublin_pints';
+      try {
+        await supabase.from(table).update({ likes: target.likes }).eq('id', id);
+      } catch (err) {
+        console.warn("DB like update error:", err);
+      }
+    }
+  };
+
+  // Add Comment to Post
+  const handleAddComment = async (postId, type) => {
+    const inputState = commentInputs[postId] || {};
+    const text = inputState.text || '';
+    const photo = inputState.photo || null;
+
+    if (!text.trim() && !photo) return;
+
+    const newComment = {
+      id: Math.random().toString(36).substring(2),
+      author: userProfile?.full_name || currentUser.split('@')[0] || 'Voyageur',
+      authorEmail: currentUser,
+      content: text,
+      photo: photo,
+      created_at: new Date().toISOString()
+    };
+
+    const list = type === 'journal' ? journalEntries : pints;
+    const updated = list.map(item => {
+      if (item.id === postId) {
+        const currentComments = Array.isArray(item.comments) ? item.comments : [];
+        return { ...item, comments: [...currentComments, newComment] };
+      }
+      return item;
+    });
+
+    if (type === 'journal') {
+      setJournalEntries(updated);
+      localStorage.setItem('dublin_journal_entries', JSON.stringify(updated));
+    } else {
+      setPints(updated);
+      localStorage.setItem('dublin_pints_list', JSON.stringify(updated));
+    }
+
+    // Reset comment input state for this post
+    setCommentInputs(prev => ({ ...prev, [postId]: { text: '', photo: null } }));
+
+    // Attempt DB update
+    if (supabase) {
+      const target = updated.find(i => i.id === postId);
+      const table = type === 'journal' ? 'dublin_journal' : 'dublin_pints';
+      try {
+        await supabase.from(table).update({ comments: target.comments }).eq('id', postId);
+      } catch (err) {
+        console.warn("DB comment update error:", err);
+      }
+    }
+  };
+
+  // Delete Comment from Post
+  const handleDeleteComment = async (postId, commentId, type) => {
+    const list = type === 'journal' ? journalEntries : pints;
+    const updated = list.map(item => {
+      if (item.id === postId) {
+        const filtered = (item.comments || []).filter(c => c.id !== commentId);
+        return { ...item, comments: filtered };
+      }
+      return item;
+    });
+
+    if (type === 'journal') {
+      setJournalEntries(updated);
+      localStorage.setItem('dublin_journal_entries', JSON.stringify(updated));
+    } else {
+      setPints(updated);
+      localStorage.setItem('dublin_pints_list', JSON.stringify(updated));
+    }
+
+    if (supabase) {
+      const target = updated.find(i => i.id === postId);
+      const table = type === 'journal' ? 'dublin_journal' : 'dublin_pints';
+      try {
+        await supabase.from(table).update({ comments: target.comments }).eq('id', postId);
+      } catch (err) {
+        console.warn("DB comment delete error:", err);
+      }
+    }
+  };
+
+  // File upload handler helper
+  const handlePhotoSelect = async (e, setPhotoState) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const base64 = await compressImage(file, 900, 0.75);
+      setPhotoState(base64);
+    } catch (err) {
+      alert("Erreur lors de la compression de la photo.");
+    }
+  };
+
+  // Toggle comments expand
+  const toggleComments = (id) => {
+    setExpandedComments(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
   return (
@@ -254,6 +454,33 @@ export default function JournalTab({ userProfile }) {
                 />
               </div>
 
+              {/* Photo Upload Row */}
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-2 px-3 py-1.5 bg-slate-950 border border-slate-900 rounded-xl text-[10px] font-bold text-slate-300 hover:border-emerald-500/40 cursor-pointer transition-colors">
+                  <Camera className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>{newEntryPhoto ? 'Changer la photo' : 'Joindre une photo'}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handlePhotoSelect(e, setNewEntryPhoto)}
+                    className="hidden"
+                  />
+                </label>
+
+                {newEntryPhoto && (
+                  <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-emerald-500/50 group">
+                    <img src={newEntryPhoto} alt="Aperçu" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setNewEntryPhoto(null)}
+                      className="absolute inset-0 bg-black/60 flex items-center justify-center text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <button 
                 type="submit"
                 className="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-2.5 px-4 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-emerald-500/10"
@@ -274,37 +501,178 @@ export default function JournalTab({ userProfile }) {
               </div>
             ) : (
               <div className="relative border-l border-slate-800/80 ml-6 space-y-6">
-                {journalEntries.map((entry) => (
-                  <div key={entry.id} className="relative pl-6">
-                    {/* Floating Bullet */}
-                    <span className="absolute -left-4.5 top-0.5 w-9 h-9 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-base shadow-md">
-                      {entry.emoji}
-                    </span>
+                {journalEntries.map((entry) => {
+                  const likes = Array.isArray(entry.likes) ? entry.likes : [];
+                  const comments = Array.isArray(entry.comments) ? entry.comments : [];
+                  const isLiked = likes.includes(currentUser);
+                  const showComments = !!expandedComments[entry.id];
+                  const cInput = commentInputs[entry.id] || { text: '', photo: null };
 
-                    {/* Entry Bubble */}
-                    <div className="card-premium p-4 space-y-2 relative">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-bold text-slate-500 flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(entry.created_at).toLocaleDateString('fr-FR', {
-                            day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
-                          })}
-                        </span>
+                  return (
+                    <div key={entry.id} className="relative pl-6">
+                      {/* Floating Bullet */}
+                      <span className="absolute -left-4.5 top-0.5 w-9 h-9 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-base shadow-md">
+                        {entry.emoji}
+                      </span>
+
+                      {/* Entry Bubble */}
+                      <div className="card-premium p-4 space-y-3 relative">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] font-bold text-slate-500 flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(entry.created_at).toLocaleDateString('fr-FR', {
+                              day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                            })}
+                          </span>
+                          
+                          {userProfile?.is_admin && (
+                            <button 
+                              onClick={() => handleDeleteEntry(entry.id)}
+                              className="text-slate-600 hover:text-rose-400 p-1 rounded transition-colors cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
                         
-                        {userProfile?.is_admin && (
-                          <button 
-                            onClick={() => handleDeleteEntry(entry.id)}
-                            className="text-slate-600 hover:text-rose-400 p-1 rounded transition-colors cursor-pointer"
+                        <p className="text-xs text-slate-200 leading-relaxed">{entry.content}</p>
+
+                        {/* Entry Photo if available */}
+                        {entry.photo && (
+                          <div 
+                            onClick={() => setLightboxImage(entry.photo)}
+                            className="relative rounded-xl overflow-hidden border border-slate-800 max-h-60 cursor-pointer group"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <img src={entry.photo} alt="Photo" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <ZoomIn className="w-6 h-6 text-white drop-shadow-md" />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Actions Row: Likes & Comments */}
+                        <div className="flex items-center gap-4 pt-2 border-t border-slate-900/60 text-[10px]">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleLike(entry.id, 'journal')}
+                            className={`flex items-center gap-1.5 font-bold transition-all cursor-pointer ${
+                              isLiked ? 'text-rose-400 scale-105' : 'text-slate-400 hover:text-rose-400'
+                            }`}
+                          >
+                            <Heart className={`w-4 h-4 ${isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
+                            <span>{likes.length}</span>
                           </button>
+
+                          <button
+                            type="button"
+                            onClick={() => toggleComments(entry.id)}
+                            className="flex items-center gap-1.5 font-bold text-slate-400 hover:text-emerald-400 transition-colors cursor-pointer"
+                          >
+                            <MessageSquare className="w-4 h-4" />
+                            <span>{comments.length} commentaire{comments.length > 1 ? 's' : ''}</span>
+                          </button>
+                        </div>
+
+                        {/* Comments Section */}
+                        {showComments && (
+                          <div className="space-y-3 pt-3 border-t border-slate-900/80">
+                            {/* Comments List */}
+                            <div className="space-y-2 max-h-60 overflow-y-auto">
+                              {comments.length === 0 ? (
+                                <p className="text-[9px] text-slate-500 italic">Aucun commentaire pour l'instant. Soyez le premier !</p>
+                              ) : (
+                                comments.map(comment => (
+                                  <div key={comment.id} className="bg-slate-950/60 border border-slate-900 rounded-xl p-2.5 space-y-1">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[9px] font-bold text-emerald-400">{comment.author}</span>
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-[8px] text-slate-500">
+                                          {new Date(comment.created_at).toLocaleDateString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                        {(userProfile?.is_admin || comment.authorEmail === currentUser) && (
+                                          <button
+                                            type="button"
+                                            onClick={() => handleDeleteComment(entry.id, comment.id, 'journal')}
+                                            className="text-slate-600 hover:text-rose-400 cursor-pointer"
+                                          >
+                                            <X className="w-3 h-3" />
+                                          </button>
+                                        )}
+                                      </div>
+                                    </div>
+                                    {comment.content && <p className="text-[10px] text-slate-300 leading-normal">{comment.content}</p>}
+                                    {comment.photo && (
+                                      <div onClick={() => setLightboxImage(comment.photo)} className="w-20 h-20 rounded-lg overflow-hidden border border-slate-800 cursor-pointer mt-1">
+                                        <img src={comment.photo} alt="Photo commentaire" className="w-full h-full object-cover" />
+                                      </div>
+                                    )}
+                                  </div>
+                                ))
+                              )}
+                            </div>
+
+                            {/* Add Comment Input */}
+                            <div className="flex items-center gap-2 pt-1">
+                              <input
+                                type="text"
+                                placeholder="Ajouter un commentaire..."
+                                value={cInput.text}
+                                onChange={(e) => setCommentInputs(prev => ({
+                                  ...prev,
+                                  [entry.id]: { ...prev[entry.id], text: e.target.value }
+                                }))}
+                                onKeyDown={(e) => { if (e.key === 'Enter') handleAddComment(entry.id, 'journal'); }}
+                                className="flex-grow bg-slate-950 border border-slate-900 rounded-xl px-3 py-1.5 text-[10px] text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500/50"
+                              />
+
+                              {/* Comment Photo Upload */}
+                              <label className="p-1.5 bg-slate-950 border border-slate-900 rounded-xl text-slate-400 hover:text-emerald-400 cursor-pointer transition-colors flex-shrink-0" title="Ajouter une photo au commentaire">
+                                <Camera className="w-3.5 h-3.5" />
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => handlePhotoSelect(e, (b64) => setCommentInputs(prev => ({
+                                    ...prev,
+                                    [entry.id]: { ...prev[entry.id], photo: b64 }
+                                  })))}
+                                  className="hidden"
+                                />
+                              </label>
+
+                              <button
+                                type="button"
+                                onClick={() => handleAddComment(entry.id, 'journal')}
+                                className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 rounded-xl font-bold transition-colors cursor-pointer flex-shrink-0"
+                              >
+                                <Send className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+
+                            {/* Comment Attached Photo Thumbnail */}
+                            {cInput.photo && (
+                              <div className="flex items-center gap-2">
+                                <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-emerald-500/40">
+                                  <img src={cInput.photo} alt="Commentaire photo" className="w-full h-full object-cover" />
+                                  <button
+                                    type="button"
+                                    onClick={() => setCommentInputs(prev => ({
+                                      ...prev,
+                                      [entry.id]: { ...prev[entry.id], photo: null }
+                                    }))}
+                                    className="absolute inset-0 bg-black/60 flex items-center justify-center text-rose-400"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </div>
+                                <span className="text-[8px] text-emerald-400 font-bold">Photo jointe au commentaire</span>
+                              </div>
+                            )}
+                          </div>
                         )}
                       </div>
-                      
-                      <p className="text-xs text-slate-200 leading-relaxed">{entry.content}</p>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -395,6 +763,33 @@ export default function JournalTab({ userProfile }) {
                 />
               </div>
 
+              {/* Photo Upload Row for Pint */}
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-2 px-3 py-1.5 bg-slate-950 border border-slate-900 rounded-xl text-[10px] font-bold text-slate-300 hover:border-amber-500/40 cursor-pointer transition-colors">
+                  <Camera className="w-3.5 h-3.5 text-amber-500" />
+                  <span>{newPintPhoto ? 'Changer la photo' : 'Photo de la pinte / du pub'}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handlePhotoSelect(e, setNewPintPhoto)}
+                    className="hidden"
+                  />
+                </label>
+
+                {newPintPhoto && (
+                  <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-amber-500/50 group">
+                    <img src={newPintPhoto} alt="Aperçu pinte" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setNewPintPhoto(null)}
+                      className="absolute inset-0 bg-black/60 flex items-center justify-center text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <button 
                 type="submit"
                 className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-2.5 px-4 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-amber-500/10"
@@ -415,53 +810,211 @@ export default function JournalTab({ userProfile }) {
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-3.5">
-                {pints.map((pint) => (
-                  <div key={pint.id} className="card-premium p-4 flex gap-4 items-center justify-between">
-                    
-                    {/* Left Icon Panel */}
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center flex-shrink-0 text-lg font-black">
-                      🍺
-                    </div>
+                {pints.map((pint) => {
+                  const likes = Array.isArray(pint.likes) ? pint.likes : [];
+                  const comments = Array.isArray(pint.comments) ? pint.comments : [];
+                  const isLiked = likes.includes(currentUser);
+                  const showComments = !!expandedComments[pint.id];
+                  const cInput = commentInputs[pint.id] || { text: '', photo: null };
 
-                    {/* Content Panel */}
-                    <div className="flex-grow min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-slate-200 text-xs truncate">{pint.pub}</h4>
-                        <span className="text-[10px] text-amber-400 font-bold">
-                          {'☘️'.repeat(pint.rating)}
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-slate-400 mt-0.5 truncate">{pint.note || "Aucune note rédigée"}</p>
-                      
-                      {/* Price and Date */}
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[8px] font-mono bg-slate-950 px-1.5 py-0.5 rounded text-slate-500 flex items-center gap-1">
-                          <MapPin className="w-2.5 h-2.5" />
-                          {new Date(pint.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-                        </span>
-                        {pint.price > 0 && (
-                          <span className="text-[9px] font-bold text-emerald-400">{pint.price.toFixed(2)} €</span>
+                  return (
+                    <div key={pint.id} className="card-premium p-4 space-y-3">
+                      <div className="flex gap-4 items-start justify-between">
+                        
+                        {/* Left Icon Panel / Photo */}
+                        {pint.photo ? (
+                          <div 
+                            onClick={() => setLightboxImage(pint.photo)}
+                            className="w-12 h-12 rounded-xl overflow-hidden border border-amber-500/30 flex-shrink-0 cursor-pointer group"
+                          >
+                            <img src={pint.photo} alt={pint.pub} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                          </div>
+                        ) : (
+                          <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center flex-shrink-0 text-lg font-black">
+                            🍺
+                          </div>
+                        )}
+
+                        {/* Content Panel */}
+                        <div className="flex-grow min-w-0">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-bold text-slate-200 text-xs truncate">{pint.pub}</h4>
+                            <span className="text-[10px] text-amber-400 font-bold">
+                              {'☘️'.repeat(pint.rating)}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-slate-400 mt-0.5 leading-normal">{pint.note || "Aucune note rédigée"}</p>
+                          
+                          {/* Price and Date */}
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-[8px] font-mono bg-slate-950 px-1.5 py-0.5 rounded text-slate-500 flex items-center gap-1">
+                              <MapPin className="w-2.5 h-2.5" />
+                              {new Date(pint.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                            </span>
+                            {pint.price > 0 && (
+                              <span className="text-[9px] font-bold text-emerald-400">{pint.price.toFixed(2)} €</span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Delete button */}
+                        {userProfile?.is_admin && (
+                          <button 
+                            onClick={() => handleDeletePint(pint.id)}
+                            className="text-slate-700 hover:text-rose-400 p-1.5 rounded transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         )}
                       </div>
+
+                      {/* Actions Row: Likes & Comments */}
+                      <div className="flex items-center gap-4 pt-2 border-t border-slate-900/60 text-[10px]">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleLike(pint.id, 'pints')}
+                          className={`flex items-center gap-1.5 font-bold transition-all cursor-pointer ${
+                            isLiked ? 'text-rose-400 scale-105' : 'text-slate-400 hover:text-rose-400'
+                          }`}
+                        >
+                          <Heart className={`w-4 h-4 ${isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
+                          <span>{likes.length}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => toggleComments(pint.id)}
+                          className="flex items-center gap-1.5 font-bold text-slate-400 hover:text-emerald-400 transition-colors cursor-pointer"
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                          <span>{comments.length} commentaire{comments.length > 1 ? 's' : ''}</span>
+                        </button>
+                      </div>
+
+                      {/* Comments Section */}
+                      {showComments && (
+                        <div className="space-y-3 pt-3 border-t border-slate-900/80">
+                          {/* Comments List */}
+                          <div className="space-y-2 max-h-60 overflow-y-auto">
+                            {comments.length === 0 ? (
+                              <p className="text-[9px] text-slate-500 italic">Aucun commentaire pour l'instant. Soyez le premier !</p>
+                            ) : (
+                              comments.map(comment => (
+                                <div key={comment.id} className="bg-slate-950/60 border border-slate-900 rounded-xl p-2.5 space-y-1">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-[9px] font-bold text-amber-400">{comment.author}</span>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-[8px] text-slate-500">
+                                        {new Date(comment.created_at).toLocaleDateString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                      </span>
+                                      {(userProfile?.is_admin || comment.authorEmail === currentUser) && (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleDeleteComment(pint.id, comment.id, 'pints')}
+                                          className="text-slate-600 hover:text-rose-400 cursor-pointer"
+                                        >
+                                          <X className="w-3 h-3" />
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                  {comment.content && <p className="text-[10px] text-slate-300 leading-normal">{comment.content}</p>}
+                                  {comment.photo && (
+                                    <div onClick={() => setLightboxImage(comment.photo)} className="w-20 h-20 rounded-lg overflow-hidden border border-slate-800 cursor-pointer mt-1">
+                                      <img src={comment.photo} alt="Photo commentaire" className="w-full h-full object-cover" />
+                                    </div>
+                                  )}
+                                </div>
+                              ))
+                            )}
+                          </div>
+
+                          {/* Add Comment Input */}
+                          <div className="flex items-center gap-2 pt-1">
+                            <input
+                              type="text"
+                              placeholder="Ajouter un commentaire sur ce pub..."
+                              value={cInput.text}
+                              onChange={(e) => setCommentInputs(prev => ({
+                                ...prev,
+                                [pint.id]: { ...prev[pint.id], text: e.target.value }
+                              }))}
+                              onKeyDown={(e) => { if (e.key === 'Enter') handleAddComment(pint.id, 'pints'); }}
+                              className="flex-grow bg-slate-950 border border-slate-900 rounded-xl px-3 py-1.5 text-[10px] text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500/50"
+                            />
+
+                            {/* Comment Photo Upload */}
+                            <label className="p-1.5 bg-slate-950 border border-slate-900 rounded-xl text-slate-400 hover:text-amber-400 cursor-pointer transition-colors flex-shrink-0" title="Ajouter une photo au commentaire">
+                              <Camera className="w-3.5 h-3.5" />
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handlePhotoSelect(e, (b64) => setCommentInputs(prev => ({
+                                  ...prev,
+                                  [pint.id]: { ...prev[pint.id], photo: b64 }
+                                })))}
+                                className="hidden"
+                              />
+                            </label>
+
+                            <button
+                              type="button"
+                              onClick={() => handleAddComment(pint.id, 'pints')}
+                              className="p-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl font-bold transition-colors cursor-pointer flex-shrink-0"
+                            >
+                              <Send className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+
+                          {/* Comment Attached Photo Thumbnail */}
+                          {cInput.photo && (
+                            <div className="flex items-center gap-2">
+                              <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-amber-500/40">
+                                <img src={cInput.photo} alt="Commentaire photo" className="w-full h-full object-cover" />
+                                <button
+                                  type="button"
+                                  onClick={() => setCommentInputs(prev => ({
+                                    ...prev,
+                                    [pint.id]: { ...prev[pint.id], photo: null }
+                                  }))}
+                                  className="absolute inset-0 bg-black/60 flex items-center justify-center text-rose-400"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                              <span className="text-[8px] text-amber-400 font-bold">Photo jointe au commentaire</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-
-                    {/* Delete button */}
-                    {userProfile?.is_admin && (
-                      <button 
-                        onClick={() => handleDeletePint(pint.id)}
-                        className="text-slate-700 hover:text-rose-400 p-1.5 rounded transition-colors cursor-pointer"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
 
         </div>
+      )}
+
+      {/* Lightbox Modal (Portal) */}
+      {lightboxImage && createPortal(
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer"
+          onClick={() => setLightboxImage(null)}
+        >
+          <div className="relative max-w-3xl max-h-[85vh]">
+            <img src={lightboxImage} alt="Agrandissement" className="w-full h-full object-contain rounded-2xl border border-slate-800 shadow-2xl" />
+            <button
+              type="button"
+              onClick={() => setLightboxImage(null)}
+              className="absolute -top-4 -right-4 w-9 h-9 rounded-full bg-slate-900 border border-slate-700 text-white flex items-center justify-center hover:bg-rose-500 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>,
+        document.body
       )}
 
     </div>
