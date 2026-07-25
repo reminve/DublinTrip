@@ -293,18 +293,13 @@ export default function JournalTab({ userProfile }) {
 
   // Add Comment to Post
   const handleAddComment = async (postId, type) => {
-    const inputState = commentInputs[postId] || {};
-    const text = inputState.text || '';
-    const photo = inputState.photo || null;
-
-    if (!text.trim() && !photo) return;
+    if (!text.trim()) return;
 
     const newComment = {
       id: Math.random().toString(36).substring(2),
       author: userProfile?.full_name || currentUser.split('@')[0] || 'Voyageur',
       authorEmail: currentUser,
       content: text,
-      photo: photo,
       created_at: new Date().toISOString()
     };
 
@@ -575,16 +570,16 @@ export default function JournalTab({ userProfile }) {
 
                         {/* Comments Section */}
                         {showComments && (
-                          <div className="space-y-3 pt-3 border-t border-slate-900/80">
+                          <div className="space-y-3 pt-3 border-t border-slate-200 dark:border-slate-900/80">
                             {/* Comments List */}
                             <div className="space-y-2 max-h-60 overflow-y-auto">
                               {comments.length === 0 ? (
                                 <p className="text-[9px] text-slate-500 italic">Aucun commentaire pour l'instant. Soyez le premier !</p>
                               ) : (
                                 comments.map(comment => (
-                                  <div key={comment.id} className="bg-slate-950/60 border border-slate-900 rounded-xl p-2.5 space-y-1">
+                                  <div key={comment.id} className="bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-900 rounded-xl p-2.5 space-y-1">
                                     <div className="flex items-center justify-between">
-                                      <span className="text-[9px] font-bold text-emerald-400">{comment.author}</span>
+                                      <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400">{comment.author}</span>
                                       <div className="flex items-center gap-2">
                                         <span className="text-[8px] text-slate-500">
                                           {new Date(comment.created_at).toLocaleDateString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
@@ -593,19 +588,14 @@ export default function JournalTab({ userProfile }) {
                                           <button
                                             type="button"
                                             onClick={() => handleDeleteComment(entry.id, comment.id, 'journal')}
-                                            className="text-slate-600 hover:text-rose-400 cursor-pointer"
+                                            className="text-slate-400 hover:text-rose-400 cursor-pointer"
                                           >
                                             <X className="w-3 h-3" />
                                           </button>
                                         )}
                                       </div>
                                     </div>
-                                    {comment.content && <p className="text-[10px] text-slate-300 leading-normal">{comment.content}</p>}
-                                    {comment.photo && (
-                                      <div onClick={() => setLightboxImage(comment.photo)} className="w-20 h-20 rounded-lg overflow-hidden border border-slate-800 cursor-pointer mt-1">
-                                        <img src={comment.photo} alt="Photo commentaire" className="w-full h-full object-cover" />
-                                      </div>
-                                    )}
+                                    {comment.content && <p className="text-[10px] text-slate-800 dark:text-slate-200 font-medium leading-normal">{comment.content}</p>}
                                   </div>
                                 ))
                               )}
@@ -622,22 +612,8 @@ export default function JournalTab({ userProfile }) {
                                   [entry.id]: { ...prev[entry.id], text: e.target.value }
                                 }))}
                                 onKeyDown={(e) => { if (e.key === 'Enter') handleAddComment(entry.id, 'journal'); }}
-                                className="flex-grow bg-slate-950 border border-slate-900 rounded-xl px-3 py-1.5 text-[10px] text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500/50"
+                                className="flex-grow bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl px-3 py-1.5 text-[10px] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-emerald-500/50 font-medium"
                               />
-
-                              {/* Comment Photo Upload */}
-                              <label className="p-1.5 bg-slate-950 border border-slate-900 rounded-xl text-slate-400 hover:text-emerald-400 cursor-pointer transition-colors flex-shrink-0" title="Ajouter une photo au commentaire">
-                                <Camera className="w-3.5 h-3.5" />
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={(e) => handlePhotoSelect(e, (b64) => setCommentInputs(prev => ({
-                                    ...prev,
-                                    [entry.id]: { ...prev[entry.id], photo: b64 }
-                                  })))}
-                                  className="hidden"
-                                />
-                              </label>
 
                               <button
                                 type="button"
@@ -647,26 +623,6 @@ export default function JournalTab({ userProfile }) {
                                 <Send className="w-3.5 h-3.5" />
                               </button>
                             </div>
-
-                            {/* Comment Attached Photo Thumbnail */}
-                            {cInput.photo && (
-                              <div className="flex items-center gap-2">
-                                <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-emerald-500/40">
-                                  <img src={cInput.photo} alt="Commentaire photo" className="w-full h-full object-cover" />
-                                  <button
-                                    type="button"
-                                    onClick={() => setCommentInputs(prev => ({
-                                      ...prev,
-                                      [entry.id]: { ...prev[entry.id], photo: null }
-                                    }))}
-                                    className="absolute inset-0 bg-black/60 flex items-center justify-center text-rose-400"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </button>
-                                </div>
-                                <span className="text-[8px] text-emerald-400 font-bold">Photo jointe au commentaire</span>
-                              </div>
-                            )}
                           </div>
                         )}
                       </div>
@@ -893,16 +849,16 @@ export default function JournalTab({ userProfile }) {
 
                       {/* Comments Section */}
                       {showComments && (
-                        <div className="space-y-3 pt-3 border-t border-slate-900/80">
+                        <div className="space-y-3 pt-3 border-t border-slate-200 dark:border-slate-900/80">
                           {/* Comments List */}
                           <div className="space-y-2 max-h-60 overflow-y-auto">
                             {comments.length === 0 ? (
                               <p className="text-[9px] text-slate-500 italic">Aucun commentaire pour l'instant. Soyez le premier !</p>
                             ) : (
                               comments.map(comment => (
-                                <div key={comment.id} className="bg-slate-950/60 border border-slate-900 rounded-xl p-2.5 space-y-1">
+                                <div key={comment.id} className="bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-900 rounded-xl p-2.5 space-y-1">
                                   <div className="flex items-center justify-between">
-                                    <span className="text-[9px] font-bold text-amber-400">{comment.author}</span>
+                                    <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400">{comment.author}</span>
                                     <div className="flex items-center gap-2">
                                       <span className="text-[8px] text-slate-500">
                                         {new Date(comment.created_at).toLocaleDateString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
@@ -911,82 +867,43 @@ export default function JournalTab({ userProfile }) {
                                         <button
                                           type="button"
                                           onClick={() => handleDeleteComment(pint.id, comment.id, 'pints')}
-                                          className="text-slate-600 hover:text-rose-400 cursor-pointer"
+                                          className="text-slate-400 hover:text-rose-400 cursor-pointer"
                                         >
                                           <X className="w-3 h-3" />
                                         </button>
                                       )}
                                     </div>
                                   </div>
-                                  {comment.content && <p className="text-[10px] text-slate-300 leading-normal">{comment.content}</p>}
-                                  {comment.photo && (
-                                    <div onClick={() => setLightboxImage(comment.photo)} className="w-20 h-20 rounded-lg overflow-hidden border border-slate-800 cursor-pointer mt-1">
-                                      <img src={comment.photo} alt="Photo commentaire" className="w-full h-full object-cover" />
-                                    </div>
-                                  )}
+                                  {comment.content && <p className="text-[10px] text-slate-800 dark:text-slate-200 font-medium leading-normal">{comment.content}</p>}
                                 </div>
                               ))
                             )}
                           </div>
 
-                          {/* Add Comment Input */}
-                          <div className="flex items-center gap-2 pt-1">
-                            <input
-                              type="text"
-                              placeholder="Ajouter un commentaire sur ce pub..."
-                              value={cInput.text}
-                              onChange={(e) => setCommentInputs(prev => ({
-                                ...prev,
-                                [pint.id]: { ...prev[pint.id], text: e.target.value }
-                              }))}
-                              onKeyDown={(e) => { if (e.key === 'Enter') handleAddComment(pint.id, 'pints'); }}
-                              className="flex-grow bg-slate-950 border border-slate-900 rounded-xl px-3 py-1.5 text-[10px] text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500/50"
-                            />
-
-                            {/* Comment Photo Upload */}
-                            <label className="p-1.5 bg-slate-950 border border-slate-900 rounded-xl text-slate-400 hover:text-amber-400 cursor-pointer transition-colors flex-shrink-0" title="Ajouter une photo au commentaire">
-                              <Camera className="w-3.5 h-3.5" />
+                            {/* Add Comment Input */}
+                            <div className="flex items-center gap-2 pt-1">
                               <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => handlePhotoSelect(e, (b64) => setCommentInputs(prev => ({
+                                type="text"
+                                placeholder="Ajouter un commentaire sur ce pub..."
+                                value={cInput.text}
+                                onChange={(e) => setCommentInputs(prev => ({
                                   ...prev,
-                                  [pint.id]: { ...prev[pint.id], photo: b64 }
-                                })))}
-                                className="hidden"
+                                  [pint.id]: { ...prev[pint.id], text: e.target.value }
+                                }))}
+                                onKeyDown={(e) => { if (e.key === 'Enter') handleAddComment(pint.id, 'pints'); }}
+                                className="flex-grow bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl px-3 py-1.5 text-[10px] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-amber-500/50 font-medium"
                               />
-                            </label>
 
-                            <button
-                              type="button"
-                              onClick={() => handleAddComment(pint.id, 'pints')}
-                              className="p-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl font-bold transition-colors cursor-pointer flex-shrink-0"
-                            >
-                              <Send className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-
-                          {/* Comment Attached Photo Thumbnail */}
-                          {cInput.photo && (
-                            <div className="flex items-center gap-2">
-                              <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-amber-500/40">
-                                <img src={cInput.photo} alt="Commentaire photo" className="w-full h-full object-cover" />
-                                <button
-                                  type="button"
-                                  onClick={() => setCommentInputs(prev => ({
-                                    ...prev,
-                                    [pint.id]: { ...prev[pint.id], photo: null }
-                                  }))}
-                                  className="absolute inset-0 bg-black/60 flex items-center justify-center text-rose-400"
-                                >
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </div>
-                              <span className="text-[8px] text-amber-400 font-bold">Photo jointe au commentaire</span>
+                              <button
+                                type="button"
+                                onClick={() => handleAddComment(pint.id, 'pints')}
+                                className="p-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl font-bold transition-colors cursor-pointer flex-shrink-0"
+                              >
+                                <Send className="w-3.5 h-3.5" />
+                              </button>
                             </div>
-                          )}
-                        </div>
-                      )}
+                          </div>
+                        )}
                     </div>
                   );
                 })}
