@@ -349,7 +349,7 @@ function LegCard({ leg, journeyDate, isLast }) {
               )}
 
               {/* Flight radar toggle */}
-              {leg.type === 'flight' && leg.fr24Link && (
+              {leg.type === 'flight' && (
                 <button
                   type="button"
                   onClick={() => setShowRadar(v => !v)}
