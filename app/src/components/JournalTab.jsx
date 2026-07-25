@@ -3,7 +3,7 @@ import { getSupabase } from '../supabase';
 import { Beer, Edit3, Trash2, Calendar, Smile, Compass, MapPin } from 'lucide-react';
 
 export default function JournalTab({ userProfile }) {
-  const [activeSubTab, setActiveSubTab] = useState('journal'); // 'journal' | 'pints'
+  const [activeSubTab, setActiveSubTab] = useState('pints'); // 'journal' | 'pints'
   
   // States for Journal
   const [journalEntries, setJournalEntries] = useState([]);
@@ -193,18 +193,18 @@ export default function JournalTab({ userProfile }) {
       {/* Sub Tabs */}
       <div className="flex bg-slate-900/40 p-1 rounded-xl border border-slate-900/60 max-w-sm">
         <button
-          onClick={() => setActiveSubTab('journal')}
-          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${activeSubTab === 'journal' ? 'bg-gradient-to-tr from-emerald-500 to-teal-500 text-slate-950 font-black shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
-        >
-          <Edit3 className="w-3.5 h-3.5" />
-          <span>Carnet de Bord</span>
-        </button>
-        <button
           onClick={() => setActiveSubTab('pints')}
           className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${activeSubTab === 'pints' ? 'bg-gradient-to-tr from-emerald-500 to-teal-500 text-slate-950 font-black shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
         >
           <Beer className="w-3.5 h-3.5" />
           <span>Guinness Tracker</span>
+        </button>
+        <button
+          onClick={() => setActiveSubTab('journal')}
+          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${activeSubTab === 'journal' ? 'bg-gradient-to-tr from-emerald-500 to-teal-500 text-slate-950 font-black shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+        >
+          <Edit3 className="w-3.5 h-3.5" />
+          <span>Carnet de Bord</span>
         </button>
       </div>
 
@@ -220,10 +220,10 @@ export default function JournalTab({ userProfile }) {
               className="w-full h-full object-cover brightness-[0.7]" 
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent flex flex-col justify-end p-4">
-              <h3 className="text-base font-extrabold text-slate-50 flex items-center gap-2">
+              <h3 className="text-overlay-white text-base font-extrabold text-slate-50 flex items-center gap-2">
                 <Compass className="w-4 h-4 text-emerald-400" /> Le Journal de Route
               </h3>
-              <p className="text-[10px] text-slate-400">Micro-anecdotes partagées en direct d'Irlande</p>
+              <p className="text-overlay-muted text-[10px] text-slate-400">Micro-anecdotes partagées en direct d'Irlande</p>
             </div>
           </div>
 
@@ -324,10 +324,10 @@ export default function JournalTab({ userProfile }) {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent flex items-center justify-between p-5">
               <div>
-                <h3 className="text-base font-extrabold text-slate-50 flex items-center gap-2">
+                <h3 className="text-overlay-white text-base font-extrabold text-slate-50 flex items-center gap-2">
                   <Beer className="w-4.5 h-4.5 text-amber-500 animate-bounce" /> Guinness & Pub Counter
                 </h3>
-                <p className="text-[10px] text-slate-400">Le tableau de chasse des pubs dublinois</p>
+                <p className="text-overlay-muted text-[10px] text-slate-400">Le tableau de chasse des pubs dublinois</p>
               </div>
               <div className="bg-amber-500 text-slate-950 rounded-2xl w-14 h-14 flex flex-col items-center justify-center shadow-lg border border-amber-400">
                 <span className="text-xl font-black leading-none">{pints.length}</span>

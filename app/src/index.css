@@ -273,3 +273,11 @@ body.light input::placeholder {
 body.light .leaflet-container {
   background: #e5e7eb !important;
 }
+
+/* Custom bright text rules for elements layered on top of dark images */
+body.light .text-overlay-white {
+  color: #ffffff !important;
+}
+body.light .text-overlay-muted {
+  color: #cbd5e1 !important;
+}

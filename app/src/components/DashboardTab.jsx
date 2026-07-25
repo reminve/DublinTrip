@@ -152,14 +152,13 @@ export default function DashboardTab() {
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent flex flex-col justify-end p-4">
-            <h2 className="text-lg font-black text-white tracking-tight drop-shadow-md">Mon Dublin Express ☘️</h2>
-            <p className="text-xs text-emerald-300 font-bold drop-shadow-sm">Mon Voyage • 6-12 Août 2026</p>
+            <h2 className="text-overlay-white text-lg font-black text-white tracking-tight drop-shadow-md">Mon Dublin Express ☘️</h2>
+            <p className="text-overlay-muted text-xs text-emerald-300 font-bold drop-shadow-sm">Mon Voyage • 6-12 Août 2026</p>
           </div>
         </div>
 
         {/* Countdown Card */}
         <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-900/60 rounded-2xl p-5 shadow-xl relative overflow-hidden transition-all duration-300 hover:border-slate-800 hover:-translate-y-0.5">
-          <div className="absolute -right-6 -bottom-6 text-slate-800/10 text-8xl font-black select-none pointer-events-none">DUB</div>
           
           {tripState === 'before' && (
             <>

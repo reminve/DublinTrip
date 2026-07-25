@@ -280,10 +280,10 @@ export default function ToolsTab({ userProfile }) {
               className="w-full h-full object-cover brightness-[0.7]" 
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent flex flex-col justify-end p-4">
-              <h3 className="text-base font-extrabold text-slate-50 flex items-center gap-2">
+              <h3 className="text-overlay-white text-base font-extrabold text-slate-50 flex items-center gap-2">
                 <Globe className="w-4.5 h-4.5 text-emerald-400" /> Irish Slang Guide
               </h3>
-              <p className="text-[10px] text-slate-400">Parlez comme un vrai Dublinois dans les pubs</p>
+              <p className="text-overlay-muted text-[10px] text-slate-400">Parlez comme un vrai Dublinois dans les pubs</p>
             </div>
           </div>
 
