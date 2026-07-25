@@ -71,15 +71,19 @@ export default function DashboardTab({ userProfile }) {
                 date: e.date,
                 note: e.note
               }));
-              await supabase.from('dublin_expenses').insert(seedData);
-              localStorage.setItem('dublin_expenses_seeded', 'true');
-              
-              // Refetch seeded data
-              const { data: refetched } = await supabase
-                .from('dublin_expenses')
-                .select('*')
-                .order('date', { ascending: false });
-              loaded = refetched || DEFAULT_EXPENSES;
+              const { error: insertError } = await supabase.from('dublin_expenses').insert(seedData);
+              if (!insertError) {
+                localStorage.setItem('dublin_expenses_seeded', 'true');
+                // Refetch seeded data
+                const { data: refetched } = await supabase
+                  .from('dublin_expenses')
+                  .select('*')
+                  .order('date', { ascending: false });
+                loaded = refetched || DEFAULT_EXPENSES;
+              } else {
+                // If insertion failed, fallback to defaults
+                loaded = DEFAULT_EXPENSES;
+              }
             } else {
               loaded = [];
             }
@@ -87,11 +91,17 @@ export default function DashboardTab({ userProfile }) {
             loaded = data;
           }
         } else {
-          throw new Error(error?.message || "Table not found");
+          // Table does not exist or fetch error: fallback to local or defaults
+          const local = localStorage.getItem('dublin_expenses_list');
+          if (local && JSON.parse(local).length > 0) {
+            loaded = JSON.parse(local);
+          } else {
+            loaded = DEFAULT_EXPENSES;
+          }
         }
       } catch (err) {
         const local = localStorage.getItem('dublin_expenses_list');
-        if (local) {
+        if (local && JSON.parse(local).length > 0) {
           loaded = JSON.parse(local);
         } else {
           loaded = DEFAULT_EXPENSES;
@@ -99,7 +109,7 @@ export default function DashboardTab({ userProfile }) {
       }
     } else {
       const local = localStorage.getItem('dublin_expenses_list');
-      if (local) {
+      if (local && JSON.parse(local).length > 0) {
         loaded = JSON.parse(local);
       } else {
         loaded = DEFAULT_EXPENSES;
