@@ -130,6 +130,9 @@ body.light .bg-slate-950 {
 body.light .bg-slate-900 {
   background-color: #ffffff !important; 
 }
+body.light .bg-slate-800 {
+  background-color: #e5e7eb !important; /* Flight numbers and days badge background */
+}
 body.light .bg-slate-900\/10 {
   background-color: rgba(243, 244, 246, 0.5) !important;
 }
@@ -138,6 +141,9 @@ body.light .bg-slate-900\/20 {
 }
 body.light .bg-slate-900\/40 {
   background-color: rgba(243, 244, 246, 0.6) !important;
+}
+body.light .bg-slate-900\/80 {
+  background-color: rgba(243, 244, 246, 0.85) !important; /* J1/J2 closed and photo icon container */
 }
 body.light .bg-slate-900\/90 {
   background-color: rgba(255, 255, 255, 0.95) !important;
@@ -167,6 +173,9 @@ body.light .border-slate-900 {
 }
 body.light .border-slate-850 {
   border-color: #f3f4f6 !important;
+}
+body.light .border-slate-700 {
+  border-color: #e5e7eb !important; /* Nights badge border */
 }
 body.light .border-slate-800\/60 {
   border-color: rgba(229, 231, 235, 0.6) !important;
