@@ -10,21 +10,21 @@
   --card-border: rgba(30, 41, 59, 0.7);
   --card-hover-border: rgba(71, 85, 105, 0.4);
   --inner-bg: rgba(2, 6, 23, 0.6);
-  --accent-glow-1: rgba(16, 185, 129, 0.08);
+  --accent-color: 16 185 129; /* rgb default emerald */
+  --accent-glow-1: rgba(var(--accent-color), 0.08);
   --accent-glow-2: rgba(245, 158, 11, 0.05);
   --accent-glow-3: rgba(99, 102, 241, 0.05);
-  --accent-color: 16 185 129; /* rgb default emerald */
 }
 
 body.light {
   /* Light theme variables */
-  --bg-color: #fbfbf9; /* warm soft cream */
+  --bg-color: #faf9f6; /* warm soft cream */
   --text-color: #1f2937; /* slate-800 */
   --card-bg: rgba(255, 255, 255, 0.85);
   --card-border: rgba(229, 231, 235, 1); /* gray-200 */
   --card-hover-border: rgba(156, 163, 175, 0.5);
   --inner-bg: #f3f4f6; /* gray-100 */
-  --accent-glow-1: rgba(16, 185, 129, 0.05);
+  --accent-glow-1: rgba(var(--accent-color), 0.05);
   --accent-glow-2: rgba(245, 158, 11, 0.03);
   --accent-glow-3: rgba(99, 102, 241, 0.03);
 }
@@ -60,6 +60,163 @@ body.light .card-premium {
   border-color: var(--card-hover-border);
   transform: translateY(-1.5px);
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* ==================== GLOBAL ACCENT COLOR OVERRIDES ==================== */
+/* Redirects all hardcoded Tailwind emerald/green classes to --accent-color */
+.text-emerald-300 {
+  color: rgba(var(--accent-color), 0.8) !important;
+}
+.text-emerald-400 {
+  color: rgb(var(--accent-color)) !important;
+}
+.text-emerald-553, .text-emerald-500 {
+  color: rgb(var(--accent-color)) !important;
+}
+.bg-emerald-400 {
+  background-color: rgb(var(--accent-color)) !important;
+}
+.bg-emerald-500 {
+  background-color: rgb(var(--accent-color)) !important;
+}
+.bg-emerald-500\/10 {
+  background-color: rgba(var(--accent-color), 0.1) !important;
+}
+.bg-emerald-500\/15 {
+  background-color: rgba(var(--accent-color), 0.15) !important;
+}
+.bg-emerald-500\/20 {
+  background-color: rgba(var(--accent-color), 0.2) !important;
+}
+.border-emerald-500\/10 {
+  border-color: rgba(var(--accent-color), 0.1) !important;
+}
+.border-emerald-500\/20 {
+  border-color: rgba(var(--accent-color), 0.2) !important;
+}
+.border-emerald-500\/30 {
+  border-color: rgba(var(--accent-color), 0.3) !important;
+}
+.border-emerald-500\/40 {
+  border-color: rgba(var(--accent-color), 0.4) !important;
+}
+.hover\:border-emerald-500\/40:hover {
+  border-color: rgba(var(--accent-color), 0.4) !important;
+}
+.hover\:border-emerald-500\/60:hover {
+  border-color: rgba(var(--accent-color), 0.6) !important;
+}
+.hover\:text-emerald-400:hover {
+  color: rgb(var(--accent-color)) !important;
+}
+.accent-emerald-500 {
+  accent-color: rgb(var(--accent-color)) !important;
+}
+
+/* Gradients override (e.g. from-emerald-500 to-teal-500) */
+.from-emerald-500 {
+  --tw-gradient-from: rgb(var(--accent-color)) !important;
+  --tw-gradient-to: rgba(var(--accent-color), 0.8) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+.to-teal-500 {
+  --tw-gradient-to: rgba(var(--accent-color), 0.8) !important;
+}
+
+/* ==================== GLOBAL LIGHT MODE OVERRIDES ==================== */
+/* Overrides all slate dark classes with warm cream/light modes */
+body.light .bg-slate-950 {
+  background-color: #f3f4f6 !important; 
+}
+body.light .bg-slate-900 {
+  background-color: #ffffff !important; 
+}
+body.light .bg-slate-900\/10 {
+  background-color: rgba(243, 244, 246, 0.5) !important;
+}
+body.light .bg-slate-900\/20 {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+body.light .bg-slate-900\/40 {
+  background-color: rgba(243, 244, 246, 0.6) !important;
+}
+body.light .bg-slate-900\/90 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+body.light .bg-slate-950\/20 {
+  background-color: rgba(243, 244, 246, 0.4) !important;
+}
+body.light .bg-slate-950\/60 {
+  background-color: rgba(243, 244, 246, 0.7) !important;
+}
+body.light .bg-slate-950\/80 {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+}
+body.light .bg-slate-950\/95 {
+  background-color: rgba(255, 255, 255, 0.98) !important;
+}
+body.light .bg-gradient-to-br.from-slate-900.to-slate-950 {
+  background-image: linear-gradient(to bottom right, #ffffff, #f3f4f6) !important;
+}
+
+body.light .border-slate-800 {
+  border-color: #e5e7eb !important;
+}
+body.light .border-slate-900 {
+  border-color: #e5e7eb !important;
+}
+body.light .border-slate-850 {
+  border-color: #f3f4f6 !important;
+}
+body.light .border-slate-800\/60 {
+  border-color: rgba(229, 231, 235, 0.6) !important;
+}
+body.light .border-slate-800\/80 {
+  border-color: rgba(229, 231, 235, 0.8) !important;
+}
+body.light .border-slate-900\/60 {
+  border-color: rgba(229, 231, 235, 0.6) !important;
+}
+body.light .border-slate-900\/80 {
+  border-color: rgba(229, 231, 235, 0.8) !important;
+}
+
+body.light .text-slate-50 {
+  color: #111827 !important; 
+}
+body.light .text-slate-100 {
+  color: #1f2937 !important; 
+}
+body.light .text-slate-200 {
+  color: #374151 !important; 
+}
+body.light .text-slate-350 {
+  color: #4b5563 !important;
+}
+body.light .text-slate-300 {
+  color: #4b5563 !important; 
+}
+body.light .text-slate-400 {
+  color: #6b7280 !important; 
+}
+body.light .text-slate-450 {
+  color: #6b7280 !important;
+}
+body.light .text-slate-500 {
+  color: #9ca3af !important; 
+}
+body.light .text-slate-800\/10 {
+  color: rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Global Light Mode inputs styling to prevent white text on white bg */
+body.light input, body.light select {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+  border-color: #d1d5db !important;
+}
+body.light input::placeholder {
+  color: #9ca3af !important;
 }
 
 /* Custom Scrollbars */
