@@ -125,15 +125,35 @@ export default function App() {
   };
 
   const getActiveStyle = (tabId) => {
-    return activeTab === tabId ? { 
+    if (activeTab !== tabId) return {};
+    const isLight = theme === 'light' || (theme === 'auto' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const darkColors = {
+      emerald: '#047857',
+      amber: '#b45309',
+      orange: '#c2410c',
+      sky: '#0369a1',
+      indigo: '#4338ca'
+    };
+    const textCol = isLight ? (darkColors[accent] || '#047857') : 'rgb(var(--accent-color))';
+    return { 
       backgroundColor: 'rgba(var(--accent-color), 0.1)', 
-      color: 'rgb(var(--accent-color))',
-      border: '1px solid rgba(var(--accent-color), 0.15)'
-    } : {};
+      color: textCol,
+      border: '1px solid rgba(var(--accent-color), 0.25)'
+    };
   };
 
   const getActiveTextStyle = (tabId) => {
-    return activeTab === tabId ? { color: 'rgb(var(--accent-color))' } : {};
+    if (activeTab !== tabId) return {};
+    const isLight = theme === 'light' || (theme === 'auto' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const darkColors = {
+      emerald: '#047857',
+      amber: '#b45309',
+      orange: '#c2410c',
+      sky: '#0369a1',
+      indigo: '#4338ca'
+    };
+    const textCol = isLight ? (darkColors[accent] || '#047857') : 'rgb(var(--accent-color))';
+    return { color: textCol };
   };
 
   if (screen === 'loading') {
