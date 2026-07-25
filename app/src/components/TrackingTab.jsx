@@ -15,6 +15,7 @@ export default function TrackingTab({ userProfile }) {
   const [isTracking, setIsTracking] = useState(false);
   const [gpsData, setGpsData] = useState({ coords: 'Inactif', accuracy: '--', stats: '--', time: '--' });
   const watchIdRef = useRef(null);
+  const wakeLockRef = useRef(null);
   const trackingPointsRef = useRef([]);
 
   const supabase = getSupabase();
@@ -78,6 +79,12 @@ export default function TrackingTab({ userProfile }) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
       }
+      if (watchIdRef.current) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+      }
+      if (wakeLockRef.current) {
+        wakeLockRef.current.release().catch(() => {});
+      }
     };
   }, []);
 
@@ -122,6 +129,16 @@ export default function TrackingTab({ userProfile }) {
         return;
       }
       setIsTracking(true);
+
+      // Request screen Wake Lock so Chrome doesn't sleep in foreground
+      if ('wakeLock' in navigator) {
+        navigator.wakeLock.request('screen').then(lock => {
+          wakeLockRef.current = lock;
+        }).catch(err => {
+          console.warn("Screen Wake Lock failed:", err.message);
+        });
+      }
+
       watchIdRef.current = navigator.geolocation.watchPosition(
         (pos) => handleGPSUpdate(pos.coords, pos.timestamp),
         (err) => {
@@ -132,6 +149,14 @@ export default function TrackingTab({ userProfile }) {
       );
     } else {
       setIsTracking(false);
+
+      // Release screen Wake Lock
+      if (wakeLockRef.current) {
+        wakeLockRef.current.release().then(() => {
+          wakeLockRef.current = null;
+        }).catch(() => {});
+      }
+
       if (watchIdRef.current) {
         navigator.geolocation.clearWatch(watchIdRef.current);
         watchIdRef.current = null;

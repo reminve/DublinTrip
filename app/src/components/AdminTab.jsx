@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Shield, RefreshCw } from 'lucide-react';
+import { Users, Shield, RefreshCw, Database, Trash2 } from 'lucide-react';
 import { getSupabase } from '../supabase';
 
 export default function AdminTab({ userProfile, onProfileStatusChanged }) {
@@ -65,6 +65,63 @@ export default function AdminTab({ userProfile, onProfileStatusChanged }) {
     }
   };
 
+  // GPS history reset
+  const handleResetGPS = async () => {
+    if (!confirm("⚠️ ATTENTION : Voulez-vous supprimer l'INTEGRALITE de l'historique des positions GPS ? Cette action videra les tracés de la carte pour tous les voyageurs.")) return;
+    try {
+      if (supabase) {
+        const { error } = await supabase
+          .from('dublin_gps')
+          .delete()
+          .neq('id', 0); // Deletes all rows
+          
+        if (error) throw error;
+      }
+      localStorage.removeItem('dublin_gps_points');
+      alert("Historique GPS effacé avec succès. La carte est de nouveau propre et prête pour Dublin !");
+    } catch (err) {
+      alert("Erreur lors de la réinitialisation : " + err.message);
+    }
+  };
+
+  // Journal reset
+  const handleResetJournal = async () => {
+    if (!confirm("⚠️ Voulez-vous supprimer tous les messages du Journal de bord ?")) return;
+    try {
+      if (supabase) {
+        const { error } = await supabase
+          .from('dublin_journal')
+          .delete()
+          .neq('user_id', '00000000-0000-0000-0000-000000000000'); // Deletes all rows
+          
+        if (error) throw error;
+      }
+      localStorage.removeItem('dublin_journal_entries');
+      alert("Journal de bord réinitialisé !");
+    } catch (err) {
+      alert("Erreur : " + err.message);
+    }
+  };
+
+  // Guinness reset
+  const handleResetGuinness = async () => {
+    if (!confirm("⚠️ Voulez-vous réinitialiser le compteur de Guinness et supprimer tous les avis de pubs enregistrés ?")) return;
+    try {
+      if (supabase) {
+        const { error } = await supabase
+          .from('dublin_pints')
+          .delete()
+          .neq('user_id', '00000000-0000-0000-0000-000000000000'); // Deletes all rows
+          
+        if (error) throw error;
+      }
+      localStorage.removeItem('dublin_pints_list');
+      alert("Compteur de Guinness réinitialisé à 0 !");
+    } catch (err) {
+      alert("Erreur : " + err.message);
+    }
+  };
+
   return (
     <div className="space-y-6">
       
@@ -95,9 +152,9 @@ export default function AdminTab({ userProfile, onProfileStatusChanged }) {
                     <p className="font-semibold text-slate-200">{profile.email}</p>
                     <div className="flex items-center gap-1.5 mt-1">
                       {profile.approved ? (
-                        <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-semibold">Approuvé</span>
+                        <span className="bg-emerald-500/10 text-emerald-455 border border-emerald-500/20 px-2 py-0.5 rounded font-semibold">Approuvé</span>
                       ) : (
-                        <span className="bg-amber-500/10 text-amber-400 border border-emerald-500/20 px-2 py-0.5 rounded font-semibold animate-pulse">En attente</span>
+                        <span className="bg-amber-500/10 text-amber-450 border border-emerald-500/20 px-2 py-0.5 rounded font-semibold animate-pulse">En attente</span>
                       )}
                       {profile.is_admin && (
                         <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded font-semibold ml-1">Admin</span>
@@ -116,7 +173,7 @@ export default function AdminTab({ userProfile, onProfileStatusChanged }) {
                     {!isSelf && (
                       <button 
                         onClick={() => deleteUser(profile.id)} 
-                        className="bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 text-rose-400 font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                        className="bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 text-rose-455 font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
                       >
                         Supprimer
                       </button>
@@ -126,6 +183,51 @@ export default function AdminTab({ userProfile, onProfileStatusChanged }) {
               );
             })
           )}
+        </div>
+      </div>
+
+      {/* Database Maintenance panel */}
+      <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 shadow-lg backdrop-blur space-y-4">
+        <h3 className="text-slate-300 text-sm font-bold flex items-center gap-2 border-b border-slate-800/80 pb-3">
+          <Database className="w-4 h-4 text-emerald-400" /> Maintenance des Données
+        </h3>
+        <p className="text-xs text-slate-400 leading-normal">
+          Utilisez ces actions pour nettoyer les données de test (GPS ou bières) avant de décoller pour Dublin afin de démarrer votre voyage sur une base vierge.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+          <button
+            onClick={handleResetGPS}
+            className="bg-slate-950 hover:bg-rose-500/10 border border-slate-900 hover:border-rose-500/20 text-slate-300 hover:text-rose-400 font-bold p-4 rounded-2xl text-xs transition-all flex flex-col items-center justify-center gap-2.5 cursor-pointer text-center"
+          >
+            <Trash2 className="w-5 h-5 text-rose-400" />
+            <div>
+              <p className="font-extrabold">Effacer Historique GPS</p>
+              <p className="text-[9px] text-slate-500 mt-0.5">Vider la carte en direct</p>
+            </div>
+          </button>
+
+          <button
+            onClick={handleResetJournal}
+            className="bg-slate-950 hover:bg-rose-500/10 border border-slate-900 hover:border-rose-500/20 text-slate-300 hover:text-rose-400 font-bold p-4 rounded-2xl text-xs transition-all flex flex-col items-center justify-center gap-2.5 cursor-pointer text-center"
+          >
+            <Trash2 className="w-5 h-5 text-rose-400" />
+            <div>
+              <p className="font-extrabold">Réinitialiser Journal</p>
+              <p className="text-[9px] text-slate-500 mt-0.5">Vider les billets du blog</p>
+            </div>
+          </button>
+
+          <button
+            onClick={handleResetGuinness}
+            className="bg-slate-950 hover:bg-rose-500/10 border border-slate-900 hover:border-rose-500/20 text-slate-300 hover:text-rose-400 font-bold p-4 rounded-2xl text-xs transition-all flex flex-col items-center justify-center gap-2.5 cursor-pointer text-center"
+          >
+            <Trash2 className="w-5 h-5 text-rose-400" />
+            <div>
+              <p className="font-extrabold">Remettre Guinness à 0</p>
+              <p className="text-[9px] text-slate-500 mt-0.5">Réinitialiser le compteur</p>
+            </div>
+          </button>
         </div>
       </div>
 
