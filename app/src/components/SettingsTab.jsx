@@ -24,7 +24,7 @@ export default function SettingsTab({ onLogout, onShowSetup }) {
             <p className="text-xs text-slate-400">Copiez ce script et exécutez-le dans le <strong>SQL Editor</strong> de Supabase pour créer la structure et les politiques de sécurité (RLS) :</p>
             <div className="bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-[9px] font-mono text-slate-350 overflow-x-auto select-all space-y-2 leading-relaxed">
               CREATE TABLE IF NOT EXISTS public.profiles (<br />
-              &nbsp;&nbsp;id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,<br />
+              &nbsp;&nbsp;id UUID PRIMARY KEY,<br />
               &nbsp;&nbsp;email TEXT NOT NULL,<br />
               &nbsp;&nbsp;approved BOOLEAN DEFAULT FALSE,<br />
               &nbsp;&nbsp;is_admin BOOLEAN DEFAULT FALSE,<br />

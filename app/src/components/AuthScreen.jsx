@@ -58,8 +58,12 @@ export default function AuthScreen({ onAuthenticated, onShowSetup }) {
         if (error) throw error;
 
         if (data && data.user) {
-          // The database trigger public.handle_new_user() automatically
-          // creates the profile row. We don't need to manually insert it anymore.
+          // Insert or update profile (safe without foreign key check)
+          const { error: profileErr } = await supabase.from('profiles').upsert([
+            { id: data.user.id, email: email, approved: false, is_admin: false }
+          ]);
+          if (profileErr) throw profileErr;
+
           alert("Compte créé ! Veuillez patienter pendant que l'administrateur valide votre demande.");
           setAuthMode('login');
           setEmail('');
