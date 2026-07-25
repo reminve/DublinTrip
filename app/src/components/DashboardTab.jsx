@@ -141,6 +141,22 @@ export default function DashboardTab() {
       {/* ==================== LEFT COLUMN (LOGISTICS & WEATHER) ==================== */}
       <div className="space-y-6">
         
+        {/* Banner Card */}
+        <div className="relative rounded-2xl overflow-hidden border border-slate-900/60 shadow-xl h-40 group">
+          <img 
+            src="./assets/dublin_banner.jpg" 
+            alt="Dublin Banner" 
+            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700" 
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent flex flex-col justify-end p-4">
+            <h2 className="text-lg font-black text-white tracking-tight drop-shadow-md">Mon Dublin Express ☘️</h2>
+            <p className="text-xs text-emerald-300 font-bold drop-shadow-sm">Mon Voyage • 6-12 Août 2026</p>
+          </div>
+        </div>
+
         {/* Countdown Card */}
         <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-900/60 rounded-2xl p-5 shadow-xl relative overflow-hidden transition-all duration-300 hover:border-slate-800 hover:-translate-y-0.5">
           <div className="absolute -right-6 -bottom-6 text-slate-800/10 text-8xl font-black select-none pointer-events-none">DUB</div>

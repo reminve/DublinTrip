@@ -41,6 +41,12 @@ jobs:
         run: npm install
         working-directory: ./app
 
+      - name: Create env file from Secrets
+        run: |
+          echo "VITE_SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
+          echo "VITE_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
+        working-directory: ./app
+
       - name: Build project
         run: npm run build
         working-directory: ./app
