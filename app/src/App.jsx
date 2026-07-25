@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Home, Calendar, Camera, MapPin, Users, Settings, 
   Sun, Moon, Sparkles, BookOpen, Compass, Beer, 
-  CheckSquare, Plus, Palette, LogOut, MessageSquare
+  CheckSquare, Plus, Palette, LogOut, MessageSquare, FileText
 } from 'lucide-react';
 import { getSupabase } from './supabase';
 import SetupScreen from './components/SetupScreen';
@@ -13,6 +13,7 @@ import GalleryTab from './components/GalleryTab';
 import TrackingTab from './components/TrackingTab';
 import JournalTab from './components/JournalTab';
 import ToolsTab from './components/ToolsTab';
+import DocumentsTab from './components/DocumentsTab';
 import AdminTab from './components/AdminTab';
 import SettingsTab from './components/SettingsTab';
 
@@ -46,7 +47,7 @@ export default function App() {
           .single();
 
         if (error || !profile) {
-          // Profile entry missing: create it via upsert (fallback)
+          // Profile entry missing: create it via insert
           await supabase
             .from('profiles')
             .insert([{ id: session.user.id, email: session.user.email, approved: false, is_admin: false }]);
@@ -263,7 +264,7 @@ export default function App() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex flex-col gap-1.5">
+          <nav className="flex flex-col gap-1.5 overflow-y-auto max-h-[50vh] scrollbar-none">
             <button 
               onClick={() => setActiveTab('dashboard')} 
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'dashboard' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
@@ -298,6 +299,15 @@ export default function App() {
             >
               <Camera className="w-4 h-4" />
               <span>Album Photos</span>
+            </button>
+
+            <button 
+              onClick={() => setActiveTab('documents')} 
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'documents' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              style={getActiveStyle('documents')}
+            >
+              <FileText className="w-4 h-4" />
+              <span>Billets & Résas</span>
             </button>
             
             <button 
@@ -359,7 +369,7 @@ export default function App() {
           </div>
           <button 
             onClick={handleLogout}
-            className="w-full bg-slate-900 hover:bg-rose-500/10 border border-slate-850 hover:border-rose-500/20 text-slate-400 hover:text-rose-450 font-bold py-2.5 px-4 rounded-xl text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer mt-2"
+            className="w-full bg-slate-900 hover:bg-rose-500/10 border border-slate-850 hover:border-rose-500/20 text-slate-400 hover:text-rose-455 font-bold py-2.5 px-4 rounded-xl text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer mt-2"
           >
             <LogOut className="w-4 h-4" /> Déconnexion
           </button>
@@ -394,6 +404,7 @@ export default function App() {
           {activeTab === 'gallery' && <GalleryTab userProfile={userProfile} />}
           {activeTab === 'tracking' && <TrackingTab userProfile={userProfile} />}
           {activeTab === 'tools' && <ToolsTab userProfile={userProfile} />}
+          {activeTab === 'documents' && <DocumentsTab userProfile={userProfile} />}
           {activeTab === 'admin' && userProfile?.is_admin && (
             <AdminTab 
               userProfile={userProfile} 
@@ -452,7 +463,7 @@ export default function App() {
           <button 
             onClick={() => setShowPlusMenu(prev => !prev)} 
             className={`flex flex-col items-center gap-1.5 transition-all cursor-pointer ${showPlusMenu ? 'text-slate-200' : 'text-slate-500'}`}
-            style={['tracking', 'tools', 'admin', 'settings'].includes(activeTab) && !showPlusMenu ? { color: 'rgb(var(--accent-color))' } : {}}
+            style={['tracking', 'tools', 'documents', 'admin', 'settings'].includes(activeTab) && !showPlusMenu ? { color: 'rgb(var(--accent-color))' } : {}}
           >
             <Plus className={`w-5 h-5 transition-transform duration-300 ${showPlusMenu ? 'rotate-45 text-rose-400' : ''}`} />
             <span className="text-[9px] font-bold uppercase tracking-wider">{showPlusMenu ? "Fermer" : "Plus"}</span>
@@ -492,10 +503,26 @@ export default function App() {
                 <span className="text-[10px] font-bold uppercase text-slate-300">Checklists & Défis</span>
               </button>
 
+              <button 
+                onClick={() => { setActiveTab('documents'); setShowPlusMenu(false); }}
+                className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer gap-2"
+              >
+                <FileText className="w-5 h-5 text-emerald-400" />
+                <span className="text-[10px] font-bold uppercase text-slate-300">Billets & Résas</span>
+              </button>
+
+              <button 
+                onClick={() => { setActiveTab('settings'); setShowPlusMenu(false); }}
+                className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer gap-2"
+              >
+                <Settings className="w-5 h-5 text-emerald-400" />
+                <span className="text-[10px] font-bold uppercase text-slate-300">Réglages</span>
+              </button>
+
               {userProfile?.is_admin && (
                 <button 
                   onClick={() => { setActiveTab('admin'); setShowPlusMenu(false); }}
-                  className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer relative gap-2"
+                  className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer relative gap-2 col-span-2"
                 >
                   <Users className="w-5 h-5 text-emerald-400" />
                   <span className="text-[10px] font-bold uppercase text-slate-300">Admin</span>
@@ -506,14 +533,6 @@ export default function App() {
                   )}
                 </button>
               )}
-
-              <button 
-                onClick={() => { setActiveTab('settings'); setShowPlusMenu(false); }}
-                className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer gap-2"
-              >
-                <Settings className="w-5 h-5 text-emerald-400" />
-                <span className="text-[10px] font-bold uppercase text-slate-300">Réglages</span>
-              </button>
             </div>
 
             {/* Customizers inside Plus Menu */}
