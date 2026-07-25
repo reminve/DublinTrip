@@ -1,0 +1,114 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Dublin 2026 Voyage Dashboard//NONSGML v1.0//FR
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:event-ter-aller@dublin2026.com
+DTSTAMP:20260725T134600Z
+DTSTART:20260806T070000Z
+DTEND:20260806T093000Z
+SUMMARY:TER Clermont-Ferrand -> Lyon Part-Dieu
+DESCRIPTION:Train aller pour Lyon. Tarif: 22,00 € A/R (partie aller).
+LOCATION:Gare de Clermont-Ferrand
+END:VEVENT
+BEGIN:VEVENT
+UID:event-rhonexpress-aller@dublin2026.com
+DTSTAMP:20260725T134600Z
+DTSTART:20260806T103000Z
+DTEND:20260806T111000Z
+SUMMARY:Rhônexpress Lyon Part-Dieu -> LYS Aéroport
+DESCRIPTION:Navette rapide pour l'aéroport Lyon-Saint Exupéry. Tarif: 19,90 € A/R (partie aller).
+LOCATION:Gare de Lyon Part-Dieu
+END:VEVENT
+BEGIN:VEVENT
+UID:event-vol-aller@dublin2026.com
+DTSTAMP:20260725T134600Z
+DTSTART:20260806T144500Z
+DTEND:20260806T170500Z
+SUMMARY:Vol Aer Lingus EI 553 (LYS -> DUB)
+DESCRIPTION:Vol aller pour Dublin. Terminal de départ: Terminal 1 (Lyon). Terminal d'arrivée: Terminal 2 (Dublin).\nBagage soute: 10 kg enregistré au comptoir (55 x 40 x 24 cm).\nBagage cabine: Petit sac personnel sous le siège (40 x 30 x 20 cm).
+LOCATION:Aéroport Lyon-Saint Exupéry (LYS) Terminal 1
+END:VEVENT
+BEGIN:VEVENT
+UID:event-dublinexpress-aller@dublin2026.com
+DTSTAMP:20260725T134600Z
+DTSTART:20260806T174500Z
+DTEND:20260806T183000Z
+SUMMARY:Dublin Express 782 (Aéroport -> Usher's Quay)
+DESCRIPTION:Navette Terminal 2 vers Usher's Quay (3 min du logement). Tarif: 12,00 € A/R (partie aller).
+LOCATION:Dublin Airport T2 Bus Stop
+END:VEVENT
+BEGIN:VEVENT
+UID:event-checkin-binaryhub@dublin2026.com
+DTSTAMP:20260725T134600Z
+DTSTART:20260806T183000Z
+DTEND:20260806T193000Z
+SUMMARY:Check-in aparto Binary Hub Apartments
+DESCRIPTION:Installation dans le logement. Adresse: aparto Binary Hub Apartments.\n6 nuits réservées (327,00 € - Tarif Mobile Booking).
+LOCATION:aparto Binary Hub Apartments, Dublin
+END:VEVENT
+BEGIN:VEVENT
+UID:event-bookofkells@dublin2026.com
+DTSTAMP:20260725T134600Z
+DTSTART:20260807T113000Z
+DTEND:20260807T130000Z
+SUMMARY:Book of Kells Experience (Trinity College)
+DESCRIPTION:Visite réservée à 12h30 local (11h30 UTC). Tarif Étudiant: 21,00 €. Présenter le billet électronique.
+LOCATION:Trinity College Dublin, College Green, Dublin 2
+END:VEVENT
+BEGIN:VEVENT
+UID:event-guinness@dublin2026.com
+DTSTAMP:20260725T134600Z
+DTSTART:20260810T130000Z
+DTEND:20260810T153000Z
+SUMMARY:Guinness Storehouse
+DESCRIPTION:Visite réservée à 14h00 local (13h00 UTC). Tarif d'été: 22,50 €.
+LOCATION:St James's Gate, Dublin 8
+END:VEVENT
+BEGIN:VEVENT
+UID:event-checkout-binaryhub@dublin2026.com
+DTSTAMP:20260725T134600Z
+DTSTART:20260812T023000Z
+DTEND:20260812T030000Z
+SUMMARY:Check-out précoce aparto Binary Hub
+DESCRIPTION:Check-out à 03h30 local (02h30 UTC). Réception/Gardien 24h/24 ou Key Drop Box. Libérer la chambre.
+LOCATION:aparto Binary Hub Apartments, Dublin
+END:VEVENT
+BEGIN:VEVENT
+UID:event-dublinexpress-retour@dublin2026.com
+DTSTAMP:20260725T134600Z
+DTSTART:20260812T031500Z
+DTEND:20260812T040000Z
+SUMMARY:Dublin Express 782 (Usher's Quay -> Aéroport T2)
+DESCRIPTION:Navette retour de Usher's Quay vers l'aéroport (Terminal 2) à 04h15 local (03h15 UTC). Arriver en avance pour le vol.
+LOCATION:Usher's Quay, Dublin
+END:VEVENT
+BEGIN:VEVENT
+UID:event-vol-retour@dublin2026.com
+DTSTAMP:20260725T134600Z
+DTSTART:20260812T051500Z
+DTEND:20260812T073000Z
+SUMMARY:Vol Aer Lingus EI 550 (DUB -> LYS)
+DESCRIPTION:Vol retour pour Lyon. Départ de Dublin Terminal 2 à 06h15 local (05h15 UTC), arrivée à Lyon Terminal 1 à 09h30 local (07h30 UTC).\nBagage soute: 10 kg enregistré au comptoir.\nBagage cabine: Petit sac personnel sous le siège.
+LOCATION:Dublin Airport (DUB) Terminal 2
+END:VEVENT
+BEGIN:VEVENT
+UID:event-rhonexpress-retour@dublin2026.com
+DTSTAMP:20260725T134600Z
+DTSTART:20260812T081500Z
+DTEND:20260812T085500Z
+SUMMARY:Rhônexpress LYS Aéroport -> Lyon Part-Dieu
+DESCRIPTION:Navette rapide retour pour Lyon Part-Dieu à 10h15 local (08h15 UTC).
+LOCATION:Aéroport Lyon-Saint Exupéry (LYS) Terminal 1
+END:VEVENT
+BEGIN:VEVENT
+UID:event-ter-retour@dublin2026.com
+DTSTAMP:20260725T134600Z
+DTSTART:20260812T100000Z
+DTEND:20260812T123000Z
+SUMMARY:TER Lyon Part-Dieu -> Clermont-Ferrand
+DESCRIPTION:Train retour pour Clermont-Ferrand à 12h00 local (10h00 UTC).
+LOCATION:Gare de Lyon Part-Dieu
+END:VEVENT
+END:VCALENDAR

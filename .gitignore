@@ -1,0 +1,8 @@
+# Ignorer les billets et reçus PDF contenant des données privées
+*.pdf
+
+# Fichiers de configuration système
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
