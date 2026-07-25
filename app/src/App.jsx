@@ -265,87 +265,87 @@ export default function App() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex flex-col gap-2 overflow-y-auto max-h-[65vh] scrollbar-none">
+          <nav className="flex flex-col gap-1.5 overflow-y-auto max-h-[55vh] scrollbar-none">
             <button 
               onClick={() => setActiveTab('dashboard')} 
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${activeTab === 'dashboard' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'dashboard' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('dashboard')}
             >
-              <Home className="w-5 h-5" />
+              <Home className="w-4 h-4" />
               <span>Voyage</span>
             </button>
             
             <button 
               onClick={() => setActiveTab('itinerary')} 
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${activeTab === 'itinerary' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'itinerary' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('itinerary')}
             >
-              <Calendar className="w-5 h-5" />
+              <Calendar className="w-4 h-4" />
               <span>Feuille de Route</span>
             </button>
             
             <button 
               onClick={() => setActiveTab('journal')} 
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${activeTab === 'journal' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'journal' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('journal')}
             >
-              <Beer className="w-5 h-5" />
+              <Beer className="w-4 h-4" />
               <span>Journal & Pubs</span>
             </button>
             
             <button 
               onClick={() => setActiveTab('gallery')} 
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${activeTab === 'gallery' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'gallery' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('gallery')}
             >
-              <Camera className="w-5 h-5" />
+              <Camera className="w-4 h-4" />
               <span>Album Photos</span>
             </button>
 
             <button 
               onClick={() => setActiveTab('documents')} 
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${activeTab === 'documents' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'documents' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('documents')}
             >
-              <FileText className="w-5 h-5" />
+              <FileText className="w-4 h-4" />
               <span>Billets & Résas</span>
             </button>
             
             <button 
               onClick={() => setActiveTab('tracking')} 
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${activeTab === 'tracking' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'tracking' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('tracking')}
             >
-              <MapPin className="w-5 h-5" />
+              <MapPin className="w-4 h-4" />
               <span>Suivi GPS Live</span>
             </button>
 
             <button 
               onClick={() => setActiveTab('transport')} 
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${activeTab === 'transport' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'transport' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('transport')}
             >
-              <Plane className="w-5 h-5" />
+              <Plane className="w-4 h-4" />
               <span>Vols &amp; Transports</span>
             </button>
 
             <button 
               onClick={() => setActiveTab('tools')} 
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${activeTab === 'tools' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'tools' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('tools')}
             >
-              <CheckSquare className="w-5 h-5" />
+              <CheckSquare className="w-4 h-4" />
               <span>Outils & Défis</span>
             </button>
 
             {userProfile?.is_admin && (
               <button 
                 onClick={() => setActiveTab('admin')} 
-                className={`flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${activeTab === 'admin' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+                className={`flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'admin' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
                 style={getActiveStyle('admin')}
               >
                 <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5" />
+                  <Users className="w-4 h-4" />
                   <span>Admin Accès</span>
                 </div>
                 {pendingApprovals > 0 && (
