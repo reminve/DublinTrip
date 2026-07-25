@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Plane, Home, AlertTriangle, RefreshCw, ArrowLeftRight, 
   Plus, Trash2, X, Calendar, DollarSign, Tag, Clock
@@ -60,61 +61,40 @@ export default function DashboardTab({ userProfile }) {
           .select('*')
           .order('date', { ascending: false });
         if (!error && data) {
-          if (data.length === 0) {
-            // Table is empty! Let's seed it with the default expenses
-            const hasSeeded = localStorage.getItem('dublin_expenses_seeded');
-            if (!hasSeeded) {
-              const seedData = DEFAULT_EXPENSES.map(e => ({
-                title: e.title,
-                amount: e.amount,
-                category: e.category,
-                date: e.date,
-                note: e.note
-              }));
-              const { error: insertError } = await supabase.from('dublin_expenses').insert(seedData);
-              if (!insertError) {
-                localStorage.setItem('dublin_expenses_seeded', 'true');
-                // Refetch seeded data
-                const { data: refetched } = await supabase
-                  .from('dublin_expenses')
-                  .select('*')
-                  .order('date', { ascending: false });
-                loaded = refetched || DEFAULT_EXPENSES;
-              } else {
-                // If insertion failed, fallback to defaults
-                loaded = DEFAULT_EXPENSES;
-              }
-            } else {
-              loaded = [];
-            }
-          } else {
-            loaded = data;
-          }
+          loaded = data;
         } else {
-          // Table does not exist or fetch error: fallback to local or defaults
+          // Table or fetch error: fallback to local storage
           const local = localStorage.getItem('dublin_expenses_list');
-          if (local && JSON.parse(local).length > 0) {
-            loaded = JSON.parse(local);
-          } else {
-            loaded = DEFAULT_EXPENSES;
-          }
+          if (local) loaded = JSON.parse(local);
         }
       } catch (err) {
         const local = localStorage.getItem('dublin_expenses_list');
-        if (local && JSON.parse(local).length > 0) {
-          loaded = JSON.parse(local);
-        } else {
-          loaded = DEFAULT_EXPENSES;
-        }
+        if (local) loaded = JSON.parse(local);
       }
     } else {
       const local = localStorage.getItem('dublin_expenses_list');
-      if (local && JSON.parse(local).length > 0) {
-        loaded = JSON.parse(local);
-      } else {
+      if (local) loaded = JSON.parse(local);
+    }
+
+    // IF nothing was loaded (length is 0), check if the user intentionally cleared it
+    if (loaded.length === 0) {
+      const isCleared = localStorage.getItem('dublin_expenses_cleared') === 'true';
+      if (!isCleared) {
         loaded = DEFAULT_EXPENSES;
+        // Optionally seed Supabase in background if table exists but empty
+        if (supabase) {
+          const seedData = DEFAULT_EXPENSES.map(e => ({
+            title: e.title,
+            amount: e.amount,
+            category: e.category,
+            date: e.date,
+            note: e.note
+          }));
+          supabase.from('dublin_expenses').insert(seedData).catch(() => {});
+        }
       }
     }
+
     setExpenses(loaded);
     setExpensesLoading(false);
   };
@@ -472,9 +452,9 @@ export default function DashboardTab({ userProfile }) {
       </div>
 
       {/* ==================== EXPENSE MANAGER MODAL ==================== */}
-      {showExpenseModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl backdrop-blur-xl">
+      {showExpenseModal && createPortal(
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl backdrop-blur-xl animate-fade-in">
             
             {/* Modal Header */}
             <div className="p-5 border-b border-slate-850 flex items-center justify-between">
@@ -635,7 +615,8 @@ export default function DashboardTab({ userProfile }) {
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </div>

@@ -149,7 +149,7 @@ export default function AdminTab({ userProfile, onProfileStatusChanged }) {
         if (error) throw error;
       }
       localStorage.removeItem('dublin_expenses_list');
-      localStorage.removeItem('dublin_expenses_seeded');
+      localStorage.setItem('dublin_expenses_cleared', 'true');
       alert("Registre des dépenses réinitialisé avec succès !");
     } catch (err) {
       alert("Erreur lors du nettoyage des dépenses : " + err.message);
