@@ -2,18 +2,64 @@
 
 @import "tailwindcss";
 
+:root {
+  /* Default Dark theme variables */
+  --bg-color: #030712;
+  --text-color: #f3f4f6;
+  --card-bg: rgba(15, 23, 42, 0.3);
+  --card-border: rgba(30, 41, 59, 0.7);
+  --card-hover-border: rgba(71, 85, 105, 0.4);
+  --inner-bg: rgba(2, 6, 23, 0.6);
+  --accent-glow-1: rgba(16, 185, 129, 0.08);
+  --accent-glow-2: rgba(245, 158, 11, 0.05);
+  --accent-glow-3: rgba(99, 102, 241, 0.05);
+  --accent-color: 16 185 129; /* rgb default emerald */
+}
+
+body.light {
+  /* Light theme variables */
+  --bg-color: #fbfbf9; /* warm soft cream */
+  --text-color: #1f2937; /* slate-800 */
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-border: rgba(229, 231, 235, 1); /* gray-200 */
+  --card-hover-border: rgba(156, 163, 175, 0.5);
+  --inner-bg: #f3f4f6; /* gray-100 */
+  --accent-glow-1: rgba(16, 185, 129, 0.05);
+  --accent-glow-2: rgba(245, 158, 11, 0.03);
+  --accent-glow-3: rgba(99, 102, 241, 0.03);
+}
+
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: #030712; 
+    background-color: var(--bg-color);
     background-image: 
-      radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
-      radial-gradient(at 50% 100%, rgba(99, 102, 241, 0.05) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, var(--accent-glow-1) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, var(--accent-glow-2) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, var(--accent-glow-3) 0px, transparent 50%);
     background-attachment: fixed;
-    color: #f3f4f6;
+    color: var(--text-color);
+    transition: background-color 0.4s ease, color 0.4s ease;
     -webkit-tap-highlight-color: transparent;
   }
+}
+
+/* Premium Card class for modern glassmorphism */
+.card-premium {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+body.light .card-premium {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.02);
+}
+.card-premium:hover {
+  border-color: var(--card-hover-border);
+  transform: translateY(-1.5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 /* Custom Scrollbars */
@@ -21,14 +67,14 @@
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #030712;
+  background: var(--bg-color);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1f2937;
+  background: var(--card-border);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #10b981;
+  background: rgb(var(--accent-color));
 }
 
 /* Leaflet Container Styling */
@@ -36,4 +82,7 @@
   background: #090d16 !important;
   width: 100%;
   height: 100%;
+}
+body.light .leaflet-container {
+  background: #e5e7eb !important;
 }

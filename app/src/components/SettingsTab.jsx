@@ -46,9 +46,36 @@ export default function SettingsTab({ onLogout, onShowSetup }) {
               &nbsp;&nbsp;image TEXT NOT NULL,<br />
               &nbsp;&nbsp;user_id UUID REFERENCES auth.users DEFAULT auth.uid()<br />
               );<br /><br />
+              CREATE TABLE IF NOT EXISTS public.dublin_journal (<br />
+              &nbsp;&nbsp;id UUID PRIMARY KEY DEFAULT gen_random_uuid(),<br />
+              &nbsp;&nbsp;created_at TIMESTAMPTZ DEFAULT NOW(),<br />
+              &nbsp;&nbsp;content TEXT NOT NULL,<br />
+              &nbsp;&nbsp;emoji TEXT NOT NULL,<br />
+              &nbsp;&nbsp;user_id UUID DEFAULT auth.uid()<br />
+              );<br /><br />
+              CREATE TABLE IF NOT EXISTS public.dublin_pints (<br />
+              &nbsp;&nbsp;id UUID PRIMARY KEY DEFAULT gen_random_uuid(),<br />
+              &nbsp;&nbsp;created_at TIMESTAMPTZ DEFAULT NOW(),<br />
+              &nbsp;&nbsp;pub TEXT NOT NULL,<br />
+              &nbsp;&nbsp;price NUMERIC(5,2) DEFAULT 0,<br />
+              &nbsp;&nbsp;rating INT DEFAULT 5,<br />
+              &nbsp;&nbsp;note TEXT,<br />
+              &nbsp;&nbsp;user_id UUID DEFAULT auth.uid()<br />
+              );<br /><br />
+              CREATE TABLE IF NOT EXISTS public.dublin_suggestions (<br />
+              &nbsp;&nbsp;id UUID PRIMARY KEY DEFAULT gen_random_uuid(),<br />
+              &nbsp;&nbsp;created_at TIMESTAMPTZ DEFAULT NOW(),<br />
+              &nbsp;&nbsp;text TEXT NOT NULL,<br />
+              &nbsp;&nbsp;submitted_by TEXT NOT NULL,<br />
+              &nbsp;&nbsp;completed BOOLEAN DEFAULT FALSE,<br />
+              &nbsp;&nbsp;user_id UUID DEFAULT auth.uid()<br />
+              );<br /><br />
               ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;<br />
               ALTER TABLE public.dublin_gps ENABLE ROW LEVEL SECURITY;<br />
-              ALTER TABLE public.dublin_photos ENABLE ROW LEVEL SECURITY;<br /><br />
+              ALTER TABLE public.dublin_photos ENABLE ROW LEVEL SECURITY;<br />
+              ALTER TABLE public.dublin_journal ENABLE ROW LEVEL SECURITY;<br />
+              ALTER TABLE public.dublin_pints ENABLE ROW LEVEL SECURITY;<br />
+              ALTER TABLE public.dublin_suggestions ENABLE ROW LEVEL SECURITY;<br /><br />
               -- Politiques RLS (Corrigées sans récursion)<br />
               CREATE POLICY "Tout le monde peut s'inscrire" ON public.profiles FOR INSERT WITH CHECK (true);<br />
               CREATE POLICY "Les membres connectés voient tous les profils" ON public.profiles FOR SELECT USING (auth.role() = 'authenticated');<br />
@@ -58,7 +85,17 @@ export default function SettingsTab({ onLogout, onShowSetup }) {
               CREATE POLICY "Les membres voient GPS" ON public.dublin_gps FOR SELECT USING ((SELECT approved FROM public.profiles WHERE id = auth.uid()) = true);<br /><br />
               CREATE POLICY "Les admins écrivent Photos" ON public.dublin_photos FOR INSERT WITH CHECK ((SELECT is_admin FROM public.profiles WHERE id = auth.uid()) = true);<br />
               CREATE POLICY "Les membres voient Photos" ON public.dublin_photos FOR SELECT USING ((SELECT approved FROM public.profiles WHERE id = auth.uid()) = true);<br />
-              CREATE POLICY "Les admins suppriment Photos" ON public.dublin_photos FOR DELETE USING ((SELECT is_admin FROM public.profiles WHERE id = auth.uid()) = true);
+              CREATE POLICY "Les admins suppriment Photos" ON public.dublin_photos FOR DELETE USING ((SELECT is_admin FROM public.profiles WHERE id = auth.uid()) = true);<br /><br />
+              CREATE POLICY "Les admins écrivent Journal" ON public.dublin_journal FOR INSERT WITH CHECK ((SELECT is_admin FROM public.profiles WHERE id = auth.uid()) = true);<br />
+              CREATE POLICY "Les membres voient Journal" ON public.dublin_journal FOR SELECT USING ((SELECT approved FROM public.profiles WHERE id = auth.uid()) = true);<br />
+              CREATE POLICY "Les admins suppriment Journal" ON public.dublin_journal FOR DELETE USING ((SELECT is_admin FROM public.profiles WHERE id = auth.uid()) = true);<br /><br />
+              CREATE POLICY "Les admins écrivent Pints" ON public.dublin_pints FOR INSERT WITH CHECK ((SELECT is_admin FROM public.profiles WHERE id = auth.uid()) = true);<br />
+              CREATE POLICY "Les membres voient Pints" ON public.dublin_pints FOR SELECT USING ((SELECT approved FROM public.profiles WHERE id = auth.uid()) = true);<br />
+              CREATE POLICY "Les admins suppriment Pints" ON public.dublin_pints FOR DELETE USING ((SELECT is_admin FROM public.profiles WHERE id = auth.uid()) = true);<br /><br />
+              CREATE POLICY "Membres écrivent Suggestions" ON public.dublin_suggestions FOR INSERT WITH CHECK (auth.role() = 'authenticated');<br />
+              CREATE POLICY "Membres voient Suggestions" ON public.dublin_suggestions FOR SELECT USING (auth.role() = 'authenticated');<br />
+              CREATE POLICY "Modif Suggestions" ON public.dublin_suggestions FOR UPDATE USING (auth.role() = 'authenticated');<br />
+              CREATE POLICY "Suppr Suggestions" ON public.dublin_suggestions FOR DELETE USING (auth.role() = 'authenticated');
             </div>
           </div>
         )}
