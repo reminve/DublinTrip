@@ -120,7 +120,7 @@ export default function GalleryTab({ userProfile }) {
       {userProfile.is_admin && (
         <div 
           onClick={() => document.getElementById('react-file-input').click()}
-          className="border-2 border-dashed border-slate-800 rounded-2xl p-6 text-center hover:border-emerald-500/60 bg-slate-900/10 hover:bg-slate-900/40 transition-all cursor-pointer"
+          className="border border-dashed border-slate-800 hover:border-emerald-500/40 rounded-2xl p-6 text-center bg-slate-900/10 hover:bg-emerald-500/[0.01] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
         >
           <input 
             type="file" 
@@ -131,10 +131,10 @@ export default function GalleryTab({ userProfile }) {
             className="hidden" 
           />
           <div className="flex flex-col items-center gap-2">
-            <div className="w-10 h-10 bg-slate-900/80 rounded-xl flex items-center justify-center border border-slate-800">
+            <div className="w-10 h-10 bg-slate-900/80 rounded-xl flex items-center justify-center border border-slate-850">
               <UploadCloud className="w-5 h-5 text-emerald-400" />
             </div>
-            <p className="text-xs font-bold text-slate-300">Ajouter des photos du voyage</p>
+            <p className="text-xs font-bold text-slate-350">Ajouter des photos du voyage</p>
             <p className="text-[10px] text-slate-500">JPG/PNG compressé automatiquement</p>
           </div>
         </div>
@@ -147,16 +147,16 @@ export default function GalleryTab({ userProfile }) {
           <p className="text-xs font-medium">Aucune photo dans la galerie pour l'instant.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {photos.map(photo => (
             <div 
               key={photo.id}
               onClick={() => setLightboxPhoto(photo)}
-              className="relative aspect-square rounded-xl overflow-hidden border border-slate-800/80 shadow-md group cursor-pointer active:scale-98 transition-all"
+              className="relative aspect-square rounded-xl overflow-hidden border border-slate-900 shadow-md group cursor-pointer active:scale-98 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-350"
             >
-              <img src={photo.src} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <p className="absolute bottom-2 left-2 text-[10px] text-slate-300 font-medium">{photo.date.split(' ')[0]}</p>
+              <img src={photo.src} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent"></div>
+              <p className="absolute bottom-2.5 left-3 text-[10px] text-slate-300 font-bold tracking-wide">{photo.date.split(' ')[0]}</p>
             </div>
           ))}
         </div>

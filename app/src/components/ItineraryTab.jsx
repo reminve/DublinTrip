@@ -108,36 +108,36 @@ export default function ItineraryTab() {
         </a>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-3.5">
         {ITINERARY_DATA.map((day) => {
           const isOpen = openDay === day.id;
           return (
             <div 
               key={day.id} 
-              className={`bg-slate-900/40 border border-slate-800 rounded-2xl p-4 transition-all ${isOpen ? 'ring-1 ring-emerald-500/30' : ''}`}
+              className={`bg-slate-900/20 border border-slate-900/60 rounded-2xl p-4 hover:border-slate-850 transition-all duration-300 ${isOpen ? 'border-emerald-500/20 bg-slate-900/30 shadow-lg shadow-emerald-500/[0.02]' : ''}`}
             >
               <div 
                 onClick={() => toggleAccordion(day.id)}
-                className="flex items-center justify-between cursor-pointer"
+                className="flex items-center justify-between cursor-pointer group"
               >
                 <div className="flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-xs font-bold">
+                  <span className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold transition-colors ${isOpen ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-900/80 text-slate-400 border border-slate-850 group-hover:border-slate-700'}`}>
                     {day.day}
                   </span>
                   <div>
-                    <h4 className="font-bold text-slate-200 text-sm">{day.title}</h4>
+                    <h4 className="font-bold text-slate-200 text-sm group-hover:text-slate-100 transition-colors">{day.title}</h4>
                     <p className="text-xs text-slate-500">{day.subtitle}</p>
                   </div>
                 </div>
-                <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-300 ${isOpen ? 'rotate-180 text-emerald-400' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-300 group-hover:text-slate-300 ${isOpen ? 'rotate-180 text-emerald-400 group-hover:text-emerald-400' : ''}`} />
               </div>
               
               {isOpen && (
-                <div className="mt-4 border-l border-slate-850 pl-4 ml-4 space-y-4 text-sm text-slate-300">
+                <div className="mt-4 border-l border-slate-850 pl-4 ml-4 space-y-4 text-sm text-slate-350">
                   {day.events.map((evt, idx) => (
                     <div key={idx} className="relative">
                       <span className={`absolute -left-[21px] top-1.5 w-2 h-2 rounded-full ${evt.badge ? 'bg-emerald-400 shadow shadow-emerald-400/50' : 'bg-slate-700'}`}></span>
-                      <p className="font-bold text-xs text-slate-400 flex items-center gap-1.5">
+                      <p className="font-bold text-xs text-slate-500 flex items-center gap-1.5">
                         {evt.time}
                         {evt.badge && (
                           <span className="bg-emerald-500/10 px-1.5 py-0.5 rounded text-[9px] font-semibold border border-emerald-500/20 text-emerald-400">
@@ -145,7 +145,7 @@ export default function ItineraryTab() {
                           </span>
                         )}
                       </p>
-                      <p className="font-medium mt-0.5">{evt.desc}</p>
+                      <p className="font-medium mt-0.5 text-slate-300">{evt.desc}</p>
                     </div>
                   ))}
                 </div>

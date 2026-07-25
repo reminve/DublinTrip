@@ -197,53 +197,58 @@ export default function TrackingTab({ userProfile }) {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider">Géolocalisation & Suivi Direct</h3>
-        <div className="flex gap-2">
-          <button 
-            type="button"
-            onClick={toggleTracking} 
-            className={`text-xs border font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer ${isTracking ? 'bg-rose-500/10 border-rose-500/20 text-rose-400 hover:text-rose-300' : 'bg-slate-900 border-slate-800 text-rose-450 hover:text-rose-400'}`}
-          >
-            {isTracking ? <Square className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            <span>{isTracking ? "Arrêter" : "Activer"}</span>
-          </button>
-          <button 
-            type="button"
-            onClick={simulateGPSMove} 
-            className="text-xs bg-slate-900 border border-slate-800 text-slate-300 hover:text-slate-100 font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
-          >
-            <CornerDownRight className="w-3.5 h-3.5" /> 
-            <span>Simuler</span>
-          </button>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+      
+      {/* Controls & Stats (1 Column on Desktop) */}
+      <div className="md:col-span-1 space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider">Géolocalisation Live</h3>
+          <div className="flex gap-2">
+            <button 
+              type="button"
+              onClick={toggleTracking} 
+              className={`text-xs border font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer ${isTracking ? 'bg-rose-500/10 border-rose-500/20 text-rose-400 hover:text-rose-300' : 'bg-slate-900 border-slate-800 text-rose-450 hover:text-rose-400'}`}
+            >
+              {isTracking ? <Square className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+              <span>{isTracking ? "Arrêter" : "Activer"}</span>
+            </button>
+            <button 
+              type="button"
+              onClick={simulateGPSMove} 
+              className="text-xs bg-slate-900 border border-slate-800 text-slate-300 hover:text-slate-100 font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <CornerDownRight className="w-3.5 h-3.5" /> 
+              <span>Simuler</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Stats Card */}
+        <div className="bg-slate-900/20 border border-slate-900/60 rounded-2xl p-4 grid grid-cols-2 gap-3 text-xs backdrop-blur shadow-md">
+          <div className="space-y-1">
+            <p className="text-slate-500 font-semibold uppercase text-[9px] tracking-wide">Coordonnées</p>
+            <p className="font-mono text-slate-200">{gpsData.coords}</p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-slate-500 font-semibold uppercase text-[9px] tracking-wide">Précision</p>
+            <p className="font-mono text-slate-200">{gpsData.accuracy}</p>
+          </div>
+          <div className="space-y-1 border-t border-slate-850 pt-2">
+            <p className="text-slate-500 font-semibold uppercase text-[9px] tracking-wide">Vitesse / Altitude</p>
+            <p className="font-mono text-slate-200">{gpsData.stats}</p>
+          </div>
+          <div className="space-y-1 border-t border-slate-850 pt-2">
+            <p className="text-slate-500 font-semibold uppercase text-[9px] tracking-wide">Mis à jour</p>
+            <p className="font-mono text-slate-200">{gpsData.time}</p>
+          </div>
         </div>
       </div>
 
-      {/* Stats Overlay */}
-      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 grid grid-cols-2 gap-3 text-xs backdrop-blur">
-        <div className="space-y-1">
-          <p className="text-slate-500 font-semibold uppercase text-[9px] tracking-wide">Coordonnées</p>
-          <p className="font-mono text-slate-200">{gpsData.coords}</p>
-        </div>
-        <div className="space-y-1">
-          <p className="text-slate-500 font-semibold uppercase text-[9px] tracking-wide">Précision</p>
-          <p className="font-mono text-slate-200">{gpsData.accuracy}</p>
-        </div>
-        <div className="space-y-1 border-t border-slate-800/80 pt-2">
-          <p className="text-slate-500 font-semibold uppercase text-[9px] tracking-wide">Vitesse / Altitude</p>
-          <p className="font-mono text-slate-200">{gpsData.stats}</p>
-        </div>
-        <div className="space-y-1 border-t border-slate-800/80 pt-2">
-          <p className="text-slate-500 font-semibold uppercase text-[9px] tracking-wide">Mis à jour</p>
-          <p className="font-mono text-slate-200">{gpsData.time}</p>
-        </div>
-      </div>
-
-      {/* Map container */}
-      <div className="relative rounded-2xl border border-slate-800 overflow-hidden shadow-inner bg-slate-950 h-[320px]">
+      {/* Map Display (2 Columns on Desktop) */}
+      <div className="md:col-span-2 relative rounded-2xl border border-slate-900/60 overflow-hidden shadow-inner bg-slate-950 h-[320px] md:h-[450px]">
         <div ref={mapContainerRef} className="w-full h-full z-10"></div>
       </div>
+      
     </div>
   );
 }
