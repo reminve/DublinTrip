@@ -40,7 +40,7 @@ export default function AuthScreen({ onAuthenticated, onShowSetup }) {
 
         if (profileErr || !profile) {
           // Profile entry missing: create a draft via upsert (fallback)
-          await supabase.from('profiles').upsert([
+          await supabase.from('profiles').insert([
             { id: data.user.id, email: email, approved: false, is_admin: false }
           ]);
           await supabase.auth.signOut();
@@ -59,7 +59,7 @@ export default function AuthScreen({ onAuthenticated, onShowSetup }) {
 
         if (data && data.user) {
           // Insert or update profile (safe without foreign key check)
-          const { error: profileErr } = await supabase.from('profiles').upsert([
+          const { error: profileErr } = await supabase.from('profiles').insert([
             { id: data.user.id, email: email, approved: false, is_admin: false }
           ]);
           if (profileErr) throw profileErr;

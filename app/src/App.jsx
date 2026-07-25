@@ -49,7 +49,7 @@ export default function App() {
           // Profile entry missing: create it via upsert (fallback)
           await supabase
             .from('profiles')
-            .upsert([{ id: session.user.id, email: session.user.email, approved: false, is_admin: false }]);
+            .insert([{ id: session.user.id, email: session.user.email, approved: false, is_admin: false }]);
             
           await supabase.auth.signOut();
           setUserProfile(null);
