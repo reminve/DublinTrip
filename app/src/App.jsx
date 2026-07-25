@@ -476,8 +476,14 @@ export default function App() {
 
       {/* ==================== MOBILE "PLUS" MENU OVERLAY ==================== */}
       {showPlusMenu && (
-        <div className="md:hidden fixed inset-0 z-38 bg-black/60 backdrop-blur-sm flex items-end justify-center p-4 transition-all">
-          <div className="w-full max-w-sm bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 pb-24 backdrop-blur-xl">
+        <div 
+          onClick={() => setShowPlusMenu(false)}
+          className="md:hidden fixed inset-0 z-45 bg-black/60 backdrop-blur-sm flex items-end justify-center p-4 transition-all"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 pb-24 backdrop-blur-xl"
+          >
             <div className="flex justify-between items-center border-b border-slate-850 pb-3">
               <h3 className="text-sm font-bold text-slate-200 flex items-center gap-1.5"><Compass className="w-4 h-4 text-emerald-400" /> Autres outils</h3>
               <button 

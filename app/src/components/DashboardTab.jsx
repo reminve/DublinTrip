@@ -148,6 +148,27 @@ export default function DashboardTab({ userProfile }) {
     }
   };
 
+  const handleImportDefaults = async () => {
+    try {
+      if (supabase) {
+        const seedData = DEFAULT_EXPENSES.map(e => ({
+          title: e.title,
+          amount: e.amount,
+          category: e.category,
+          date: e.date,
+          note: e.note
+        }));
+        await supabase.from('dublin_expenses').insert(seedData);
+      }
+      localStorage.removeItem('dublin_expenses_cleared');
+      localStorage.setItem('dublin_expenses_list', JSON.stringify(DEFAULT_EXPENSES));
+      await loadExpenses();
+      alert("Les 7 dépenses initiales ont été importées avec succès !");
+    } catch (err) {
+      alert("Erreur lors de l'import : " + err.message);
+    }
+  };
+
   // 1. Countdown Logic
   useEffect(() => {
     const updateCountdown = () => {
@@ -475,14 +496,14 @@ export default function DashboardTab({ userProfile }) {
               
               {/* Add Expense Form (Admin Only) */}
               {userProfile?.is_admin && (
-                <form onSubmit={handleAddExpense} className="bg-slate-950/40 border border-slate-900/60 rounded-2xl p-4 space-y-4">
+                <form onSubmit={handleAddExpense} className="card-premium p-5 space-y-4 border border-slate-800/80 bg-slate-950/20">
                   <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-450 flex items-center gap-2">
                     <Plus className="w-3.5 h-3.5 text-emerald-400" /> Enregistrer un nouveau paiement
                   </h4>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                     <div className="sm:col-span-2">
-                      <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Libellé / Titre de la dépense</label>
+                      <label className="text-[9px] font-bold text-slate-450 uppercase tracking-wider mb-1 block">Libellé / Titre de la dépense</label>
                       <input 
                         type="text"
                         placeholder="Ex: Pub The Temple Bar, Guinness Storehouse..."
@@ -494,7 +515,7 @@ export default function DashboardTab({ userProfile }) {
                     </div>
 
                     <div>
-                      <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Montant (€)</label>
+                      <label className="text-[9px] font-bold text-slate-450 uppercase tracking-wider mb-1 block">Montant (€)</label>
                       <input 
                         type="number"
                         step="0.01"
@@ -507,7 +528,7 @@ export default function DashboardTab({ userProfile }) {
                     </div>
 
                     <div>
-                      <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Type de dépense</label>
+                      <label className="text-[9px] font-bold text-slate-450 uppercase tracking-wider mb-1 block">Type de dépense</label>
                       <select
                         value={expenseCategory}
                         onChange={(e) => setExpenseCategory(e.target.value)}
@@ -519,7 +540,7 @@ export default function DashboardTab({ userProfile }) {
                     </div>
 
                     <div>
-                      <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Date du paiement</label>
+                      <label className="text-[9px] font-bold text-slate-450 uppercase tracking-wider mb-1 block">Date du paiement</label>
                       <input 
                         type="date"
                         value={expenseDate}
@@ -530,7 +551,7 @@ export default function DashboardTab({ userProfile }) {
                     </div>
 
                     <div>
-                      <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Commentaire / Notes (Optionnel)</label>
+                      <label className="text-[9px] font-bold text-slate-450 uppercase tracking-wider mb-1 block">Commentaire / Notes (Optionnel)</label>
                       <input 
                         type="text"
                         placeholder="Ex: Payé par carte"
@@ -543,7 +564,7 @@ export default function DashboardTab({ userProfile }) {
 
                   <button 
                     type="submit"
-                    className="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-2.5 px-4 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow"
+                    className="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-black py-2.5 px-4 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow"
                   >
                     Ajouter au budget
                   </button>
@@ -561,7 +582,16 @@ export default function DashboardTab({ userProfile }) {
 
                 <div className="space-y-2 max-h-[30vh] overflow-y-auto pr-1">
                   {expenses.length === 0 ? (
-                    <p className="text-center py-6 text-xs text-slate-500">Aucune dépense enregistrée.</p>
+                    <div className="text-center py-8 bg-slate-950/20 border border-slate-900/40 rounded-2xl p-5 space-y-3">
+                      <p className="text-xs text-slate-450 font-semibold">Aucune dépense enregistrée dans votre budget.</p>
+                      <button
+                        type="button"
+                        onClick={handleImportDefaults}
+                        className="text-[10px] font-black uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-slate-900 px-4 py-2.5 rounded-xl transition-all cursor-pointer shadow inline-flex items-center gap-1.5"
+                      >
+                        📥 Importer les 7 dépenses de base
+                      </button>
+                    </div>
                   ) : (
                     expenses.map((exp) => (
                       <div key={exp.id} className="bg-slate-950/60 border border-slate-900 rounded-xl p-3 flex items-center justify-between gap-4 hover:border-slate-850 transition-colors">

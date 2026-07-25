@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { UploadCloud, Image, Trash2, X } from 'lucide-react';
 import { getSupabase } from '../supabase';
 
@@ -163,7 +164,7 @@ export default function GalleryTab({ userProfile }) {
       )}
 
       {/* Lightbox Modal */}
-      {lightboxPhoto && (
+      {lightboxPhoto && createPortal(
         <div className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-4">
           <div className="absolute top-4 right-4 flex gap-4">
             {userProfile.is_admin && (
@@ -183,7 +184,8 @@ export default function GalleryTab({ userProfile }) {
           </div>
           <img src={lightboxPhoto.src} alt="" className="max-w-full max-h-[80vh] rounded-xl object-contain shadow-2xl" />
           <p className="text-xs text-slate-500 mt-4">{lightboxPhoto.date}</p>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
