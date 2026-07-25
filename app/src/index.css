@@ -182,31 +182,31 @@ body.light .border-slate-900\/80 {
 }
 
 body.light .text-slate-50 {
-  color: #111827 !important; 
+  color: #0f172a !important; 
 }
 body.light .text-slate-100 {
-  color: #1f2937 !important; 
+  color: #0f172a !important; 
 }
 body.light .text-slate-200 {
-  color: #374151 !important; 
+  color: #1e293b !important; 
 }
 body.light .text-slate-350 {
-  color: #4b5563 !important;
+  color: #334155 !important;
 }
 body.light .text-slate-300 {
-  color: #4b5563 !important; 
+  color: #334155 !important; 
 }
 body.light .text-slate-400 {
-  color: #6b7280 !important; 
+  color: #475569 !important; 
 }
 body.light .text-slate-450 {
-  color: #6b7280 !important;
+  color: #475569 !important;
 }
 body.light .text-slate-500 {
-  color: #9ca3af !important; 
+  color: #64748b !important; 
 }
 body.light .text-slate-800\/10 {
-  color: rgba(0, 0, 0, 0.03) !important;
+  color: rgba(15, 23, 42, 0.05) !important;
 }
 
 /* Global Light Mode inputs styling to prevent white text on white bg */
