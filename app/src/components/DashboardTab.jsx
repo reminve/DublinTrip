@@ -19,7 +19,7 @@ const DEFAULT_EXPENSES = [
   { id: 'e7', title: "Booking.com Hotel", amount: 327.41, category: 'reserved', date: '2026-07-25', note: 'Logement aparto' }
 ];
 
-export default function DashboardTab() {
+export default function DashboardTab({ userProfile }) {
   // Countdown State
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [tripState, setTripState] = useState('before'); // 'before', 'ongoing', 'after'
@@ -60,7 +60,32 @@ export default function DashboardTab() {
           .select('*')
           .order('date', { ascending: false });
         if (!error && data) {
-          loaded = data;
+          if (data.length === 0) {
+            // Table is empty! Let's seed it with the default expenses
+            const hasSeeded = localStorage.getItem('dublin_expenses_seeded');
+            if (!hasSeeded) {
+              const seedData = DEFAULT_EXPENSES.map(e => ({
+                title: e.title,
+                amount: e.amount,
+                category: e.category,
+                date: e.date,
+                note: e.note
+              }));
+              await supabase.from('dublin_expenses').insert(seedData);
+              localStorage.setItem('dublin_expenses_seeded', 'true');
+              
+              // Refetch seeded data
+              const { data: refetched } = await supabase
+                .from('dublin_expenses')
+                .select('*')
+                .order('date', { ascending: false });
+              loaded = refetched || DEFAULT_EXPENSES;
+            } else {
+              loaded = [];
+            }
+          } else {
+            loaded = data;
+          }
         } else {
           throw new Error(error?.message || "Table not found");
         }
@@ -458,80 +483,82 @@ export default function DashboardTab() {
             {/* Modal Body (Scrollable) */}
             <div className="p-5 overflow-y-auto space-y-6 flex-grow">
               
-              {/* Add Expense Form */}
-              <form onSubmit={handleAddExpense} className="bg-slate-950/40 border border-slate-900/60 rounded-2xl p-4 space-y-4">
-                <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-450 flex items-center gap-2">
-                  <Plus className="w-3.5 h-3.5 text-emerald-400" /> Enregistrer un nouveau paiement
-                </h4>
+              {/* Add Expense Form (Admin Only) */}
+              {userProfile?.is_admin && (
+                <form onSubmit={handleAddExpense} className="bg-slate-950/40 border border-slate-900/60 rounded-2xl p-4 space-y-4">
+                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-450 flex items-center gap-2">
+                    <Plus className="w-3.5 h-3.5 text-emerald-400" /> Enregistrer un nouveau paiement
+                  </h4>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                  <div className="sm:col-span-2">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Libellé / Titre de la dépense</label>
-                    <input 
-                      type="text"
-                      placeholder="Ex: Pub The Temple Bar, Guinness Storehouse..."
-                      value={expenseTitle}
-                      onChange={(e) => setExpenseTitle(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-900 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/50"
-                      required
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div className="sm:col-span-2">
+                      <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Libellé / Titre de la dépense</label>
+                      <input 
+                        type="text"
+                        placeholder="Ex: Pub The Temple Bar, Guinness Storehouse..."
+                        value={expenseTitle}
+                        onChange={(e) => setExpenseTitle(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-900 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/50"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Montant (€)</label>
+                      <input 
+                        type="number"
+                        step="0.01"
+                        placeholder="Ex: 22.50"
+                        value={expenseAmount}
+                        onChange={(e) => setExpenseAmount(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-900 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/50"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Type de dépense</label>
+                      <select
+                        value={expenseCategory}
+                        onChange={(e) => setExpenseCategory(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-900 rounded-xl px-2 py-2 text-xs text-slate-200 cursor-pointer focus:outline-none focus:border-emerald-500/50"
+                      >
+                        <option value="reserved">Réservé (Avant départ)</option>
+                        <option value="on_site">Sur place (Dublin)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Date du paiement</label>
+                      <input 
+                        type="date"
+                        value={expenseDate}
+                        onChange={(e) => setExpenseDate(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-900 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Commentaire / Notes (Optionnel)</label>
+                      <input 
+                        type="text"
+                        placeholder="Ex: Payé par carte"
+                        value={expenseNotes}
+                        onChange={(e) => setExpenseNotes(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-900 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none"
+                      />
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Montant (€)</label>
-                    <input 
-                      type="number"
-                      step="0.01"
-                      placeholder="Ex: 22.50"
-                      value={expenseAmount}
-                      onChange={(e) => setExpenseAmount(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-900 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/50"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Type de dépense</label>
-                    <select
-                      value={expenseCategory}
-                      onChange={(e) => setExpenseCategory(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-900 rounded-xl px-2 py-2 text-xs text-slate-200 cursor-pointer focus:outline-none focus:border-emerald-500/50"
-                    >
-                      <option value="reserved">Réservé (Avant départ)</option>
-                      <option value="on_site">Sur place (Dublin)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Date du paiement</label>
-                    <input 
-                      type="date"
-                      value={expenseDate}
-                      onChange={(e) => setExpenseDate(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-900 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Commentaire / Notes (Optionnel)</label>
-                    <input 
-                      type="text"
-                      placeholder="Ex: Payé par carte"
-                      value={expenseNotes}
-                      onChange={(e) => setExpenseNotes(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-900 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <button 
-                  type="submit"
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-2.5 px-4 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow"
-                >
-                  Ajouter au budget
-                </button>
-              </form>
+                  <button 
+                    type="submit"
+                    className="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-2.5 px-4 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow"
+                  >
+                    Ajouter au budget
+                  </button>
+                </form>
+              )}
 
               {/* Ledger List */}
               <div className="space-y-3">
@@ -561,13 +588,15 @@ export default function DashboardTab() {
 
                         <div className="flex items-center gap-3.5 flex-shrink-0">
                           <span className="text-xs font-black text-rose-400">-{exp.amount.toFixed(2)} €</span>
-                          <button
-                            onClick={() => handleDeleteExpense(exp.id)}
-                            className="p-1.5 bg-slate-950 border border-slate-900 text-slate-500 hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
-                            title="Supprimer"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          {userProfile?.is_admin && (
+                            <button
+                              onClick={() => handleDeleteExpense(exp.id)}
+                              className="p-1.5 bg-slate-950 border border-slate-900 text-slate-500 hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
+                              title="Supprimer la dépense"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                         </div>
                       </div>
                     ))

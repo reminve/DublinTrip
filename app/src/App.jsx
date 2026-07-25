@@ -346,14 +346,16 @@ export default function App() {
               </button>
             )}
 
-            <button 
-              onClick={() => setActiveTab('settings')} 
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'settings' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
-              style={getActiveStyle('settings')}
-            >
-              <Settings className="w-4 h-4" />
-              <span>Réglages</span>
-            </button>
+            {userProfile?.is_admin && (
+              <button 
+                onClick={() => setActiveTab('settings')} 
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'settings' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+                style={getActiveStyle('settings')}
+              >
+                <Settings className="w-4 h-4" />
+                <span>Réglages</span>
+              </button>
+            )}
           </nav>
         </div>
 
@@ -398,7 +400,7 @@ export default function App() {
       {/* ==================== MAIN CONTENT WRAPPER ==================== */}
       <div className="flex-grow p-4 md:p-8 max-w-5xl mx-auto w-full z-10">
         <main className="pb-20 md:pb-0">
-          {activeTab === 'dashboard' && <DashboardTab />}
+          {activeTab === 'dashboard' && <DashboardTab userProfile={userProfile} />}
           {activeTab === 'itinerary' && <ItineraryTab />}
           {activeTab === 'journal' && <JournalTab userProfile={userProfile} />}
           {activeTab === 'gallery' && <GalleryTab userProfile={userProfile} />}
@@ -411,7 +413,7 @@ export default function App() {
               onProfileStatusChanged={setPendingApprovals} 
             />
           )}
-          {activeTab === 'settings' && (
+          {activeTab === 'settings' && userProfile?.is_admin && (
             <SettingsTab 
               onLogout={handleLogout} 
               onShowSetup={() => setScreen('setup')} 
@@ -505,19 +507,21 @@ export default function App() {
 
               <button 
                 onClick={() => { setActiveTab('documents'); setShowPlusMenu(false); }}
-                className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer gap-2"
+                className={`flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer gap-2 ${!userProfile?.is_admin ? 'col-span-2' : ''}`}
               >
                 <FileText className="w-5 h-5 text-emerald-400" />
                 <span className="text-[10px] font-bold uppercase text-slate-300">Billets & Résas</span>
               </button>
 
-              <button 
-                onClick={() => { setActiveTab('settings'); setShowPlusMenu(false); }}
-                className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer gap-2"
-              >
-                <Settings className="w-5 h-5 text-emerald-400" />
-                <span className="text-[10px] font-bold uppercase text-slate-300">Réglages</span>
-              </button>
+              {userProfile?.is_admin && (
+                <button 
+                  onClick={() => { setActiveTab('settings'); setShowPlusMenu(false); }}
+                  className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer gap-2"
+                >
+                  <Settings className="w-5 h-5 text-emerald-400" />
+                  <span className="text-[10px] font-bold uppercase text-slate-300">Réglages</span>
+                </button>
+              )}
 
               {userProfile?.is_admin && (
                 <button 

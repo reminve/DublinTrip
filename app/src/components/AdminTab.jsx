@@ -65,6 +65,20 @@ export default function AdminTab({ userProfile, onProfileStatusChanged }) {
     }
   };
 
+  const toggleAdminStatus = async (userId, currentStatus) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_admin: !currentStatus })
+        .eq('id', userId);
+        
+      if (error) throw error;
+      fetchProfiles();
+    } catch (err) {
+      alert("Erreur lors de la mise à jour des privilèges : " + err.message);
+    }
+  };
+
   // GPS history reset
   const handleResetGPS = async () => {
     if (!confirm("⚠️ ATTENTION : Voulez-vous supprimer l'INTEGRALITE de l'historique des positions GPS ? Cette action videra les tracés de la carte pour tous les voyageurs.")) return;
@@ -122,6 +136,26 @@ export default function AdminTab({ userProfile, onProfileStatusChanged }) {
     }
   };
 
+  // Expenses reset
+  const handleResetExpenses = async () => {
+    if (!confirm("⚠️ Voulez-vous supprimer TOUTES les dépenses enregistrées (y compris les 7 dépenses par défaut) de la base de données ?")) return;
+    try {
+      if (supabase) {
+        const { error } = await supabase
+          .from('dublin_expenses')
+          .delete()
+          .neq('user_id', '00000000-0000-0000-0000-000000000000'); // Deletes all rows
+          
+        if (error) throw error;
+      }
+      localStorage.removeItem('dublin_expenses_list');
+      localStorage.removeItem('dublin_expenses_seeded');
+      alert("Registre des dépenses réinitialisé avec succès !");
+    } catch (err) {
+      alert("Erreur lors du nettoyage des dépenses : " + err.message);
+    }
+  };
+
   return (
     <div className="space-y-6">
       
@@ -160,6 +194,18 @@ export default function AdminTab({ userProfile, onProfileStatusChanged }) {
                         <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded font-semibold ml-1">Admin</span>
                       )}
                     </div>
+                    {profile.approved && (
+                      <label className="flex items-center gap-1.5 mt-2 text-[10px] text-slate-400 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={profile.is_admin}
+                          disabled={isSelf} // Prevent self demotion
+                          onChange={() => toggleAdminStatus(profile.id, profile.is_admin)}
+                          className="w-3 h-3 rounded border-slate-900 bg-slate-950 text-emerald-500 accent-emerald-500 cursor-pointer"
+                        />
+                        <span>Droits Administrateur</span>
+                      </label>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     {!profile.approved && (
@@ -195,10 +241,10 @@ export default function AdminTab({ userProfile, onProfileStatusChanged }) {
           Utilisez ces actions pour nettoyer les données de test (GPS ou bières) avant de décoller pour Dublin afin de démarrer votre voyage sur une base vierge.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
           <button
             onClick={handleResetGPS}
-            className="bg-slate-950 hover:bg-rose-500/10 border border-slate-900 hover:border-rose-500/20 text-slate-300 hover:text-rose-400 font-bold p-4 rounded-2xl text-xs transition-all flex flex-col items-center justify-center gap-2.5 cursor-pointer text-center"
+            className="bg-slate-950 hover:bg-rose-500/10 border border-slate-900 hover:border-rose-500/20 text-slate-300 hover:text-rose-400 font-bold p-4 rounded-2xl text-xs transition-all flex flex-col items-center justify-center gap-2.5 cursor-pointer text-center animate-duration-100"
           >
             <Trash2 className="w-5 h-5 text-rose-400" />
             <div>
@@ -226,6 +272,17 @@ export default function AdminTab({ userProfile, onProfileStatusChanged }) {
             <div>
               <p className="font-extrabold">Remettre Guinness à 0</p>
               <p className="text-[9px] text-slate-500 mt-0.5">Réinitialiser le compteur</p>
+            </div>
+          </button>
+
+          <button
+            onClick={handleResetExpenses}
+            className="bg-slate-950 hover:bg-rose-500/10 border border-slate-900 hover:border-rose-500/20 text-slate-300 hover:text-rose-400 font-bold p-4 rounded-2xl text-xs transition-all flex flex-col items-center justify-center gap-2.5 cursor-pointer text-center"
+          >
+            <Trash2 className="w-5 h-5 text-rose-400" />
+            <div>
+              <p className="font-extrabold">Vider le Budget</p>
+              <p className="text-[9px] text-slate-500 mt-0.5">Réinitialiser le registre</p>
             </div>
           </button>
         </div>
