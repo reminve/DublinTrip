@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Home, Calendar, Camera, MapPin, Users, Settings, 
   Sun, Moon, Sparkles, BookOpen, Compass, Beer, 
-  CheckSquare, Plus, Palette, LogOut, MessageSquare, FileText
+  CheckSquare, Plus, Palette, LogOut, MessageSquare, FileText, Plane
 } from 'lucide-react';
 import { getSupabase } from './supabase';
 import SetupScreen from './components/SetupScreen';
