@@ -38,7 +38,7 @@ jobs:
           cache-dependency-path: 'app/package-lock.json'
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --force
         working-directory: ./app
 
       - name: Create env file from Secrets
