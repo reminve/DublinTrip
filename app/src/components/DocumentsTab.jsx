@@ -1,10 +1,86 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { getSupabase } from '../supabase';
 import { 
   FileText, CreditCard, Link, FileDown, UploadCloud, 
   File, Image as ImageIcon, Trash2, X, ZoomIn, ExternalLink
 } from 'lucide-react';
+
+// ── PDF.js canvas renderer (works on mobile where iframes fail) ──────────────
+function MobilePDFViewer({ dataUrl }) {
+  const [pages, setPages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const cancelled = useRef(false);
+
+  useEffect(() => {
+    cancelled.current = false;
+    setLoading(true);
+    setPages([]);
+    setError(false);
+
+    const render = async () => {
+      try {
+        // Load PDF.js from CDN if not already loaded
+        if (!window.pdfjsLib) {
+          await new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.appendChild(s);
+          });
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+
+        const pdf = await window.pdfjsLib.getDocument(dataUrl).promise;
+        const rendered = [];
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          if (cancelled.current) return;
+          const page = await pdf.getPage(i);
+          const vp = page.getViewport({ scale: 1.8 });
+          const canvas = document.createElement('canvas');
+          canvas.width = vp.width;
+          canvas.height = vp.height;
+          await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+          rendered.push(canvas.toDataURL('image/jpeg', 0.92));
+        }
+
+        if (!cancelled.current) {
+          setPages(rendered);
+          setLoading(false);
+        }
+      } catch (e) {
+        if (!cancelled.current) { setError(true); setLoading(false); }
+      }
+    };
+
+    render();
+    return () => { cancelled.current = true; };
+  }, [dataUrl]);
+
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center gap-3 h-64 text-slate-400">
+      <div className="w-8 h-8 border-2 border-slate-700 border-t-emerald-400 rounded-full animate-spin" />
+      <p className="text-xs font-semibold">Rendu du PDF en cours...</p>
+    </div>
+  );
+  if (error) return (
+    <div className="flex flex-col items-center justify-center gap-2 h-64 text-rose-400 text-center px-6">
+      <p className="text-sm font-bold">⚠️ Impossible d'afficher ce PDF</p>
+      <p className="text-xs text-slate-500">Utilisez le bouton "Ouvrir" pour le consulter dans votre navigateur.</p>
+    </div>
+  );
+  return (
+    <div className="w-full space-y-2 overflow-y-auto">
+      {pages.map((src, i) => (
+        <img key={i} src={src} alt={`Page ${i + 1}`} className="w-full" />
+      ))}
+    </div>
+  );
+}
 
 export default function DocumentsTab({ userProfile }) {
   const [documents, setDocuments] = useState([]);
@@ -382,16 +458,18 @@ export default function DocumentsTab({ userProfile }) {
               <span className="text-sm font-bold text-slate-200 truncate">{previewDoc.title}</span>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
-              {/* Open in new tab */}
-              <a
-                href={previewDoc.file_data}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[10px] font-black uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-300 hover:text-white px-3 py-2 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <ExternalLink className="w-3.5 h-3.5" /> Ouvrir
-              </a>
+              {/* Open in new tab — hidden on mobile (PDF.js renders inline instead) */}
+              {(previewDoc.type !== 'pdf' || window.innerWidth >= 768) && (
+                <a
+                  href={previewDoc.file_data}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] font-black uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-300 hover:text-white px-3 py-2 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ExternalLink className="w-3.5 h-3.5" /> Ouvrir
+                </a>
+              )}
               {/* Download */}
               {userProfile?.is_admin && (
                 <button
@@ -415,15 +493,22 @@ export default function DocumentsTab({ userProfile }) {
 
           {/* Viewer body */}
           <div
-            className="flex-1 overflow-auto flex items-center justify-center p-4"
+            className="flex-1 overflow-auto flex items-start justify-center p-4"
             onClick={(e) => e.stopPropagation()}
           >
             {previewDoc.type === 'pdf' ? (
-              <iframe
-                src={previewDoc.file_data}
-                title={previewDoc.title}
-                className="w-full max-w-4xl h-full min-h-[70vh] rounded-xl border border-slate-800 bg-white"
-              />
+              // Desktop: iframe renders natively. Mobile: PDF.js canvas renderer.
+              window.innerWidth >= 768 ? (
+                <iframe
+                  src={previewDoc.file_data}
+                  title={previewDoc.title}
+                  className="w-full max-w-4xl h-full min-h-[70vh] rounded-xl border border-slate-800 bg-white"
+                />
+              ) : (
+                <div className="w-full max-w-lg">
+                  <MobilePDFViewer dataUrl={previewDoc.file_data} />
+                </div>
+              )
             ) : (
               <img
                 src={previewDoc.file_data}
