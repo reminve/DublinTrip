@@ -11,13 +11,17 @@ const DEPARTURE_TIME = new Date('2026-08-06T09:00:00+02:00').getTime();
 const RETURN_TIME = new Date('2026-08-12T14:30:00+02:00').getTime();
 
 const DEFAULT_EXPENSES = [
-  { id: 'e1', title: "Vol Aer Lingus A/R", amount: 340.22, category: 'reserved', date: '2026-07-25', note: 'Vols aller/retour (EI 553 / EI 550)' },
-  { id: 'e2', title: "Binary Hub - Aparto", amount: 327.41, category: 'reserved', date: '2026-07-25', note: 'Chambre 6 nuits (Booking.com)' },
-  { id: 'e3', title: "Dublin Express 782 A/R", amount: 12.00, category: 'reserved', date: '2026-07-25', note: 'Navette aéroport Usher\'s Quay' },
-  { id: 'e4', title: "Book of Kells Experience", amount: 21.00, category: 'reserved', date: '2026-07-25', note: 'Trinity Visit (Tarif étudiant)' },
-  { id: 'e5', title: "Guinness Storehouse", amount: 22.50, category: 'on_site', date: '2026-08-08', note: 'Visite prévisionnelle' },
-  { id: 'e6', title: "Transports locaux (DART/Bus)", amount: 25.00, category: 'on_site', date: '2026-08-06', note: 'DART Howth & bus' },
-  { id: 'e7', title: "Restauration & Courses", amount: 240.00, category: 'on_site', date: '2026-08-06', note: 'Repas, supermarché & extras' }
+  { id: 'e1', title: "Train TER Clermont ↔ Lyon", amount: 22.00, category: 'reserved', date: '2026-07-25', note: 'SNCF Connect (09h02 / 11h34)' },
+  { id: 'e2', title: "Rhônexpress Lyon ↔ LYS", amount: 19.90, category: 'reserved', date: '2026-07-25', note: 'Tram-train express (Jeune 12-25 ans)' },
+  { id: 'e3', title: "Vol Aer Lingus A/R", amount: 340.22, category: 'reserved', date: '2026-07-25', note: 'Vols LYS ↔ DUB T2 + 10kg soute' },
+  { id: 'e4', title: "aparto Binary Hub (6 nuits)", amount: 327.41, category: 'reserved', date: '2026-07-25', note: 'Booking.com n° 5694634506 (Code: 9401)' },
+  { id: 'e5', title: "Navette Dublin Express 782", amount: 12.00, category: 'reserved', date: '2026-07-25', note: 'Usher\'s Quay ↔ T2 (A/R)' },
+  { id: 'e6', title: "Visite Book of Kells", amount: 21.00, category: 'reserved', date: '2026-07-25', note: 'Trinity Visit 7 août @ 12h30 (Étudiant)' },
+  { id: 'e7', title: "Guinness Storehouse", amount: 22.50, category: 'on_site', date: '2026-08-08', note: 'St James\'s Gate' },
+  { id: 'e8', title: "Visite Kilmainham Gaol", amount: 8.00, category: 'on_site', date: '2026-08-10', note: 'Achat J-28 ou matin même' },
+  { id: 'e9', title: "Transports Locaux (TFI Leap)", amount: 25.00, category: 'on_site', date: '2026-08-06', note: 'DART Howth + Bus' },
+  { id: 'e10', title: "Excursion Glendalough", amount: 25.00, category: 'on_site', date: '2026-08-09', note: 'Car St. Kevin\'s Bus A/R' },
+  { id: 'e11', title: "Nourriture & Repas", amount: 175.00, category: 'on_site', date: '2026-08-06', note: 'Meal deals + pubs & snacks' }
 ];
 
 export default function DashboardTab({ userProfile }) {
