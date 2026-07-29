@@ -11,13 +11,13 @@ const DEPARTURE_TIME = new Date('2026-08-06T09:00:00+02:00').getTime();
 const RETURN_TIME = new Date('2026-08-12T14:30:00+02:00').getTime();
 
 const DEFAULT_EXPENSES = [
-  { id: 'e1', title: "TCD.IE BOOK OF K DUB", amount: 21.00, category: 'reserved', date: '2026-07-25', note: 'Book of Kells' },
-  { id: 'e2', title: "Guinness Storehouse Dub", amount: 22.50, category: 'reserved', date: '2026-07-25', note: 'Visite Guinness' },
-  { id: 'e3', title: "DT Dublin Express BER", amount: 12.00, category: 'reserved', date: '2026-07-25', note: 'Bus Navette' },
-  { id: 'e4', title: "SNCF", amount: 22.00, category: 'reserved', date: '2026-07-25', note: 'Train aller' },
-  { id: 'e5', title: "RHONEXPRESS LYON", amount: 19.90, category: 'reserved', date: '2026-07-25', note: 'Tram Aéroport' },
-  { id: 'e6', title: "Aer Lingus Flight", amount: 340.22, category: 'reserved', date: '2026-07-25', note: 'Vols Aller/Retour' },
-  { id: 'e7', title: "Booking.com Hotel", amount: 327.41, category: 'reserved', date: '2026-07-25', note: 'Logement aparto' }
+  { id: 'e1', title: "Vol Aer Lingus A/R", amount: 340.22, category: 'reserved', date: '2026-07-25', note: 'Vols aller/retour (EI 553 / EI 550)' },
+  { id: 'e2', title: "Binary Hub - Aparto", amount: 327.41, category: 'reserved', date: '2026-07-25', note: 'Chambre 6 nuits (Booking.com)' },
+  { id: 'e3', title: "Dublin Express 782 A/R", amount: 12.00, category: 'reserved', date: '2026-07-25', note: 'Navette aéroport Usher\'s Quay' },
+  { id: 'e4', title: "Book of Kells Experience", amount: 21.00, category: 'reserved', date: '2026-07-25', note: 'Trinity Visit (Tarif étudiant)' },
+  { id: 'e5', title: "Guinness Storehouse", amount: 22.50, category: 'on_site', date: '2026-08-08', note: 'Visite prévisionnelle' },
+  { id: 'e6', title: "Transports locaux (DART/Bus)", amount: 25.00, category: 'on_site', date: '2026-08-06', note: 'DART Howth & bus' },
+  { id: 'e7', title: "Restauration & Courses", amount: 240.00, category: 'on_site', date: '2026-08-06', note: 'Repas, supermarché & extras' }
 ];
 
 export default function DashboardTab({ userProfile }) {
