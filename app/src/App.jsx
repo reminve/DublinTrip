@@ -236,14 +236,14 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 flex flex-col md:flex-row relative overflow-x-hidden">
+    <div className="min-h-screen bg-slate-950 text-slate-50 flex flex-col md:flex-row items-start relative overflow-x-hidden">
       
       {/* Aesthetic blur background elements */}
       <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-10 right-1/4 w-[400px] h-[400px] bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
       {/* ==================== LEFT SIDEBAR (DESKTOP ONLY) ==================== */}
-      <aside className="hidden md:flex w-64 bg-slate-900/10 border-r border-slate-900/60 p-6 flex-col justify-between h-screen sticky top-0 backdrop-blur-xl z-30">
+      <aside className="hidden md:flex w-64 shrink-0 bg-slate-900/10 border-r border-slate-900/60 p-6 flex-col justify-between h-screen sticky top-0 self-start backdrop-blur-xl z-30">
         <div className="space-y-6">
           
           {/* Sidebar Header */}

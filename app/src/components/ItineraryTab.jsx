@@ -137,7 +137,7 @@ export default function ItineraryTab() {
           <a 
             href="/plan_voyage_dublin_2026.md" 
             download="plan_voyage_dublin_2026.md"
-            className="text-xs bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 hover:text-emerald-100 font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="text-xs bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-white-force font-black px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all cursor-pointer border border-emerald-400/50"
             title="Télécharger plan_voyage_dublin_2026.md"
           >
             <Download className="w-3.5 h-3.5" /> Plan (.md)
@@ -145,10 +145,10 @@ export default function ItineraryTab() {
           <a 
             href="/programme_google_calendar_dublin.ics" 
             download="programme_google_calendar_dublin.ics" 
-            className="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-100 hover:text-white font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-100 hover:text-white font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-700 shadow-sm"
             title="Télécharger l'agenda Google Calendar"
           >
-            <Calendar className="w-3.5 h-3.5" /> Calendar (.ics)
+            <Calendar className="w-3.5 h-3.5 text-emerald-400" /> Calendar (.ics)
           </a>
         </div>
       </div>
