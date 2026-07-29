@@ -192,7 +192,7 @@ export default function JournalTab({ userProfile }) {
     setNewEntryText('');
     setNewEntryPhoto(null);
 
-    const payload = { content: newEntry.content, emoji: newEntry.emoji, photo: newEntry.photo, likes: [], comments: [] };
+    const payload = { content: newEntry.content, emoji: newEntry.emoji };
 
     if (supabase && isOnline()) {
       try {
@@ -232,7 +232,7 @@ export default function JournalTab({ userProfile }) {
     setPintNote('');
     setNewPintPhoto(null);
 
-    const payload = { pub: newPint.pub, price: newPint.price, rating: newPint.rating, note: newPint.note, photo: newPint.photo, likes: [], comments: [] };
+    const payload = { pub: newPint.pub, price: newPint.price, rating: newPint.rating, note: newPint.note };
 
     if (supabase && isOnline()) {
       try {
