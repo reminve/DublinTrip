@@ -28,17 +28,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4.2.0
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: 'npm'
           cache-dependency-path: 'app/package-lock.json'
 
       - name: Install dependencies
-        run: npm ci || npm install --force
+        run: npm install --force
         working-directory: ./app
 
       - name: Create env file from Secrets
@@ -52,11 +52,11 @@ jobs:
         working-directory: ./app
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3.5.0
+        uses: actions/upload-pages-artifact@v5
         with:
           # Upload compiled dist directory
           path: './app/dist'
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4.0.5
+        uses: actions/deploy-pages@v5
