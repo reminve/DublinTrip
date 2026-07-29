@@ -405,7 +405,7 @@ export default function ItineraryTab() {
                     <li><strong>Code confidentiel :</strong> 9401</li>
                     <li><strong>Type :</strong> Chambre Double Privative avec SDB (Cuisine partagée)</li>
                     <li><strong>Check-in :</strong> Jeudi 6 août (19:00 - 20:00 - Demande spéciale approuvée)</li>
-                    <li><strong>Check-out :** Mercredi 12 août à 03:00 (Approuvé par Kyla - Réception 24h/24)</li>
+                    <li><strong>Check-out :</strong> Mercredi 12 août à 03:00 (Approuvé par Kyla - Réception 24h/24)</li>
                   </ul>
                 </div>
 
@@ -422,7 +422,7 @@ export default function ItineraryTab() {
                   <ul className="text-xs text-slate-300 space-y-1.5">
                     <li><strong>Vol Aller :</strong> EI 553 – Jeudi 6 Août 2026 (LYS ➔ DUB T2)</li>
                     <li><strong>Vol Retour :</strong> EI 550 – Mercredi 12 Août 2026 (DUB T2 ➔ LYS)</li>
-                    <li><strong>Terminal :** Terminal 2 (T2) Aéroport de Dublin</li>
+                    <li><strong>Terminal :</strong> Terminal 2 (T2) Aéroport de Dublin</li>
                     <li><strong>Bagage Cabine :</strong> 1 petit sac sous le siège (40 x 30 x 20 cm)</li>
                     <li><strong>Bagage Soute :</strong> 1 bagage de 10 kg (55 x 40 x 24 cm) à déposer au comptoir</li>
                   </ul>
@@ -547,7 +547,7 @@ export default function ItineraryTab() {
               <ol className="list-decimal list-inside text-xs text-slate-300 space-y-2">
                 <li><strong className="text-slate-100">Adaptateur Prise :</strong> Prises de Type G (3 fiches carrées) nécessaires en Irlande.</li>
                 <li><strong className="text-slate-100">Pièce d'Identité :</strong> Carte nationale d'identité ou Passeport en cours de validité + Carte d'étudiant physique pour l'entrée Trinity College.</li>
-                <li><strong className="text-slate-100">Paiements :** Les cartes bancaires sont acceptées partout (Apple Pay / Google Pay généralisés). Prévoir uniquement 20 € à 30 € en espèces au cas où.</li>
+                <li><strong className="text-slate-100">Paiements :</strong> Les cartes bancaires sont acceptées partout (Apple Pay / Google Pay généralisés). Prévoir uniquement 20 € à 30 € en espèces au cas où.</li>
               </ol>
             </div>
 
