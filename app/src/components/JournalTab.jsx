@@ -89,8 +89,8 @@ export default function JournalTab({ userProfile }) {
         if (!error && data) {
           const localRaw = localStorage.getItem('dublin_journal_entries');
           const localEntries = localRaw ? JSON.parse(localRaw) : [];
-          const dbIds = new Set(data.map(d => d.id));
-          const unsyncedLocal = localEntries.filter(e => e.id && (e.id.startsWith('off_') || !dbIds.has(e.id)));
+          const dbContents = new Set(data.map(d => d.content));
+          const unsyncedLocal = localEntries.filter(e => e.id && e.id.startsWith('off_') && !dbContents.has(e.content));
           loadedEntries = [...unsyncedLocal, ...data];
           localStorage.setItem('dublin_journal_entries', JSON.stringify(loadedEntries));
         } else {
@@ -131,8 +131,8 @@ export default function JournalTab({ userProfile }) {
         if (!error && data) {
           const localRaw = localStorage.getItem('dublin_pints_list');
           const localPints = localRaw ? JSON.parse(localRaw) : [];
-          const dbIds = new Set(data.map(d => d.id));
-          const unsyncedLocal = localPints.filter(p => p.id && (p.id.startsWith('off_') || !dbIds.has(p.id)));
+          const dbPubNotes = new Set(data.map(d => `${d.pub}_${d.note || ''}`));
+          const unsyncedLocal = localPints.filter(p => p.id && p.id.startsWith('off_') && !dbPubNotes.has(`${p.pub}_${p.note || ''}`));
           loadedPints = [...unsyncedLocal, ...data];
           localStorage.setItem('dublin_pints_list', JSON.stringify(loadedPints));
         } else {
@@ -192,7 +192,7 @@ export default function JournalTab({ userProfile }) {
     setNewEntryText('');
     setNewEntryPhoto(null);
 
-    const payload = { content: newEntry.content, emoji: newEntry.emoji };
+    const payload = { content: newEntry.content, emoji: newEntry.emoji, photo: newEntry.photo };
 
     if (supabase && isOnline()) {
       try {
@@ -232,7 +232,7 @@ export default function JournalTab({ userProfile }) {
     setPintNote('');
     setNewPintPhoto(null);
 
-    const payload = { pub: newPint.pub, price: newPint.price, rating: newPint.rating, note: newPint.note };
+    const payload = { pub: newPint.pub, price: newPint.price, rating: newPint.rating, note: newPint.note, photo: newPint.photo };
 
     if (supabase && isOnline()) {
       try {

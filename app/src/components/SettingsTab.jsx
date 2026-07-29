@@ -51,6 +51,7 @@ export default function SettingsTab({ onLogout, onShowSetup }) {
               &nbsp;&nbsp;created_at TIMESTAMPTZ DEFAULT NOW(),<br />
               &nbsp;&nbsp;content TEXT NOT NULL,<br />
               &nbsp;&nbsp;emoji TEXT NOT NULL,<br />
+              &nbsp;&nbsp;photo TEXT,<br />
               &nbsp;&nbsp;user_id UUID DEFAULT auth.uid()<br />
               );<br /><br />
               CREATE TABLE IF NOT EXISTS public.dublin_pints (<br />
@@ -60,6 +61,7 @@ export default function SettingsTab({ onLogout, onShowSetup }) {
               &nbsp;&nbsp;price NUMERIC(5,2) DEFAULT 0,<br />
               &nbsp;&nbsp;rating INT DEFAULT 5,<br />
               &nbsp;&nbsp;note TEXT,<br />
+              &nbsp;&nbsp;photo TEXT,<br />
               &nbsp;&nbsp;user_id UUID DEFAULT auth.uid()<br />
               );<br /><br />
               CREATE TABLE IF NOT EXISTS public.dublin_suggestions (<br />
