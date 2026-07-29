@@ -23,9 +23,16 @@ import SettingsTab from './components/SettingsTab';
 export default function App() {
   const [screen, setScreen] = useState('loading'); // 'loading', 'setup', 'auth', 'app'
   const [userProfile, setUserProfile] = useState(null);
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(() => sessionStorage.getItem('app-active-tab') || 'dashboard');
   const [pendingApprovals, setPendingApprovals] = useState(0);
   const [showPlusMenu, setShowPlusMenu] = useState(false);
+
+  // Persist active tab during current browser session (cleared when closing tab/app)
+  useEffect(() => {
+    if (activeTab) {
+      sessionStorage.setItem('app-active-tab', activeTab);
+    }
+  }, [activeTab]);
 
   // Customization Themes & Accents
   const [theme, setTheme] = useState(() => localStorage.getItem('app-theme') || 'dark');
