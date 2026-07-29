@@ -4,6 +4,7 @@ import {
   UploadCloud, Image, Trash2, X, Heart, MessageSquare, Send
 } from 'lucide-react';
 import { getSupabase } from '../supabase';
+import { isOnline, addToOfflineQueue } from '../offlineSync';
 
 export default function GalleryTab({ userProfile }) {
   const [photos, setPhotos] = useState([]);
@@ -18,7 +19,7 @@ export default function GalleryTab({ userProfile }) {
 
   const fetchPhotos = async () => {
     let loadedPhotos = [];
-    if (supabase) {
+    if (supabase && isOnline()) {
       try {
         const { data, error } = await supabase
           .from('dublin_photos')
@@ -34,6 +35,7 @@ export default function GalleryTab({ userProfile }) {
             likes: Array.isArray(p.likes) ? p.likes : (p.likes ? JSON.parse(p.likes) : []),
             comments: Array.isArray(p.comments) ? p.comments : (p.comments ? JSON.parse(p.comments) : [])
           }));
+          localStorage.setItem('dublin_gallery_photos', JSON.stringify(loadedPhotos));
         } else {
           throw new Error(error?.message || "Table not found");
         }
@@ -51,6 +53,9 @@ export default function GalleryTab({ userProfile }) {
 
   useEffect(() => {
     fetchPhotos();
+    const handleSyncComplete = () => fetchPhotos();
+    window.addEventListener('offline-sync-complete', handleSyncComplete);
+    return () => window.removeEventListener('offline-sync-complete', handleSyncComplete);
   }, []);
 
   const handleFileChange = (e) => {
@@ -109,26 +114,22 @@ export default function GalleryTab({ userProfile }) {
             comments: []
           };
 
-          if (supabase) {
+          const payload = { image: compressedBase64, likes: [], comments: [] };
+          const updated = [newPhoto, ...photos];
+          setPhotos(updated);
+          localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
+
+          if (supabase && isOnline()) {
             try {
-              const { error } = await supabase.from('dublin_photos').insert([{ 
-                image: compressedBase64,
-                likes: [],
-                comments: []
-              }]);
+              const { error } = await supabase.from('dublin_photos').insert([payload]);
               if (error) throw error;
-              fetchPhotos();
             } catch (err) {
-              const updated = [newPhoto, ...photos];
-              setPhotos(updated);
-              localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
+              addToOfflineQueue({ type: 'INSERT', table: 'dublin_photos', data: payload });
             } finally {
               setLoading(false);
             }
           } else {
-            const updated = [newPhoto, ...photos];
-            setPhotos(updated);
-            localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
+            addToOfflineQueue({ type: 'INSERT', table: 'dublin_photos', data: payload });
             setLoading(false);
           }
         };

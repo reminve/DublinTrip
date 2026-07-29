@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { getSupabase } from '../supabase';
+import { isOnline, addToOfflineQueue } from '../offlineSync';
 import { 
   Beer, Edit3, Trash2, Calendar, Smile, Compass, MapPin, 
   Heart, MessageSquare, Send, Camera, Image as ImageIcon, X, ZoomIn
@@ -78,7 +79,7 @@ export default function JournalTab({ userProfile }) {
     setJournalLoading(true);
     let loadedEntries = [];
     
-    if (supabase) {
+    if (supabase && isOnline()) {
       try {
         const { data, error } = await supabase
           .from('dublin_journal')
@@ -87,6 +88,7 @@ export default function JournalTab({ userProfile }) {
         
         if (!error && data) {
           loadedEntries = data;
+          localStorage.setItem('dublin_journal_entries', JSON.stringify(data));
         } else {
           throw new Error(error?.message || "Table not found");
         }
@@ -115,7 +117,7 @@ export default function JournalTab({ userProfile }) {
     setPintLoading(true);
     let loadedPints = [];
     
-    if (supabase) {
+    if (supabase && isOnline()) {
       try {
         const { data, error } = await supabase
           .from('dublin_pints')
@@ -124,6 +126,7 @@ export default function JournalTab({ userProfile }) {
         
         if (!error && data) {
           loadedPints = data;
+          localStorage.setItem('dublin_pints_list', JSON.stringify(data));
         } else {
           throw new Error(error?.message || "Table not found");
         }
@@ -150,6 +153,13 @@ export default function JournalTab({ userProfile }) {
   useEffect(() => {
     loadJournal();
     loadPints();
+
+    const handleSyncComplete = () => {
+      loadJournal();
+      loadPints();
+    };
+    window.addEventListener('offline-sync-complete', handleSyncComplete);
+    return () => window.removeEventListener('offline-sync-complete', handleSyncComplete);
   }, []);
 
   // Save Journal Entry
@@ -170,20 +180,21 @@ export default function JournalTab({ userProfile }) {
 
     const updatedEntries = [newEntry, ...journalEntries];
     setJournalEntries(updatedEntries);
+    localStorage.setItem('dublin_journal_entries', JSON.stringify(updatedEntries));
     setNewEntryText('');
     setNewEntryPhoto(null);
 
-    if (supabase) {
+    const payload = { content: newEntry.content, emoji: newEntry.emoji, photo: newEntry.photo, likes: [], comments: [] };
+
+    if (supabase && isOnline()) {
       try {
-        const { error } = await supabase.from('dublin_journal').insert([
-          { content: newEntry.content, emoji: newEntry.emoji, photo: newEntry.photo, likes: [], comments: [] }
-        ]);
+        const { error } = await supabase.from('dublin_journal').insert([payload]);
         if (error) throw error;
       } catch (err) {
-        localStorage.setItem('dublin_journal_entries', JSON.stringify(updatedEntries));
+        addToOfflineQueue({ type: 'INSERT', table: 'dublin_journal', data: payload });
       }
     } else {
-      localStorage.setItem('dublin_journal_entries', JSON.stringify(updatedEntries));
+      addToOfflineQueue({ type: 'INSERT', table: 'dublin_journal', data: payload });
     }
   };
 
@@ -207,22 +218,23 @@ export default function JournalTab({ userProfile }) {
 
     const updatedPints = [newPint, ...pints];
     setPints(updatedPints);
+    localStorage.setItem('dublin_pints_list', JSON.stringify(updatedPints));
     setPubName('');
     setPintPrice('');
     setPintNote('');
     setNewPintPhoto(null);
 
-    if (supabase) {
+    const payload = { pub: newPint.pub, price: newPint.price, rating: newPint.rating, note: newPint.note, photo: newPint.photo, likes: [], comments: [] };
+
+    if (supabase && isOnline()) {
       try {
-        const { error } = await supabase.from('dublin_pints').insert([
-          { pub: newPint.pub, price: newPint.price, rating: newPint.rating, note: newPint.note, photo: newPint.photo, likes: [], comments: [] }
-        ]);
+        const { error } = await supabase.from('dublin_pints').insert([payload]);
         if (error) throw error;
       } catch (err) {
-        localStorage.setItem('dublin_pints_list', JSON.stringify(updatedPints));
+        addToOfflineQueue({ type: 'INSERT', table: 'dublin_pints', data: payload });
       }
     } else {
-      localStorage.setItem('dublin_pints_list', JSON.stringify(updatedPints));
+      addToOfflineQueue({ type: 'INSERT', table: 'dublin_pints', data: payload });
     }
   };
 
@@ -230,15 +242,16 @@ export default function JournalTab({ userProfile }) {
   const handleDeleteEntry = async (id) => {
     const updated = journalEntries.filter(entry => entry.id !== id);
     setJournalEntries(updated);
+    localStorage.setItem('dublin_journal_entries', JSON.stringify(updated));
 
-    if (supabase) {
+    if (supabase && isOnline()) {
       try {
         await supabase.from('dublin_journal').delete().eq('id', id);
       } catch (err) {
-        localStorage.setItem('dublin_journal_entries', JSON.stringify(updated));
+        addToOfflineQueue({ type: 'DELETE', table: 'dublin_journal', data: { id } });
       }
     } else {
-      localStorage.setItem('dublin_journal_entries', JSON.stringify(updated));
+      addToOfflineQueue({ type: 'DELETE', table: 'dublin_journal', data: { id } });
     }
   };
 
@@ -246,15 +259,16 @@ export default function JournalTab({ userProfile }) {
   const handleDeletePint = async (id) => {
     const updated = pints.filter(pint => pint.id !== id);
     setPints(updated);
+    localStorage.setItem('dublin_pints_list', JSON.stringify(updated));
 
-    if (supabase) {
+    if (supabase && isOnline()) {
       try {
         await supabase.from('dublin_pints').delete().eq('id', id);
       } catch (err) {
-        localStorage.setItem('dublin_pints_list', JSON.stringify(updated));
+        addToOfflineQueue({ type: 'DELETE', table: 'dublin_pints', data: { id } });
       }
     } else {
-      localStorage.setItem('dublin_pints_list', JSON.stringify(updated));
+      addToOfflineQueue({ type: 'DELETE', table: 'dublin_pints', data: { id } });
     }
   };
 

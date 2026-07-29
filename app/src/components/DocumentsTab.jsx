@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { getSupabase } from '../supabase';
+import { isOnline, addToOfflineQueue } from '../offlineSync';
 import { 
   FileText, CreditCard, Link, FileDown, UploadCloud, 
   File, Image as ImageIcon, Trash2, X, ZoomIn, ExternalLink
@@ -98,12 +99,15 @@ export default function DocumentsTab({ userProfile }) {
 
   useEffect(() => {
     loadDocuments();
+    const handleSyncComplete = () => loadDocuments();
+    window.addEventListener('offline-sync-complete', handleSyncComplete);
+    return () => window.removeEventListener('offline-sync-complete', handleSyncComplete);
   }, []);
 
   const loadDocuments = async () => {
     setDocLoading(true);
     let loadedDocs = [];
-    if (supabase) {
+    if (supabase && isOnline()) {
       try {
         const { data, error } = await supabase
           .from('dublin_documents')
@@ -111,6 +115,7 @@ export default function DocumentsTab({ userProfile }) {
           .order('created_at', { ascending: false });
         if (!error && data) {
           loadedDocs = data;
+          localStorage.setItem('dublin_documents_list', JSON.stringify(data));
         } else {
           throw new Error(error?.message || "Table not found");
         }
@@ -174,6 +179,7 @@ export default function DocumentsTab({ userProfile }) {
 
     const updated = [newDoc, ...documents];
     setDocuments(updated);
+    localStorage.setItem('dublin_documents_list', JSON.stringify(updated));
     setDocTitle('');
     setDocUrl('');
     setDocNotes('');
@@ -182,32 +188,33 @@ export default function DocumentsTab({ userProfile }) {
     const fileInput = document.getElementById('doc-file-input-tab');
     if (fileInput) fileInput.value = '';
 
-    if (supabase) {
+    const payload = { title: newDoc.title, type: newDoc.type, file_data: newDoc.file_data, notes: newDoc.notes };
+
+    if (supabase && isOnline()) {
       try {
-        const { error } = await supabase.from('dublin_documents').insert([
-          { title: newDoc.title, type: newDoc.type, file_data: newDoc.file_data, notes: newDoc.notes }
-        ]);
+        const { error } = await supabase.from('dublin_documents').insert([payload]);
         if (error) throw error;
       } catch (err) {
-        localStorage.setItem('dublin_documents_list', JSON.stringify(updated));
+        addToOfflineQueue({ type: 'INSERT', table: 'dublin_documents', data: payload });
       }
     } else {
-      localStorage.setItem('dublin_documents_list', JSON.stringify(updated));
+      addToOfflineQueue({ type: 'INSERT', table: 'dublin_documents', data: payload });
     }
   };
 
   const handleDeleteDocument = async (id) => {
     const updated = documents.filter(doc => doc.id !== id);
     setDocuments(updated);
+    localStorage.setItem('dublin_documents_list', JSON.stringify(updated));
 
-    if (supabase) {
+    if (supabase && isOnline()) {
       try {
         await supabase.from('dublin_documents').delete().eq('id', id);
       } catch (err) {
-        localStorage.setItem('dublin_documents_list', JSON.stringify(updated));
+        addToOfflineQueue({ type: 'DELETE', table: 'dublin_documents', data: { id } });
       }
     } else {
-      localStorage.setItem('dublin_documents_list', JSON.stringify(updated));
+      addToOfflineQueue({ type: 'DELETE', table: 'dublin_documents', data: { id } });
     }
   };
 
