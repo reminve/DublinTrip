@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, ChevronDown, FileText, Calendar, Info, ShieldCheck, MapPin, DollarSign, CreditCard } from 'lucide-react';
+import { Download, ChevronDown, FileText, Calendar, Info, ShieldCheck, DollarSign } from 'lucide-react';
 
 const ITINERARY_DATA = [
   {
@@ -114,8 +114,8 @@ export default function ItineraryTab() {
             onClick={() => setActiveView('timeline')}
             className={`flex-1 sm:flex-none text-xs font-bold px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeView === 'timeline'
-                ? 'bg-emerald-500 text-slate-950 shadow-md font-extrabold ring-2 ring-emerald-400/50'
-                : 'text-slate-100 hover:text-white hover:bg-slate-800'
+                ? 'bg-emerald-500 text-white text-white-force shadow-md font-extrabold ring-2 ring-emerald-400/50'
+                : 'text-slate-200 hover:text-white hover:bg-slate-800'
             }`}
           >
             <Calendar className="w-4 h-4" /> Chronologie J1–J7
@@ -125,8 +125,8 @@ export default function ItineraryTab() {
             onClick={() => setActiveView('document')}
             className={`flex-1 sm:flex-none text-xs font-bold px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeView === 'document'
-                ? 'bg-emerald-500 text-slate-950 shadow-md font-extrabold ring-2 ring-emerald-400/50'
-                : 'text-slate-100 hover:text-white hover:bg-slate-800'
+                ? 'bg-emerald-500 text-white text-white-force shadow-md font-extrabold ring-2 ring-emerald-400/50'
+                : 'text-slate-200 hover:text-white hover:bg-slate-800'
             }`}
           >
             <FileText className="w-4 h-4" /> Document Complet (.md)
@@ -184,13 +184,13 @@ export default function ItineraryTab() {
                   <div className="flex items-center gap-3">
                     <span className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${
                       isOpen 
-                        ? 'bg-emerald-500 text-slate-950 font-extrabold shadow-sm' 
+                        ? 'bg-emerald-500 text-white text-white-force font-extrabold shadow-sm' 
                         : 'bg-slate-950 text-emerald-400 border border-slate-700 group-hover:border-slate-600'
                     }`}>
                       {day.day}
                     </span>
                     <div>
-                      <h4 className="font-bold text-white text-sm group-hover:text-emerald-400 transition-colors">
+                      <h4 className="font-bold text-slate-100 text-sm group-hover:text-emerald-400 transition-colors">
                         {day.title}
                       </h4>
                       <p className="text-xs text-slate-300 font-medium">{day.subtitle}</p>
@@ -229,7 +229,7 @@ export default function ItineraryTab() {
         </div>
       )}
 
-      {/* VIEW 2: CLEAN COMPREHENSIVE DOCUMENT PREVIEW (WITHOUT FILE HEADER BOX) */}
+      {/* VIEW 2: CLEAN COMPREHENSIVE DOCUMENT PREVIEW (NO ENCART) */}
       {activeView === 'document' && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-7 space-y-6 text-slate-200 font-sans leading-relaxed text-sm shadow-xl">
           
@@ -240,17 +240,17 @@ export default function ItineraryTab() {
               <span>•</span>
               <span>Rémi Neveu (Solo)</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-100 flex items-center gap-2">
               ✈️ CLERMONT-FERRAND ➔ DUBLIN
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 mt-2 font-medium">
-              <strong className="text-white">Dates :</strong> Du 6 au 12 août 2026 (7 jours / 6 nuits) | <strong className="text-white">Hébergement :</strong> aparto Binary Hub Apartments (Dublin 8)
+              <strong className="text-slate-100">Dates :</strong> Du 6 au 12 août 2026 (7 jours / 6 nuits) | <strong className="text-slate-100">Hébergement :</strong> aparto Binary Hub Apartments (Dublin 8)
             </p>
           </div>
 
           {/* Section 1: Récapitulatif Financier */}
           <div className="space-y-4">
-            <h2 className="text-base font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
+            <h2 className="text-base font-bold text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-2">
               <DollarSign className="w-4 h-4 text-emerald-400" />
               📊 1. RÉCAPITULATIF FINANCIER & ÉCHÉANCIER DE PAIEMENT
             </h2>
@@ -273,46 +273,46 @@ export default function ItineraryTab() {
                   </thead>
                   <tbody className="divide-y divide-slate-800 bg-slate-900/60">
                     <tr>
-                      <td className="p-3 font-bold text-white">Train Clermont ↔ Lyon</td>
+                      <td className="p-3 font-bold text-slate-100">Train Clermont ↔ Lyon</td>
                       <td className="p-3 text-slate-300">TER / Intercités A/R (09h02 Aller / 11h34 Retour)</td>
-                      <td className="p-3 text-center font-bold text-white">22,00 €</td>
+                      <td className="p-3 text-center font-bold text-slate-100">22,00 €</td>
                       <td className="p-3 text-right text-slate-300">SNCF Connect</td>
                     </tr>
                     <tr>
-                      <td className="p-3 font-bold text-white">Rhônexpress Lyon ↔ LYS</td>
+                      <td className="p-3 font-bold text-slate-100">Rhônexpress Lyon ↔ LYS</td>
                       <td className="p-3 text-slate-300">Tram-train express (Tarif Jeune 12-25 ans A/R)</td>
-                      <td className="p-3 text-center font-bold text-white">19,90 €</td>
+                      <td className="p-3 text-center font-bold text-slate-100">19,90 €</td>
                       <td className="p-3 text-right text-slate-300">Rhônexpress</td>
                     </tr>
                     <tr>
-                      <td className="p-3 font-bold text-white">Vol Aer Lingus A/R</td>
+                      <td className="p-3 font-bold text-slate-100">Vol Aer Lingus A/R</td>
                       <td className="p-3 text-slate-300">Lyon (16h45) ↔ Dublin T2 (06h15) + Bagage 10kg soute + Petit sac cabine</td>
-                      <td className="p-3 text-center font-bold text-white">340,22 €</td>
+                      <td className="p-3 text-center font-bold text-slate-100">340,22 €</td>
                       <td className="p-3 text-right text-slate-300">EI 553 / EI 550</td>
                     </tr>
                     <tr>
-                      <td className="p-3 font-bold text-white">Hébergement (6 nuits)</td>
+                      <td className="p-3 font-bold text-slate-100">Hébergement (6 nuits)</td>
                       <td className="p-3 text-slate-300">aparto Binary Hub (Chambre + SDB privée - Tarif Mobile)</td>
-                      <td className="p-3 text-center font-bold text-white">327,41 €</td>
+                      <td className="p-3 text-center font-bold text-slate-100">327,41 €</td>
                       <td className="p-3 text-right text-slate-300">Booking n° 5694634506 (Code: 9401)</td>
                     </tr>
                     <tr>
-                      <td className="p-3 font-bold text-white">Navette Aéroport A/R</td>
+                      <td className="p-3 font-bold text-slate-100">Navette Aéroport A/R</td>
                       <td className="p-3 text-slate-300">Dublin Express 782 (Usher's Quay ↔ Terminal 2)</td>
-                      <td className="p-3 text-center font-bold text-white">12,00 €</td>
+                      <td className="p-3 text-center font-bold text-slate-100">12,00 €</td>
                       <td className="p-3 text-right text-slate-300">Dublin Express</td>
                     </tr>
                     <tr>
-                      <td className="p-3 font-bold text-white">Visite Book of Kells</td>
+                      <td className="p-3 font-bold text-slate-100">Visite Book of Kells</td>
                       <td className="p-3 text-slate-300">Trinity Visit (Book of Kells + Old Library + Red Pavilion) — 7 août @ 12h30</td>
-                      <td className="p-3 text-center font-bold text-white">21,00 €</td>
+                      <td className="p-3 text-center font-bold text-slate-100">21,00 €</td>
                       <td className="p-3 text-right text-slate-300">Billet Étudiant (Carte physique)</td>
                     </tr>
                     <tr className="bg-emerald-950/40 font-bold text-emerald-300">
-                      <td className="p-3 font-extrabold text-white">SUBTOTAL PAYÉ</td>
+                      <td className="p-3 font-extrabold text-slate-100">SUBTOTAL PAYÉ</td>
                       <td className="p-3 text-slate-200">Ensemble des prestations bloquées</td>
                       <td className="p-3 text-center font-extrabold text-emerald-300 text-sm">742,53 €</td>
-                      <td className="p-3 text-right"><span className="bg-emerald-500 text-slate-950 text-[10px] font-extrabold px-2 py-0.5 rounded">CONFIRMÉ</span></td>
+                      <td className="p-3 text-right"><span className="bg-emerald-500 text-white text-white-force text-[10px] font-extrabold px-2 py-0.5 rounded">CONFIRMÉ</span></td>
                     </tr>
                   </tbody>
                 </table>
@@ -337,37 +337,37 @@ export default function ItineraryTab() {
                   </thead>
                   <tbody className="divide-y divide-slate-800 bg-slate-900/60">
                     <tr>
-                      <td className="p-3 font-bold text-white">Visite Guinness Storehouse</td>
+                      <td className="p-3 font-bold text-slate-100">Visite Guinness Storehouse</td>
                       <td className="p-3 text-slate-300">Créneau matin (St James's Gate)</td>
-                      <td className="p-3 text-center font-bold text-white">22,50 €</td>
+                      <td className="p-3 text-center font-bold text-slate-100">22,50 €</td>
                       <td className="p-3 text-right text-slate-300">Sur place / En ligne</td>
                     </tr>
                     <tr>
-                      <td className="p-3 font-bold text-white">Visite Kilmainham Gaol</td>
+                      <td className="p-3 font-bold text-slate-100">Visite Kilmainham Gaol</td>
                       <td className="p-3 text-slate-300">Prison historique (Achat J-28 ou matin même 09h15)</td>
-                      <td className="p-3 text-center font-bold text-white">8,00 €</td>
+                      <td className="p-3 text-center font-bold text-slate-100">8,00 €</td>
                       <td className="p-3 text-right text-slate-300">En ligne</td>
                     </tr>
                     <tr>
-                      <td className="p-3 font-bold text-white">Transports Locaux</td>
+                      <td className="p-3 font-bold text-slate-100">Transports Locaux</td>
                       <td className="p-3 text-slate-300">Carte TFI Leap Visitor Card (DART Howth + Bus)</td>
-                      <td className="p-3 text-center font-bold text-white">25,00 €</td>
+                      <td className="p-3 text-center font-bold text-slate-100">25,00 €</td>
                       <td className="p-3 text-right text-slate-300">Borne Aéroport</td>
                     </tr>
                     <tr>
-                      <td className="p-3 font-bold text-white">Excursion Glendalough</td>
+                      <td className="p-3 font-bold text-slate-100">Excursion Glendalough</td>
                       <td className="p-3 text-slate-300">Car St. Kevin's Bus A/R</td>
-                      <td className="p-3 text-center font-bold text-white">25,00 €</td>
+                      <td className="p-3 text-center font-bold text-slate-100">25,00 €</td>
                       <td className="p-3 text-right text-slate-300">Chauffeur ou en ligne</td>
                     </tr>
                     <tr>
-                      <td className="p-3 font-bold text-white">Nourriture & Repas</td>
+                      <td className="p-3 font-bold text-slate-100">Nourriture & Repas</td>
                       <td className="p-3 text-slate-300">Meal Deals midi (4,50 €/j) + Pubs & Snacks soir</td>
-                      <td className="p-3 text-center font-bold text-white">175,00 €</td>
+                      <td className="p-3 text-center font-bold text-slate-100">175,00 €</td>
                       <td className="p-3 text-right text-slate-300">Carte bancaire au fil des jours</td>
                     </tr>
                     <tr className="bg-slate-950 font-bold text-slate-200">
-                      <td className="p-3 font-extrabold text-white">SUBTOTAL SUR PLACE</td>
+                      <td className="p-3 font-extrabold text-slate-100">SUBTOTAL SUR PLACE</td>
                       <td className="p-3 text-slate-300">Argent de poche du 6 au 12 août</td>
                       <td className="p-3 text-center font-extrabold text-amber-400 text-sm">255,50 €</td>
                       <td className="p-3 text-right text-slate-400">—</td>
@@ -378,7 +378,7 @@ export default function ItineraryTab() {
             </div>
 
             {/* Total Callout */}
-            <div className="bg-slate-950 border border-emerald-500/40 rounded-xl p-4 flex justify-between items-center text-sm font-bold text-white">
+            <div className="bg-slate-950 border border-emerald-500/40 rounded-xl p-4 flex justify-between items-center text-sm font-bold text-slate-100">
               <span>💰 TOTAL GLOBAL DU SÉJOUR (Tout compris) :</span>
               <span className="text-emerald-400 font-mono text-base sm:text-lg">~998,03 €</span>
             </div>
@@ -386,14 +386,14 @@ export default function ItineraryTab() {
 
           {/* Section 2: Procédures et préparatifs */}
           <div className="space-y-3 pt-2">
-            <h2 className="text-base font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
+            <h2 className="text-base font-bold text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
               📑 2. PROCÉDURES ET PRÉPARATIFS AVANT LE DÉPART
             </h2>
 
             <div className="space-y-3 text-xs sm:text-sm text-slate-200">
               <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5">
-                <h3 className="font-bold text-white text-xs mb-1">🪪 1. Papiers d'Identité & Carte Étudiant</h3>
+                <h3 className="font-bold text-slate-100 text-xs mb-1">🪪 1. Papiers d'Identité & Carte Étudiant</h3>
                 <p className="text-slate-300 text-xs">
                   <strong>Pièce d'identité :</strong> CNI ou Passeport en cours de validité (UE).<br />
                   <strong>Carte d'Étudiant PHYSIQUE :</strong> Indispensable à présenter le 7 août à 12h30 pour le tarif réduit 21,00 € au Book of Kells.
@@ -401,14 +401,14 @@ export default function ItineraryTab() {
               </div>
 
               <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5">
-                <h3 className="font-bold text-white text-xs mb-1">💶 2. Monnaie & Carte Bancaire : EURO (€)</h3>
+                <h3 className="font-bold text-slate-100 text-xs mb-1">💶 2. Monnaie & Carte Bancaire : EURO (€)</h3>
                 <p className="text-slate-300 text-xs">
                   Euro (€) en République d'Irlande. Paiements sans contact / Apple Pay acceptés partout. Garder ~20 à 30 € liquides.
                 </p>
               </div>
 
               <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5">
-                <h3 className="font-bold text-white text-xs mb-1">🎒 3. Politique de Bagages Aer Lingus</h3>
+                <h3 className="font-bold text-slate-100 text-xs mb-1">🎒 3. Politique de Bagages Aer Lingus</h3>
                 <p className="text-slate-300 text-xs">
                   <strong>1 Bagage de 10 kg soute (55x40x24 cm) :</strong> Déposer au comptoir enregistrement avant la sécurité.<br />
                   <strong>1 Petit Bagage sous le siège (40x30x20 cm) :</strong> À garder en cabine avec vous.
@@ -416,7 +416,7 @@ export default function ItineraryTab() {
               </div>
 
               <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5">
-                <h3 className="font-bold text-white text-xs mb-1">🔌 4. Adaptateur Électrique & 📱 5. Téléphone</h3>
+                <h3 className="font-bold text-slate-100 text-xs mb-1">🔌 4. Adaptateur Électrique & 📱 5. Téléphone</h3>
                 <p className="text-slate-300 text-xs">
                   Prises Type G (3 broches rectangulaires Irlande/UK). Roaming 4G/5G gratuit avec forfait français.
                 </p>
@@ -426,7 +426,7 @@ export default function ItineraryTab() {
 
           {/* Section 3: Logistique Hébergement */}
           <div className="space-y-3 pt-2">
-            <h2 className="text-base font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
+            <h2 className="text-base font-bold text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-2">
               <Info className="w-4 h-4 text-emerald-400" />
               🏠 3. LOGISTIQUE HÉBERGEMENT (aparto Binary Hub)
             </h2>
@@ -441,7 +441,7 @@ export default function ItineraryTab() {
 
           {/* Section 4: Itinéraire Résumé */}
           <div className="space-y-3 pt-2">
-            <h2 className="text-base font-bold text-white flex items-center gap-2 border-b border-slate-850 pb-2">
+            <h2 className="text-base font-bold text-slate-100 flex items-center gap-2 border-b border-slate-850 pb-2">
               <Calendar className="w-4 h-4 text-emerald-400" />
               🗓️ 4. ITINÉRAIRE DÉTAILLÉ DE A à Z
             </h2>
@@ -451,7 +451,7 @@ export default function ItineraryTab() {
                   <h3 className="font-bold text-emerald-400 text-xs sm:text-sm">{day.title}</h3>
                   {day.events.map((e, idx) => (
                     <p key={idx} className="text-slate-300">
-                      <strong className="text-white">{e.time} :</strong> {e.desc}
+                      <strong className="text-slate-100">{e.time} :</strong> {e.desc}
                     </p>
                   ))}
                 </div>

@@ -228,7 +228,47 @@ body.light .bg-clip-text {
 
 /* Sub-tabs active titles text-slate-950 in light mode on colorful background */
 body.light .text-slate-950 {
-  color: #ffffff !important; /* clean white text on active accent gradients */
+  color: #0f172a !important;
+}
+
+/* Global Light Mode overrides for text-white */
+body.light .text-white {
+  color: #0f172a !important;
+}
+body.light .text-white-force {
+  color: #ffffff !important;
+}
+
+/* Global Light Mode Table styling */
+body.light table {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+body.light table thead {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+body.light table th {
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+body.light table td {
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+}
+body.light table tbody {
+  background-color: #ffffff !important;
+}
+body.light table tr {
+  background-color: #ffffff !important;
+}
+body.light table tr.bg-emerald-950\/40, 
+body.light table tr.bg-emerald-950\/20,
+body.light .bg-emerald-950\/40,
+body.light .bg-emerald-950\/20 {
+  background-color: #ecfdf5 !important;
+  color: #065f46 !important;
 }
 
 /* ==================== LIGHT MODE ACCENT TEXT CONTRAST TUNING ==================== */
