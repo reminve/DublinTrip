@@ -87,8 +87,12 @@ export default function JournalTab({ userProfile }) {
           .order('created_at', { ascending: false });
         
         if (!error && data) {
-          loadedEntries = data;
-          localStorage.setItem('dublin_journal_entries', JSON.stringify(data));
+          const localRaw = localStorage.getItem('dublin_journal_entries');
+          const localEntries = localRaw ? JSON.parse(localRaw) : [];
+          const dbIds = new Set(data.map(d => d.id));
+          const unsyncedLocal = localEntries.filter(e => e.id && (e.id.startsWith('off_') || !dbIds.has(e.id)));
+          loadedEntries = [...unsyncedLocal, ...data];
+          localStorage.setItem('dublin_journal_entries', JSON.stringify(loadedEntries));
         } else {
           throw new Error(error?.message || "Table not found");
         }
@@ -125,8 +129,12 @@ export default function JournalTab({ userProfile }) {
           .order('created_at', { ascending: false });
         
         if (!error && data) {
-          loadedPints = data;
-          localStorage.setItem('dublin_pints_list', JSON.stringify(data));
+          const localRaw = localStorage.getItem('dublin_pints_list');
+          const localPints = localRaw ? JSON.parse(localRaw) : [];
+          const dbIds = new Set(data.map(d => d.id));
+          const unsyncedLocal = localPints.filter(p => p.id && (p.id.startsWith('off_') || !dbIds.has(p.id)));
+          loadedPints = [...unsyncedLocal, ...data];
+          localStorage.setItem('dublin_pints_list', JSON.stringify(loadedPints));
         } else {
           throw new Error(error?.message || "Table not found");
         }
@@ -168,7 +176,7 @@ export default function JournalTab({ userProfile }) {
     if (!newEntryText.trim()) return;
 
     const newEntry = {
-      id: Math.random().toString(36).substring(2),
+      id: 'off_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
       created_at: new Date().toISOString(),
       content: newEntryText,
       emoji: newEntryEmoji,
@@ -204,7 +212,7 @@ export default function JournalTab({ userProfile }) {
     if (!pubName.trim()) return;
 
     const newPint = {
-      id: Math.random().toString(36).substring(2),
+      id: 'off_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
       created_at: new Date().toISOString(),
       pub: pubName,
       price: parseFloat(pintPrice) || 0,
