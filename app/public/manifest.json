@@ -1,0 +1,24 @@
+{
+  "name": "Dublin 2026 — Companion Voyage",
+  "short_name": "Dublin 2026",
+  "description": "Application compagnon de voyage solo à Dublin — Feuille de route, budget, journal & suivi GPS avec mode hors-ligne.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#10b981",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Home, Calendar, Camera, MapPin, Users, Settings, 
-  Sun, Moon, Sparkles, BookOpen, Compass, Beer, 
-  CheckSquare, Plus, Palette, LogOut, MessageSquare, FileText, Plane
+  Sun, Moon, Sparkles, Beer, 
+  CheckSquare, Plus, Palette, LogOut, FileText, Plane,
+  Download, Wifi, WifiOff, RefreshCw, Smartphone, X, Check
 } from 'lucide-react';
 import { getSupabase } from './supabase';
+import { isOnline, getOfflineQueue, syncOfflineQueue } from './offlineSync';
 import SetupScreen from './components/SetupScreen';
 import AuthScreen from './components/AuthScreen';
 import DashboardTab from './components/DashboardTab';
@@ -29,6 +31,98 @@ export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('app-theme') || 'dark');
   const [accent, setAccent] = useState(() => localStorage.getItem('app-accent') || 'emerald');
 
+  // PWA & Offline States
+  const [installPrompt, setInstallPrompt] = useState(null);
+  const [showIosModal, setShowIosModal] = useState(false);
+  const [onlineState, setOnlineState] = useState(isOnline());
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [queueCount, setQueueCount] = useState(() => getOfflineQueue().length);
+  const [syncToast, setSyncToast] = useState({ show: false, message: '' });
+
+  // Listen to PWA install prompt & offline sync events
+  useEffect(() => {
+    // 1. Capture PWA Install prompt on Android/Chrome
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    };
+
+    // 2. Network & Sync Event Listeners
+    const handleNetworkChange = (e) => {
+      const online = e.detail?.online ?? isOnline();
+      setOnlineState(online);
+    };
+
+    const handleQueueChange = (e) => {
+      const q = e.detail?.queue || getOfflineQueue();
+      setQueueCount(q.length);
+    };
+
+    const handleSyncStart = () => {
+      setIsSyncing(true);
+    };
+
+    const handleSyncComplete = (e) => {
+      setIsSyncing(false);
+      const count = e.detail?.syncedCount || 0;
+      if (count > 0) {
+        setSyncToast({
+          show: true,
+          message: `📶 ${count} modification(s) synchronisée(s) avec succès sur le Cloud !`
+        });
+        setTimeout(() => setSyncToast({ show: false, message: '' }), 4000);
+      }
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('network-status-changed', handleNetworkChange);
+    window.addEventListener('offline-queue-changed', handleQueueChange);
+    window.addEventListener('offline-sync-start', handleSyncStart);
+    window.addEventListener('offline-sync-complete', handleSyncComplete);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('network-status-changed', handleNetworkChange);
+      window.removeEventListener('offline-queue-changed', handleQueueChange);
+      window.removeEventListener('offline-sync-start', handleSyncStart);
+      window.removeEventListener('offline-sync-complete', handleSyncComplete);
+    };
+  }, []);
+
+  const handleInstallPWA = () => {
+    if (installPrompt) {
+      installPrompt.prompt();
+      installPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('[PWA] Utilisateur a accepté l\'installation');
+        }
+        setInstallPrompt(null);
+      });
+    } else {
+      const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent);
+      if (isIos) {
+        setShowIosModal(true);
+      } else {
+        alert("Pour installer l'application sur mobile :\n1. Ouvrez le menu de votre navigateur (⋮ ou Partager).\n2. Appuyez sur 'Ajouter à l'écran d'accueil'.");
+      }
+    }
+  };
+
+  const handleForceSync = async () => {
+    if (!onlineState) {
+      alert("Vous êtes actuellement hors-ligne. La synchronisation s'effectuera dès que vous retrouverez de la connexion.");
+      return;
+    }
+    setIsSyncing(true);
+    const res = await syncOfflineQueue();
+    setIsSyncing(false);
+    if (res.syncedCount > 0) {
+      alert(`✅ Synchronisation terminée : ${res.syncedCount} élément(s) envoyés sur le Cloud !`);
+    } else if (res.remaining === 0) {
+      alert("✅ Toutes vos données sont déjà parfaitement synchronisées sur le Cloud !");
+    }
+  };
+
   // Check auth session on mount/setup updates
   const checkSession = async () => {
     const supabase = getSupabase();
@@ -48,7 +142,6 @@ export default function App() {
           .single();
 
         if (error || !profile) {
-          // Profile entry missing: create it via insert
           await supabase
             .from('profiles')
             .insert([{ id: session.user.id, email: session.user.email, approved: false, is_admin: false }]);
@@ -62,7 +155,6 @@ export default function App() {
           setUserProfile(null);
           setScreen('auth');
         } else {
-          // Session is active and approved!
           setUserProfile(profile);
           setScreen('app');
         }
@@ -109,7 +201,6 @@ export default function App() {
     const colorVal = rgbColors[accent] || '16 185 129';
     body.style.setProperty('--accent-color', colorVal);
     
-    // Manage class modifiers
     body.className = body.className.replace(/\baccent-\S+/g, '');
     body.classList.add(`accent-${accent}`);
     
@@ -138,14 +229,14 @@ export default function App() {
     };
     const textCol = isLight ? (darkColors[accent] || '#047857') : 'rgb(var(--accent-color))';
     return { 
-      backgroundColor: 'rgba(var(--accent-color), 0.1)', 
+      backgroundColor: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(var(--accent-color), 0.15)',
       color: textCol,
-      border: '1px solid rgba(var(--accent-color), 0.25)'
+      boxShadow: isLight ? 'none' : 'inset 0 0 12px rgba(var(--accent-color), 0.1)'
     };
   };
 
   const getActiveTextStyle = (tabId) => {
-    if (activeTab !== tabId) return {};
+    if (activeTab !== tabId) return { color: '#64748b' };
     const isLight = theme === 'light' || (theme === 'auto' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
     const darkColors = {
       emerald: '#047857',
@@ -242,9 +333,55 @@ export default function App() {
       <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-10 right-1/4 w-[400px] h-[400px] bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
+      {/* Sync Toast Notification */}
+      {syncToast.show && (
+        <div className="fixed top-4 right-4 z-50 bg-emerald-600 text-white font-bold text-xs px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2 animate-bounce border border-emerald-400">
+          <span>{syncToast.message}</span>
+        </div>
+      )}
+
+      {/* iOS PWA Install Modal */}
+      {showIosModal && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl relative">
+            <button 
+              onClick={() => setShowIosModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">📱</span>
+              <div>
+                <h3 className="font-extrabold text-white text-base">Installer sur iPhone</h3>
+                <p className="text-xs text-slate-400">Dublin 2026 — Mode Hors-ligne</p>
+              </div>
+            </div>
+
+            <ol className="text-xs text-slate-300 space-y-2.5 list-decimal list-inside bg-slate-950 p-3.5 rounded-2xl border border-slate-800">
+              <li>Appuyez sur le bouton <strong className="text-emerald-400">Partager ⎋</strong> en bas de Safari.</li>
+              <li>Faites défiler le menu et sélectionnez <strong className="text-emerald-400">'Sur l'écran d'accueil' ➕</strong>.</li>
+              <li>Appuyez sur <strong className="text-emerald-400">Ajouter</strong> en haut à droite.</li>
+            </ol>
+
+            <p className="text-[11px] text-slate-400 italic text-center">
+              L'application sera accessible sans connexion depuis votre écran d'accueil !
+            </p>
+
+            <button
+              onClick={() => setShowIosModal(false)}
+              className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs"
+            >
+              Compris !
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ==================== LEFT SIDEBAR (DESKTOP ONLY - FIXED) ==================== */}
       <aside className="hidden md:flex fixed top-0 left-0 w-64 h-screen bg-slate-900/10 border-r border-slate-900/60 p-6 flex-col justify-between backdrop-blur-xl z-30">
-        <div className="space-y-6">
+        <div className="space-y-5">
           
           {/* Sidebar Header */}
           <div className="flex items-center gap-3">
@@ -255,20 +392,45 @@ export default function App() {
             </div>
           </div>
 
-          {/* Sync status indicator */}
-          <div className="flex items-center gap-2.5 bg-slate-950 border border-slate-900 rounded-xl px-3 py-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-duration-1000"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Cloud Synchronisé</span>
+          {/* Sync & Network status indicator */}
+          <div 
+            onClick={handleForceSync}
+            className="flex items-center justify-between gap-2 bg-slate-950 border border-slate-900 rounded-xl px-3 py-2 cursor-pointer hover:border-slate-700 transition-colors"
+            title="Cliquer pour forcer la synchronisation Cloud"
+          >
+            <div className="flex items-center gap-2 overflow-hidden">
+              {isSyncing ? (
+                <RefreshCw className="w-3.5 h-3.5 text-amber-400 animate-spin flex-shrink-0" />
+              ) : !onlineState ? (
+                <WifiOff className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+              ) : queueCount > 0 ? (
+                <RefreshCw className="w-3.5 h-3.5 text-emerald-400 animate-spin flex-shrink-0" />
+              ) : (
+                <span className="relative flex h-2 w-2 flex-shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+              )}
+              <span className="text-[10px] font-bold text-slate-200 uppercase tracking-wider truncate">
+                {isSyncing ? 'Synchro Cloud...' : !onlineState ? `Hors-Ligne (${queueCount})` : queueCount > 0 ? `Synchro (${queueCount})` : 'Cloud Synchro'}
+              </span>
+            </div>
           </div>
 
+          {/* Install PWA Button (Desktop & Mobile) */}
+          <button
+            onClick={handleInstallPWA}
+            className="w-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-xs py-2 px-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            <span>Installer l'App PWA</span>
+          </button>
+
           {/* Navigation Links */}
-          <nav className="flex flex-col gap-1.5 overflow-y-auto max-h-[55vh] scrollbar-none">
+          <nav className="flex flex-col gap-1.5 overflow-y-auto max-h-[48vh] scrollbar-none">
             <button 
               onClick={() => setActiveTab('dashboard')} 
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'dashboard' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'dashboard' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('dashboard')}
             >
               <Home className="w-4 h-4" />
@@ -277,7 +439,7 @@ export default function App() {
             
             <button 
               onClick={() => setActiveTab('itinerary')} 
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'itinerary' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'itinerary' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('itinerary')}
             >
               <Calendar className="w-4 h-4" />
@@ -286,7 +448,7 @@ export default function App() {
             
             <button 
               onClick={() => setActiveTab('journal')} 
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'journal' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'journal' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('journal')}
             >
               <Beer className="w-4 h-4" />
@@ -295,7 +457,7 @@ export default function App() {
             
             <button 
               onClick={() => setActiveTab('gallery')} 
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'gallery' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'gallery' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('gallery')}
             >
               <Camera className="w-4 h-4" />
@@ -304,7 +466,7 @@ export default function App() {
 
             <button 
               onClick={() => setActiveTab('documents')} 
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'documents' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'documents' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('documents')}
             >
               <FileText className="w-4 h-4" />
@@ -313,7 +475,7 @@ export default function App() {
             
             <button 
               onClick={() => setActiveTab('tracking')} 
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'tracking' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'tracking' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('tracking')}
             >
               <MapPin className="w-4 h-4" />
@@ -322,7 +484,7 @@ export default function App() {
 
             <button 
               onClick={() => setActiveTab('transport')} 
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'transport' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'transport' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('transport')}
             >
               <Plane className="w-4 h-4" />
@@ -331,7 +493,7 @@ export default function App() {
 
             <button 
               onClick={() => setActiveTab('tools')} 
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'tools' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'tools' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
               style={getActiveStyle('tools')}
             >
               <CheckSquare className="w-4 h-4" />
@@ -341,7 +503,7 @@ export default function App() {
             {userProfile?.is_admin && (
               <button 
                 onClick={() => setActiveTab('admin')} 
-                className={`flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'admin' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+                className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'admin' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
                 style={getActiveStyle('admin')}
               >
                 <div className="flex items-center gap-3">
@@ -359,7 +521,7 @@ export default function App() {
             {userProfile?.is_admin && (
               <button 
                 onClick={() => setActiveTab('settings')} 
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'settings' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'settings' ? '' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'}`}
                 style={getActiveStyle('settings')}
               >
                 <Settings className="w-4 h-4" />
@@ -370,18 +532,18 @@ export default function App() {
         </div>
 
         {/* Sidebar Footer Customizer */}
-        <div className="space-y-4 pt-4 border-t border-slate-900/60">
-          <div className="space-y-1.5">
+        <div className="space-y-3 pt-3 border-t border-slate-900/60">
+          <div className="space-y-1">
             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5"><Palette className="w-3 h-3" /> Couleur d'accent</p>
             <ColorSwitcher />
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5"><Sun className="w-3 h-3" /> Thème Visuel</p>
             <ThemeSwitcher />
           </div>
           <button 
             onClick={handleLogout}
-            className="w-full bg-slate-900 hover:bg-rose-500/10 border border-slate-850 hover:border-rose-500/20 text-slate-400 hover:text-rose-455 font-bold py-2.5 px-4 rounded-xl text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer mt-2"
+            className="w-full bg-slate-900 hover:bg-rose-500/10 border border-slate-850 hover:border-rose-500/20 text-slate-400 hover:text-rose-455 font-bold py-2 px-4 rounded-xl text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
           >
             <LogOut className="w-4 h-4" /> Déconnexion
           </button>
@@ -398,12 +560,33 @@ export default function App() {
           </div>
         </div>
         
-        <div className="flex items-center gap-2 bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-full px-3 py-1 shadow-md backdrop-blur">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-          </span>
-          <span className="text-[9px] font-bold text-emerald-500 dark:text-emerald-400 uppercase tracking-wider">Live</span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleInstallPWA}
+            className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1"
+            title="Installer l'App"
+          >
+            <Smartphone className="w-3 h-3" /> App
+          </button>
+
+          <div 
+            onClick={handleForceSync}
+            className="flex items-center gap-1.5 bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-full px-2.5 py-1 shadow-sm backdrop-blur cursor-pointer"
+          >
+            {isSyncing ? (
+              <RefreshCw className="w-3 h-3 text-amber-500 animate-spin" />
+            ) : !onlineState ? (
+              <WifiOff className="w-3 h-3 text-amber-500" />
+            ) : (
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+              </span>
+            )}
+            <span className="text-[9px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+              {!onlineState ? `Hors-Ligne (${queueCount})` : 'Live'}
+            </span>
+          </div>
         </div>
       </header>
 
@@ -452,9 +635,18 @@ export default function App() {
             style={getActiveTextStyle('itinerary')}
           >
             <Calendar className="w-5 h-5" />
-            <span className="text-[9px] font-bold uppercase tracking-wider">Feuille</span>
+            <span className="text-[9px] font-bold uppercase tracking-wider">Plan</span>
           </button>
-          
+
+          <button 
+            onClick={() => setShowPlusMenu(!showPlusMenu)} 
+            className="flex flex-col items-center justify-center -mt-6"
+          >
+            <div className="w-12 h-12 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-500/30 border-4 border-slate-950 transition-transform active:scale-95">
+              <Plus className={`w-6 h-6 transition-transform duration-300 ${showPlusMenu ? 'rotate-45' : ''}`} />
+            </div>
+          </button>
+
           <button 
             onClick={() => { setActiveTab('journal'); setShowPlusMenu(false); }} 
             className="flex flex-col items-center gap-1.5 transition-all cursor-pointer text-slate-500"
@@ -463,128 +655,70 @@ export default function App() {
             <Beer className="w-5 h-5" />
             <span className="text-[9px] font-bold uppercase tracking-wider">Journal</span>
           </button>
-          
+
           <button 
             onClick={() => { setActiveTab('gallery'); setShowPlusMenu(false); }} 
             className="flex flex-col items-center gap-1.5 transition-all cursor-pointer text-slate-500"
             style={getActiveTextStyle('gallery')}
           >
             <Camera className="w-5 h-5" />
-            <span className="text-[9px] font-bold uppercase tracking-wider">Album</span>
-          </button>
-          
-          <button 
-            onClick={() => setShowPlusMenu(prev => !prev)} 
-            className={`flex flex-col items-center gap-1.5 transition-all cursor-pointer ${showPlusMenu ? 'text-slate-200' : 'text-slate-500'}`}
-            style={['tracking', 'transport', 'tools', 'documents', 'admin', 'settings'].includes(activeTab) && !showPlusMenu ? { color: 'rgb(var(--accent-color))' } : {}}
-          >
-            <Plus className={`w-5 h-5 transition-transform duration-300 ${showPlusMenu ? 'rotate-45 text-rose-400' : ''}`} />
-            <span className="text-[9px] font-bold uppercase tracking-wider">{showPlusMenu ? "Fermer" : "Plus"}</span>
+            <span className="text-[9px] font-bold uppercase tracking-wider">Photos</span>
           </button>
 
         </div>
-      </nav>
 
-      {/* ==================== MOBILE "PLUS" MENU OVERLAY ==================== */}
-      {showPlusMenu && (
-        <div 
-          onClick={() => setShowPlusMenu(false)}
-          className="md:hidden fixed inset-0 z-45 bg-black/60 backdrop-blur-sm flex items-end justify-center p-4 transition-all"
-        >
-          <div 
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 pb-24 backdrop-blur-xl"
-          >
-            <div className="flex justify-between items-center border-b border-slate-850 pb-3">
-              <h3 className="text-sm font-bold text-slate-200 flex items-center gap-1.5"><Compass className="w-4 h-4 text-emerald-400" /> Autres outils</h3>
+        {/* Plus Mobile Menu Modal Overlay */}
+        {showPlusMenu && (
+          <div className="absolute bottom-20 left-4 right-4 bg-slate-900 border border-slate-800 rounded-2xl p-3 grid grid-cols-3 gap-2 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-5">
+            <button 
+              onClick={() => { setActiveTab('documents'); setShowPlusMenu(false); }}
+              className="flex flex-col items-center gap-2 p-3 bg-slate-950/60 rounded-xl border border-slate-850 hover:border-slate-700 text-slate-300"
+            >
+              <FileText className="w-5 h-5 text-emerald-400" />
+              <span className="text-[10px] font-bold text-center">Billets & Résas</span>
+            </button>
+            <button 
+              onClick={() => { setActiveTab('tracking'); setShowPlusMenu(false); }}
+              className="flex flex-col items-center gap-2 p-3 bg-slate-950/60 rounded-xl border border-slate-850 hover:border-slate-700 text-slate-300"
+            >
+              <MapPin className="w-5 h-5 text-emerald-400" />
+              <span className="text-[10px] font-bold text-center">GPS Live</span>
+            </button>
+            <button 
+              onClick={() => { setActiveTab('transport'); setShowPlusMenu(false); }}
+              className="flex flex-col items-center gap-2 p-3 bg-slate-950/60 rounded-xl border border-slate-850 hover:border-slate-700 text-slate-300"
+            >
+              <Plane className="w-5 h-5 text-emerald-400" />
+              <span className="text-[10px] font-bold text-center">Transports</span>
+            </button>
+            <button 
+              onClick={() => { setActiveTab('tools'); setShowPlusMenu(false); }}
+              className="flex flex-col items-center gap-2 p-3 bg-slate-950/60 rounded-xl border border-slate-850 hover:border-slate-700 text-slate-300"
+            >
+              <CheckSquare className="w-5 h-5 text-emerald-400" />
+              <span className="text-[10px] font-bold text-center">Outils & Défis</span>
+            </button>
+            {userProfile?.is_admin && (
               <button 
-                onClick={() => setShowPlusMenu(false)}
-                className="text-xs text-slate-500 font-bold hover:text-slate-350"
+                onClick={() => { setActiveTab('admin'); setShowPlusMenu(false); }}
+                className="flex flex-col items-center gap-2 p-3 bg-slate-950/60 rounded-xl border border-slate-850 hover:border-slate-700 text-slate-300"
               >
-                Fermer
+                <Users className="w-5 h-5 text-emerald-400" />
+                <span className="text-[10px] font-bold text-center">Admin</span>
               </button>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3.5">
+            )}
+            {userProfile?.is_admin && (
               <button 
-                onClick={() => { setActiveTab('tracking'); setShowPlusMenu(false); }}
-                className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer gap-2"
+                onClick={() => { setActiveTab('settings'); setShowPlusMenu(false); }}
+                className="flex flex-col items-center gap-2 p-3 bg-slate-950/60 rounded-xl border border-slate-850 hover:border-slate-700 text-slate-300"
               >
-                <MapPin className="w-5 h-5 text-emerald-400" />
-                <span className="text-[10px] font-bold uppercase text-slate-300">Suivi GPS</span>
+                <Settings className="w-5 h-5 text-emerald-400" />
+                <span className="text-[10px] font-bold text-center">Réglages</span>
               </button>
-
-              <button 
-                onClick={() => { setActiveTab('transport'); setShowPlusMenu(false); }}
-                className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer gap-2"
-              >
-                <Plane className="w-5 h-5 text-emerald-400" />
-                <span className="text-[10px] font-bold uppercase text-slate-300">Vols &amp; Trains</span>
-              </button>
-              
-              <button 
-                onClick={() => { setActiveTab('tools'); setShowPlusMenu(false); }}
-                className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer gap-2"
-              >
-                <CheckSquare className="w-5 h-5 text-emerald-400" />
-                <span className="text-[10px] font-bold uppercase text-slate-300">Checklists & Défis</span>
-              </button>
-
-              <button 
-                onClick={() => { setActiveTab('documents'); setShowPlusMenu(false); }}
-                className={`flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer gap-2 ${!userProfile?.is_admin ? 'col-span-2' : ''}`}
-              >
-                <FileText className="w-5 h-5 text-emerald-400" />
-                <span className="text-[10px] font-bold uppercase text-slate-300">Billets & Résas</span>
-              </button>
-
-              {userProfile?.is_admin && (
-                <button 
-                  onClick={() => { setActiveTab('settings'); setShowPlusMenu(false); }}
-                  className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer gap-2"
-                >
-                  <Settings className="w-5 h-5 text-emerald-400" />
-                  <span className="text-[10px] font-bold uppercase text-slate-300">Réglages</span>
-                </button>
-              )}
-
-              {userProfile?.is_admin && (
-                <button 
-                  onClick={() => { setActiveTab('admin'); setShowPlusMenu(false); }}
-                  className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 transition-all text-center cursor-pointer relative gap-2 col-span-2"
-                >
-                  <Users className="w-5 h-5 text-emerald-400" />
-                  <span className="text-[10px] font-bold uppercase text-slate-300">Admin</span>
-                  {pendingApprovals > 0 && (
-                    <span className="absolute top-2 right-2 bg-rose-500 text-slate-50 text-[8px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center animate-pulse">
-                      {pendingApprovals}
-                    </span>
-                  )}
-                </button>
-              )}
-            </div>
-
-            {/* Customizers inside Plus Menu */}
-            <div className="space-y-4 pt-4 border-t border-slate-850">
-              <div className="space-y-2">
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest text-center flex items-center justify-center gap-1.5"><Palette className="w-3 h-3" /> Couleur d'accent</p>
-                <ColorSwitcher />
-              </div>
-              <div className="space-y-2 flex flex-col items-center">
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest flex items-center justify-center gap-1.5"><Sun className="w-3 h-3" /> Thème Visuel</p>
-                <ThemeSwitcher />
-              </div>
-              
-              <button 
-                onClick={() => { handleLogout(); setShowPlusMenu(false); }}
-                className="w-full bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 text-rose-400 font-bold py-2.5 px-4 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer mt-2"
-              >
-                <LogOut className="w-4 h-4" /> Déconnexion
-              </button>
-            </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
+      </nav>
 
     </div>
   );

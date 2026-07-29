@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import Chart from 'chart.js/auto';
 import { getSupabase } from '../supabase';
+import { isOnline, addToOfflineQueue } from '../offlineSync';
 
 const DEPARTURE_TIME = new Date('2026-08-06T09:00:00+02:00').getTime();
 const RETURN_TIME = new Date('2026-08-12T14:30:00+02:00').getTime();
@@ -119,16 +120,28 @@ export default function DashboardTab({ userProfile }) {
     setExpenseAmount('');
     setExpenseNotes('');
 
-    if (supabase) {
+    if (supabase && isOnline()) {
       try {
         const { error } = await supabase.from('dublin_expenses').insert([
           { title: newExpense.title, amount: newExpense.amount, category: newExpense.category, date: newExpense.date, note: newExpense.note }
         ]);
         if (error) throw error;
       } catch (err) {
+        // Network or API failure: add to offline queue
+        addToOfflineQueue({
+          type: 'INSERT',
+          table: 'dublin_expenses',
+          data: { title: newExpense.title, amount: newExpense.amount, category: newExpense.category, date: newExpense.date, note: newExpense.note }
+        });
         localStorage.setItem('dublin_expenses_list', JSON.stringify(updated));
       }
     } else {
+      // Offline mode: save locally + queue for sync when back online
+      addToOfflineQueue({
+        type: 'INSERT',
+        table: 'dublin_expenses',
+        data: { title: newExpense.title, amount: newExpense.amount, category: newExpense.category, date: newExpense.date, note: newExpense.note }
+      });
       localStorage.setItem('dublin_expenses_list', JSON.stringify(updated));
     }
   };
@@ -137,13 +150,15 @@ export default function DashboardTab({ userProfile }) {
     const updated = expenses.filter(e => e.id !== id);
     setExpenses(updated);
 
-    if (supabase) {
+    if (supabase && isOnline()) {
       try {
         await supabase.from('dublin_expenses').delete().eq('id', id);
       } catch (err) {
+        addToOfflineQueue({ type: 'DELETE', table: 'dublin_expenses', data: { id } });
         localStorage.setItem('dublin_expenses_list', JSON.stringify(updated));
       }
     } else {
+      addToOfflineQueue({ type: 'DELETE', table: 'dublin_expenses', data: { id } });
       localStorage.setItem('dublin_expenses_list', JSON.stringify(updated));
     }
   };
