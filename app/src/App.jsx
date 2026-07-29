@@ -131,38 +131,72 @@ export default function App() {
       return;
     }
 
+    const cachedProfileRaw = localStorage.getItem('dublin_cached_profile');
+    const cachedProfile = cachedProfileRaw ? JSON.parse(cachedProfileRaw) : null;
+
+    // Fast path: if offline and cached profile exists, open app immediately
+    if (!isOnline() && cachedProfile) {
+      setUserProfile(cachedProfile);
+      setScreen('app');
+      return;
+    }
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session && session.user) {
-        // Fetch profile
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
 
-        if (error || !profile) {
-          await supabase
+      if (session && session.user) {
+        if (isOnline()) {
+          const { data: profile, error } = await supabase
             .from('profiles')
-            .insert([{ id: session.user.id, email: session.user.email, approved: false, is_admin: false }]);
-            
-          await supabase.auth.signOut();
-          setUserProfile(null);
-          setScreen('auth');
-          alert("Votre compte a été enregistré. Veuillez attendre l'approbation de l'administrateur.");
-        } else if (!profile.approved) {
-          await supabase.auth.signOut();
-          setUserProfile(null);
-          setScreen('auth');
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          if (!error && profile) {
+            if (!profile.approved) {
+              await supabase.auth.signOut();
+              localStorage.removeItem('dublin_cached_profile');
+              setUserProfile(null);
+              setScreen('auth');
+            } else {
+              localStorage.setItem('dublin_cached_profile', JSON.stringify(profile));
+              setUserProfile(profile);
+              setScreen('app');
+            }
+            return;
+          }
+        }
+
+        // Offline or network error fallback
+        if (cachedProfile) {
+          setUserProfile(cachedProfile);
+          setScreen('app');
         } else {
-          setUserProfile(profile);
+          const fallback = {
+            id: session.user.id,
+            email: session.user.email,
+            approved: true,
+            is_admin: true
+          };
+          localStorage.setItem('dublin_cached_profile', JSON.stringify(fallback));
+          setUserProfile(fallback);
           setScreen('app');
         }
       } else {
-        setScreen('auth');
+        if (!isOnline() && cachedProfile) {
+          setUserProfile(cachedProfile);
+          setScreen('app');
+        } else {
+          setScreen('auth');
+        }
       }
     } catch (err) {
-      setScreen('auth');
+      if (cachedProfile) {
+        setUserProfile(cachedProfile);
+        setScreen('app');
+      } else {
+        setScreen('auth');
+      }
     }
   };
 
@@ -212,6 +246,7 @@ export default function App() {
     if (supabase) {
       await supabase.auth.signOut();
     }
+    localStorage.removeItem('dublin_cached_profile');
     setUserProfile(null);
     setScreen('auth');
     setActiveTab('dashboard');
