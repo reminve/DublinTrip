@@ -236,14 +236,14 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 flex flex-col md:flex-row items-start relative overflow-x-hidden">
+    <div className="min-h-screen bg-slate-950 text-slate-50 flex flex-col md:flex-row relative overflow-x-hidden">
       
       {/* Aesthetic blur background elements */}
       <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-10 right-1/4 w-[400px] h-[400px] bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      {/* ==================== LEFT SIDEBAR (DESKTOP ONLY) ==================== */}
-      <aside className="hidden md:flex w-64 shrink-0 bg-slate-900/10 border-r border-slate-900/60 p-6 flex-col justify-between h-screen sticky top-0 self-start backdrop-blur-xl z-30">
+      {/* ==================== LEFT SIDEBAR (DESKTOP ONLY - FIXED) ==================== */}
+      <aside className="hidden md:flex fixed top-0 left-0 w-64 h-screen bg-slate-900/10 border-r border-slate-900/60 p-6 flex-col justify-between backdrop-blur-xl z-30">
         <div className="space-y-6">
           
           {/* Sidebar Header */}
@@ -408,7 +408,7 @@ export default function App() {
       </header>
 
       {/* ==================== MAIN CONTENT WRAPPER ==================== */}
-      <div className="flex-grow p-4 md:p-8 max-w-5xl mx-auto w-full z-10">
+      <div className="flex-grow md:ml-64 p-4 md:p-8 max-w-5xl mx-auto w-full z-10">
         <main className="pb-20 md:pb-0">
           {activeTab === 'dashboard' && <DashboardTab userProfile={userProfile} />}
           {activeTab === 'itinerary' && <ItineraryTab />}

@@ -273,11 +273,29 @@ body.light .bg-emerald-950\/20 {
 
 /* ==================== LIGHT MODE ACCENT TEXT CONTRAST TUNING ==================== */
 /* Mutes active text accent neon shades to darker, highly readable tones */
-body.light.accent-emerald .text-emerald-400 { color: #047857 !important; }
-body.light.accent-amber .text-emerald-400 { color: #b45309 !important; }
-body.light.accent-orange .text-emerald-400 { color: #c2410c !important; }
-body.light.accent-sky .text-emerald-400 { color: #0369a1 !important; }
-body.light.accent-indigo .text-emerald-400 { color: #4338ca !important; }
+body.light .text-emerald-400,
+body.light .text-emerald-450,
+body.light .text-emerald-500,
+body.light .text-emerald-600 { 
+  color: #047857 !important; 
+}
+body.light .text-amber-400,
+body.light .text-amber-450,
+body.light .text-amber-500,
+body.light .text-amber-600 { 
+  color: #b45309 !important; 
+}
+
+body.light .bg-emerald-500\/10,
+body.light .bg-emerald-500\/20 {
+  background-color: #d1fae5 !important;
+  border-color: #a7f3d0 !important;
+}
+body.light .bg-amber-500\/10,
+body.light .bg-amber-500\/20 {
+  background-color: #fef3c7 !important;
+  border-color: #fde68a !important;
+}
 
 /* Global Light Mode inputs styling to prevent white text on white bg */
 body.light input, body.light select {

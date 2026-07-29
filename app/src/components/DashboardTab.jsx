@@ -710,7 +710,11 @@ export default function DashboardTab({ userProfile }) {
                       <div key={exp.id} className="bg-slate-950/60 border border-slate-900 rounded-xl p-3 flex items-center justify-between gap-4 hover:border-slate-850 transition-colors">
                         <div className="min-w-0 space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded ${exp.category === 'reserved' ? 'bg-emerald-500/10 text-emerald-450 border border-emerald-500/10' : 'bg-amber-500/10 text-amber-450 border border-amber-500/10'}`}>
+                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md border ${
+                              exp.category === 'reserved' 
+                                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-500/30' 
+                                : 'bg-amber-500/20 text-amber-800 dark:text-amber-400 border-amber-500/30'
+                            }`}>
                               {exp.category === 'reserved' ? "Réservé" : "Sur place"}
                             </span>
                             <span className="text-[8px] text-slate-500 font-bold uppercase flex items-center gap-0.5"><Calendar className="w-2.5 h-2.5" /> {new Date(exp.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</span>
