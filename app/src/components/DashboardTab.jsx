@@ -18,7 +18,7 @@ const DEFAULT_EXPENSES = [
   { id: 'e4', title: "aparto Binary Hub (6 nuits)", amount: 327.41, category: 'reserved', date: '2026-07-25', note: 'Booking.com n° 5694634506 (Code: 9401)' },
   { id: 'e5', title: "Navette Dublin Express 782", amount: 12.00, category: 'reserved', date: '2026-07-25', note: 'Usher\'s Quay ↔ T2 (A/R)' },
   { id: 'e6', title: "Visite Book of Kells", amount: 21.00, category: 'reserved', date: '2026-07-25', note: 'Trinity Visit 7 août @ 12h30 (Étudiant)' },
-  { id: 'e7', title: "Guinness Storehouse", amount: 22.50, category: 'on_site', date: '2026-08-08', note: 'St James\'s Gate' },
+  { id: 'e7', title: "Guinness Storehouse", amount: 22.50, category: 'reserved', date: '2026-08-08', note: 'St James\'s Gate' },
   { id: 'e8', title: "Visite Kilmainham Gaol", amount: 8.00, category: 'on_site', date: '2026-08-10', note: 'Achat J-28 ou matin même' },
   { id: 'e9', title: "Transports Locaux (TFI Leap)", amount: 25.00, category: 'on_site', date: '2026-08-06', note: 'DART Howth + Bus' },
   { id: 'e10', title: "Excursion Glendalough", amount: 25.00, category: 'on_site', date: '2026-08-09', note: 'Car St. Kevin\'s Bus A/R' },
