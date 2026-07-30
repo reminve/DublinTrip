@@ -1,6 +1,6 @@
 # ☘️ Dublin 2026 — Dashboard Voyage & Suivi Sécurisé
 
-Ce projet contient une application web **Single Page (SPA)** responsive et **Mobile-First** conçue pour monitorer et documenter un voyage solo à Dublin du **6 au 12 août 2026**. 
+Ce projet contient une application web **Single Page (SPA)** responsive et **Mobile-First** conçue pour monitorer et documenter un voyage solo à Dublin du **6 au 12 août 2026**.
 
 L'application est construite sous **React + Vite** avec **Tailwind CSS v4** et est déployée gratuitement sur **GitHub Pages** (URL : https://reminve.github.io/DublinTrip/). Elle s'appuie sur un backend serverless **Supabase** (gratuit) pour gérer l'authentification sécurisée, la géolocalisation GPS en temps réel et un album photo privé, le tout protégé par des règles de sécurité **Row Level Security (RLS)**.
 
@@ -8,38 +8,38 @@ L'application est construite sous **React + Vite** avec **Tailwind CSS v4** et e
 
 ## 🚀 Fonctionnalités Clés
 
-1.  **Authentification Privée (Supabase Auth) :** 
-    *   Interface de connexion sécurisée (Email/Password) fonctionnant sur tous vos appareils.
-    *   Système d'inscription publique mais bloqué par défaut. Seul l'administrateur (vous) peut approuver les comptes.
-2.  **Tableau de Bord Voyageur & Registre Interactif (Budget) :**
-    *   Compte à rebours dynamique avant le départ (ou barre de progression du voyage en cours).
-    *   **Gestionnaire de budget dynamique :** Un graphique circulaire (Doughnut Chart) réactif affiche la répartition des dépenses (*Réservations pré-payées* vs *Sur place*).
-    *   **Grand Registre des Dépenses :** Une fenêtre modale permet d'ajouter de nouvelles transactions (libellé, montant, date, notes) ou d'en supprimer. (Les ajouts et suppressions sont réservés aux Administrateurs, les invités ne peuvent que consulter).
-    *   Résumés logistiques (vols Aer Lingus EI 553/550, logement aparto Binary Hub, check-out à 03h30).
-    *   Météo en direct à Dublin via l'API publique et gratuite *Open-Meteo*.
-3.  **Central d'Embarquement (Billets & Résas) :**
-    *   Onglet dédié pour centraliser tous les titres de transport et réservations.
-    *   **Portefeuille Google Wallet :** Boutons d'accès directs pour ajouter et ouvrir les cartes de fidélité ou d'embarquement sur votre téléphone.
-    *   **Téléversement Admin :** Les administrateurs peuvent téléverser des documents PDF ou Images (captures d'écrans) qui sont convertis en Base64 côté client et sauvegardés directement dans la base de données.
-    *   **Consultation & Téléchargement :** Tous les voyageurs approuvés peuvent consulter ou télécharger ces documents instantanément.
-4.  **Feuille de Route & Itinéraire :**
-    *   Timeline chronologique jour par jour rétractable (accordéons).
-    *   Export de calendrier standard **Google Calendar (.ics)**.
-5.  **Album Photo Privé :**
-    *   Téléversement d'images avec **compression canvas côté client** (JPEG optimisé à ~50 Ko) pour économiser la base de données.
-    *   Visionneuse d'images plein écran (Lightbox) et option de suppression.
-6.  **Journal & Guinness Tracker :**
-    *   Journal de bord partagé pour écrire les impressions au fil des jours.
-    *   Compteur de Guinness en direct avec la possibilité de lister et noter les pubs visités (prix de la pinte, note sur 5 et commentaires).
-7.  **Géolocalisation & Suivi Direct (Leaflet.js) :**
-    *   Carte interactive en mode sombre (CartoDB Dark Matter).
-    *   Bouton de tracking en direct (watchPosition) qui enregistre la trace GPS du voyageur.
-    *   **Screen Wake Lock API :** Empêche l'appareil de se mettre en veille lorsque le GPS est actif, forçant le navigateur à continuer d'émettre pendant les déplacements.
-    *   Simulateur de déplacement intégré pour tester l'application depuis chez soi.
-8.  **Interface Administrateur & Sécurité :**
-    *   **Gestion des utilisateurs :** Permet d'approuver ou de supprimer les demandes de création de comptes, ou encore de **promouvoir d'autres comptes au statut Admin** via une simple case à cocher.
-    *   **Maintenance des données :** Outils d'administration en un clic pour vider l'historique GPS de test, réinitialiser le journal ou remettre le budget à zéro avant de décoller.
-    *   **Ressources réservées :** L'ajout de dépenses et l'onglet *Réglages* sont masqués et interdits aux utilisateurs non-administrateurs.
+1. **Authentification Privée (Supabase Auth) :**
+   * Interface de connexion sécurisée (Email/Password) fonctionnant sur tous vos appareils.
+   * Système d'inscription publique mais bloqué par défaut. Seul l'administrateur (vous) peut approuver les comptes.
+2. **Tableau de Bord Voyageur & Registre Interactif (Budget) :**
+   * Compte à rebours dynamique avant le départ (ou barre de progression du voyage en cours).
+   * **Gestionnaire de budget dynamique :** Un graphique circulaire (Doughnut Chart) réactif affiche la répartition des dépenses (*Réservations pré-payées* vs *Sur place*).
+   * **Grand Registre des Dépenses :** Une fenêtre modale permet d'ajouter de nouvelles transactions (libellé, montant, date, notes) ou d'en supprimer. (Les ajouts et suppressions sont réservés aux Administrateurs, les invités ne peuvent que consulter).
+   * Résumés logistiques (vols Aer Lingus EI 553/550, logement aparto Binary Hub, check-out à 03h30).
+   * Météo en direct à Dublin via l'API publique et gratuite *Open-Meteo*.
+3. **Central d'Embarquement (Billets & Résas) :**
+   * Onglet dédié pour centraliser tous les titres de transport et réservations.
+   * **Portefeuille Google Wallet :** Boutons d'accès directs pour ajouter et ouvrir les cartes de fidélité ou d'embarquement sur votre téléphone.
+   * **Téléversement Admin :** Les administrateurs peuvent téléverser des documents PDF ou Images (captures d'écrans) qui sont convertis en Base64 côté client et sauvegardés directement dans la base de données.
+   * **Consultation & Téléchargement :** Tous les voyageurs approuvés peuvent consulter ou télécharger ces documents instantanément.
+4. **Feuille de Route & Itinéraire :**
+   * Timeline chronologique jour par jour rétractable (accordéons).
+   * Export de calendrier standard **Google Calendar (.ics)**.
+5. **Album Photo Privé :**
+   * Téléversement d'images avec **compression canvas côté client** (JPEG optimisé à ~50 Ko) pour économiser la base de données.
+   * Visionneuse d'images plein écran (Lightbox) et option de suppression.
+6. **Journal & Guinness Tracker :**
+   * Journal de bord partagé pour écrire les impressions au fil des jours.
+   * Compteur de Guinness en direct avec la possibilité de lister et noter les pubs visités (prix de la pinte, note sur 5 et commentaires).
+7. **Géolocalisation & Suivi Direct (Leaflet.js) :**
+   * Carte interactive en mode sombre (CartoDB Dark Matter).
+   * Bouton de tracking en direct (watchPosition) qui enregistre la trace GPS du voyageur.
+   * **Screen Wake Lock API :** Empêche l'appareil de se mettre en veille lorsque le GPS est actif, forçant le navigateur à continuer d'émettre pendant les déplacements.
+   * Simulateur de déplacement intégré pour tester l'application depuis chez soi.
+8. **Interface Administrateur & Sécurité :**
+   * **Gestion des utilisateurs :** Permet d'approuver ou de supprimer les demandes de création de comptes, ou encore de **promouvoir d'autres comptes au statut Admin** via une simple case à cocher.
+   * **Maintenance des données :** Outils d'administration en un clic pour vider l'historique GPS de test, réinitialiser le journal ou remettre le budget à zéro avant de décoller.
+   * **Ressources réservées :** L'ajout de dépenses et l'onglet *Réglages* sont masqués et interdits aux utilisateurs non-administrateurs.
 
 ---
 
@@ -58,8 +58,7 @@ L'application est construite sous **React + Vite** avec **Tailwind CSS v4** et e
 │   └── package.json       # Dépendances npm et configurations
 ├── .gitignore             # Exclut les fichiers système et les billets d'avion PDF privés
 ├── plan_voyage_dublin_2026.md # Feuille de route logistique et jour-par-jour textuelle
-├── programme_google_calendar_dublin.ics # Export de calendrier iCalendar
-└── REMEDE_PROMPT.md       # Prompt d'initialisation de secours
+└── programme_google_calendar_dublin.ics # Export de calendrier iCalendar
 ```
 
 ---
@@ -69,23 +68,25 @@ L'application est construite sous **React + Vite** avec **Tailwind CSS v4** et e
 Pour exécuter le projet en local sur votre ordinateur :
 
 ### Prérequis
-*   [Node.js](https://nodejs.org) (v24 recommandée) installé.
+
+* [Node.js](https://nodejs.org) (v24 recommandée) installé.
 
 ### Démarrage
-1.  Entrez dans le dossier de l'application :
-    ```bash
-    cd app
-    ```
-2.  Installez les dépendances :
-    ```bash
-    npm install
-    ```
-3.  Lancez le serveur de développement :
-    ```bash
-    npm run dev
-    ```
-4.  Ouvrez votre navigateur à l'adresse indiquée (généralement `http://localhost:5173`).
-    *Note : L'exécution locale via un serveur de développement est obligatoire pour que le navigateur vous autorise à utiliser la puce GPS (Geolocation API).*
+
+1. Entrez dans le dossier de l'application :
+   ```bash
+   cd app
+   ```
+2. Installez les dépendances :
+   ```bash
+   npm install
+   ```
+3. Lancez le serveur de développement :
+   ```bash
+   npm run dev
+   ```
+4. Ouvrez votre navigateur à l'adresse indiquée (généralement `http://localhost:5173`).
+   *Note : L'exécution locale via un serveur de développement est obligatoire pour que le navigateur vous autorise à utiliser la puce GPS (Geolocation API).*
 
 ---
 
@@ -94,6 +95,7 @@ Pour exécuter le projet en local sur votre ordinateur :
 L'application utilise un projet Supabase gratuit pour stocker les profils, les trajets, les dépenses, les documents et les photos.
 
 ### 1. Initialisation des Tables & Règles RLS
+
 Dans le **SQL Editor** de votre console Supabase, exécutez le script suivant pour configurer la base de données :
 
 ```sql
@@ -232,6 +234,7 @@ CREATE POLICY "Les admins suppriment Dépenses" ON public.dublin_expenses FOR DE
 ```
 
 ### 2. Attribution du rôle Administrateur
+
 Une fois inscrit sur votre application, attribuez-vous le rôle Admin en exécutant ceci dans l'éditeur SQL de Supabase :
 
 ```sql
@@ -241,10 +244,12 @@ WHERE email = 'votre-email-de-connexion@exemple.com';
 ```
 
 ### 3. Gestion de la limite d'envoi de mails Supabase (Troubleshooting)
-Sur l'offre gratuite de Supabase, la limite de mails de confirmation d'inscription est fixée à **2 mails par heure**. 
+
+Sur l'offre gratuite de Supabase, la limite de mails de confirmation d'inscription est fixée à **2 mails par heure**.
 Si vous recevez l'erreur `email rate limit exceeded` lors de vos tests, vous devez faire une de ces deux actions :
-*   **Recommandé pour tester rapidement :** Désactiver le besoin de confirmation e-mail. Allez dans **Authentication** 🔑 ➔ **Providers** ➔ **Email** et décochez **Confirm email** (ou *Double opt-in*). Les comptes créés seront actifs instantanément.
-*   **Pour envoyer de vrais mails :** Configurez un SMTP gratuit externe (ex: [Resend](https://resend.com)) dans **Authentication** 🔑 ➔ **SMTP Settings**.
+
+* **Recommandé pour tester rapidement :** Désactiver le besoin de confirmation e-mail. Allez dans **Authentication** 🔑 ➔ **Providers** ➔ **Email** et décochez **Confirm email** (ou *Double opt-in*). Les comptes créés seront actifs instantanément.
+* **Pour envoyer de vrais mails :** Configurez un SMTP gratuit externe (ex: [Resend](https://resend.com)) dans **Authentication** 🔑 ➔ **SMTP Settings**.
 
 ---
 
@@ -252,19 +257,19 @@ Si vous recevez l'erreur `email rate limit exceeded` lors de vos tests, vous dev
 
 Le projet utilise GitHub Actions pour un déploiement continu à chaque Push.
 
-1.  Assurez-vous d'avoir lié votre dépôt local à votre répertoire GitHub distant :
-    ```bash
-    git remote add origin https://github.com/reminve/DublinTrip.git
-    git branch -M main
-    git push -u origin main
-    ```
-2.  Configurez la source de publication :
-    - Sur votre dépôt GitHub, allez dans **Settings** -> **Pages**.
-    - Sous **Build and deployment** -> **Source**, sélectionnez **GitHub Actions**.
-3.  À chaque modification, exécutez simplement :
-    ```bash
-    git add .
-    git commit -m "Description de mes modifs"
-    git push
-    ```
-    La pipeline compilera automatiquement l'application et la publiera sur `https://reminve.github.io/DublinTrip/`.
+1. Assurez-vous d'avoir lié votre dépôt local à votre répertoire GitHub distant :
+   ```bash
+   git remote add origin https://github.com/reminve/DublinTrip.git
+   git branch -M main
+   git push -u origin main
+   ```
+2. Configurez la source de publication :
+   - Sur votre dépôt GitHub, allez dans **Settings** -> **Pages**.
+   - Sous **Build and deployment** -> **Source**, sélectionnez **GitHub Actions**.
+3. À chaque modification, exécutez simplement :
+   ```bash
+   git add .
+   git commit -m "Description de mes modifs"
+   git push
+   ```
+   La pipeline compilera automatiquement l'application et la publiera sur `https://reminve.github.io/DublinTrip/`.

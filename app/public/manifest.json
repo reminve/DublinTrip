@@ -1,7 +1,7 @@
 {
-  "name": "Dublin 2026 — Companion Voyage",
+  "name": "Dublin 2026",
   "short_name": "Dublin 2026",
-  "description": "Application compagnon de voyage solo à Dublin — Feuille de route, budget, journal & suivi GPS avec mode hors-ligne.",
+  "description": "Gestion de mon voyage solo à Dublin (août 2026).",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#030712",
