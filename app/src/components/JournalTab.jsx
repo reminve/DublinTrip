@@ -486,8 +486,8 @@ export default function JournalTab({ userProfile }) {
                 <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Joindre une photo au souvenir</label>
                 <div className="flex flex-wrap items-center gap-2">
                   {/* Direct Mobile Camera Input */}
-                  <label className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-950 border border-slate-900 hover:border-emerald-500/40 rounded-xl text-[10px] font-bold text-slate-300 cursor-pointer transition-colors">
-                    <Camera className="w-3.5 h-3.5 text-emerald-400" />
+                  <label className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 hover:border-emerald-500/40 rounded-xl text-[10px] font-bold text-slate-700 dark:text-slate-300 cursor-pointer transition-colors">
+                    <Camera className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
                     <span>Appareil photo</span>
                     <input
                       type="file"
@@ -502,14 +502,14 @@ export default function JournalTab({ userProfile }) {
                   <button
                     type="button"
                     onClick={() => setCameraTarget('journal')}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-[10px] font-bold hover:bg-emerald-500/20 cursor-pointer transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 rounded-xl text-[10px] font-bold hover:bg-emerald-500/20 cursor-pointer transition-colors"
                   >
                     <Camera className="w-3.5 h-3.5" />
                     <span>Caméra Live</span>
                   </button>
 
                   {/* Gallery Input */}
-                  <label className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-950 border border-slate-900 rounded-xl text-[10px] font-bold text-slate-400 hover:text-slate-200 hover:border-slate-800 cursor-pointer transition-colors">
+                  <label className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-[10px] font-bold text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-800 cursor-pointer transition-colors">
                     <ImageIcon className="w-3.5 h-3.5" />
                     <span>Galerie</span>
                     <input
@@ -783,7 +783,7 @@ export default function JournalTab({ userProfile }) {
                 <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Photo de la pinte / du pub</label>
                 <div className="flex flex-wrap items-center gap-2">
                   {/* Direct Mobile Camera */}
-                  <label className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-950 border border-slate-900 hover:border-amber-500/40 rounded-xl text-[10px] font-bold text-slate-300 cursor-pointer transition-colors">
+                  <label className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 hover:border-amber-500/40 rounded-xl text-[10px] font-bold text-slate-700 dark:text-slate-300 cursor-pointer transition-colors">
                     <Camera className="w-3.5 h-3.5 text-amber-500" />
                     <span>Appareil photo</span>
                     <input
@@ -799,14 +799,14 @@ export default function JournalTab({ userProfile }) {
                   <button
                     type="button"
                     onClick={() => setCameraTarget('pint')}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-xl text-[10px] font-bold hover:bg-amber-500/20 cursor-pointer transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 rounded-xl text-[10px] font-bold hover:bg-amber-500/20 cursor-pointer transition-colors"
                   >
                     <Camera className="w-3.5 h-3.5" />
                     <span>Caméra Live</span>
                   </button>
 
                   {/* Gallery Input */}
-                  <label className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-950 border border-slate-900 rounded-xl text-[10px] font-bold text-slate-400 hover:text-slate-200 hover:border-slate-800 cursor-pointer transition-colors">
+                  <label className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-[10px] font-bold text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-800 cursor-pointer transition-colors">
                     <ImageIcon className="w-3.5 h-3.5" />
                     <span>Galerie</span>
                     <input
@@ -1003,15 +1003,15 @@ export default function JournalTab({ userProfile }) {
       {/* Lightbox Modal (Portal) */}
       {lightboxImage && createPortal(
         <div
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer"
+          className="fixed inset-0 z-50 bg-slate-950/80 dark:bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer"
           onClick={() => setLightboxImage(null)}
         >
-          <div className="relative max-w-3xl max-h-[85vh]">
-            <img src={lightboxImage} alt="Agrandissement" className="w-full h-full object-contain rounded-2xl border border-slate-800 shadow-2xl" />
+          <div className="relative max-w-3xl max-h-[85vh] bg-white dark:bg-slate-900 p-2 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800">
+            <img src={lightboxImage} alt="Agrandissement" className="w-full h-full object-contain rounded-2xl max-h-[80vh]" />
             <button
               type="button"
               onClick={() => setLightboxImage(null)}
-              className="absolute -top-4 -right-4 w-9 h-9 rounded-full bg-slate-900 border border-slate-700 text-white flex items-center justify-center hover:bg-rose-500 transition-colors"
+              className="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white flex items-center justify-center hover:bg-rose-500 hover:text-white transition-colors shadow-lg"
             >
               <X className="w-5 h-5" />
             </button>

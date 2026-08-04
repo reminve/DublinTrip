@@ -341,10 +341,10 @@ export default function GalleryTab({ userProfile }) {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Direct Mobile Camera */}
-            <label className="flex flex-col items-center justify-center p-3.5 bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 rounded-2xl cursor-pointer transition-all hover:-translate-y-0.5 text-center group">
-              <Camera className="w-6 h-6 text-emerald-400 mb-1.5 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-bold text-slate-200">Appareil Photo</span>
-              <span className="text-[9px] text-slate-500">Prise de vue mobile directe</span>
+            <label className="flex flex-col items-center justify-center p-3.5 bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 rounded-2xl cursor-pointer transition-all hover:-translate-y-0.5 text-center group">
+              <Camera className="w-6 h-6 text-emerald-500 dark:text-emerald-400 mb-1.5 group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Appareil Photo</span>
+              <span className="text-[9px] text-slate-500 dark:text-slate-400">Prise de vue mobile directe</span>
               <input 
                 type="file" 
                 accept="image/*" 
@@ -366,16 +366,16 @@ export default function GalleryTab({ userProfile }) {
               onClick={() => setShowCameraModal(true)}
               className="flex flex-col items-center justify-center p-3.5 bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 rounded-2xl cursor-pointer transition-all hover:-translate-y-0.5 text-center group"
             >
-              <Camera className="w-6 h-6 text-emerald-400 mb-1.5 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-bold text-emerald-300">Caméra Live</span>
-              <span className="text-[9px] text-slate-400">Capture vidéo directe</span>
+              <Camera className="w-6 h-6 text-emerald-500 dark:text-emerald-400 mb-1.5 group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-300">Caméra Live</span>
+              <span className="text-[9px] text-slate-500 dark:text-slate-400">Capture vidéo directe</span>
             </button>
 
             {/* Gallery Upload */}
-            <label className="flex flex-col items-center justify-center p-3.5 bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 rounded-2xl cursor-pointer transition-all hover:-translate-y-0.5 text-center group">
-              <Image className="w-6 h-6 text-emerald-400 mb-1.5 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-bold text-slate-200">Galerie / Fichiers</span>
-              <span className="text-[9px] text-slate-500">Importer des fichiers</span>
+            <label className="flex flex-col items-center justify-center p-3.5 bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 rounded-2xl cursor-pointer transition-all hover:-translate-y-0.5 text-center group">
+              <Image className="w-6 h-6 text-emerald-500 dark:text-emerald-400 mb-1.5 group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Galerie / Fichiers</span>
+              <span className="text-[9px] text-slate-500 dark:text-slate-400">Importer des fichiers</span>
               <input 
                 type="file" 
                 id="react-file-input" 
@@ -406,7 +406,7 @@ export default function GalleryTab({ userProfile }) {
               <div 
                 key={photo.id}
                 onClick={() => setLightboxPhoto(photo)}
-                className="relative aspect-square rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-900 shadow-md group cursor-pointer active:scale-98 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-350"
+                className="relative aspect-square rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-900 shadow-md group cursor-pointer active:scale-98 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-350 bg-slate-100 dark:bg-slate-900"
               >
                 <img src={photo.src} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
@@ -440,7 +440,7 @@ export default function GalleryTab({ userProfile }) {
       {/* Large Lightbox Modal (Portal) */}
       {lightboxPhoto && createPortal(
         <div 
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
+          className="fixed inset-0 z-50 bg-slate-950/80 dark:bg-black/95 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
           onClick={() => setLightboxPhoto(null)}
         >
           <div 
@@ -448,7 +448,7 @@ export default function GalleryTab({ userProfile }) {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Left: Large Image Container */}
-            <div className="flex-[3] bg-black flex items-center justify-center relative p-2 min-h-[350px] md:min-h-[550px] max-h-[65vh] md:max-h-[88vh]">
+            <div className="flex-[3] bg-slate-100 dark:bg-black flex items-center justify-center relative p-2 min-h-[350px] md:min-h-[550px] max-h-[65vh] md:max-h-[88vh]">
               <img src={lightboxPhoto.src} alt="" className="max-w-full max-h-[84vh] w-auto h-auto object-contain shadow-2xl rounded-xl" />
               
               {/* Top Action Buttons on Image */}
@@ -457,7 +457,7 @@ export default function GalleryTab({ userProfile }) {
                   <button 
                     type="button"
                     onClick={() => deletePhoto(lightboxPhoto.id)}
-                    className="w-10 h-10 bg-slate-900/80 border border-slate-800 rounded-full flex items-center justify-center text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer shadow-lg"
+                    className="w-10 h-10 bg-white/90 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-full flex items-center justify-center text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer shadow-lg"
                     title="Supprimer la photo"
                   >
                     <Trash2 className="w-4.5 h-4.5" />
@@ -466,7 +466,7 @@ export default function GalleryTab({ userProfile }) {
                 <button 
                   type="button"
                   onClick={() => setLightboxPhoto(null)}
-                  className="w-10 h-10 bg-slate-900/80 border border-slate-800 rounded-full flex items-center justify-center text-slate-200 hover:text-white transition-colors cursor-pointer shadow-lg"
+                  className="w-10 h-10 bg-white/90 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white transition-colors cursor-pointer shadow-lg"
                 >
                   <X className="w-5 h-5" />
                 </button>
