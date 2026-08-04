@@ -97,28 +97,28 @@ export default function CameraModal({ isOpen, onClose, onCapture }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 dark:bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col space-y-4 p-5 relative text-slate-800 dark:text-slate-100">
+    <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col space-y-4 p-5 relative">
         
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-emerald-500/20 text-emerald-500 dark:text-emerald-400 rounded-xl flex items-center justify-center font-bold">
+            <div className="w-8 h-8 bg-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center">
               <Camera className="w-4 h-4" />
             </div>
-            <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">Appareil Photo en Direct</h3>
+            <h3 className="font-bold text-sm text-slate-100">Appareil Photo en Direct</h3>
           </div>
           <button 
             type="button"
             onClick={() => { stopCamera(); onClose(); }}
-            className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors"
+            className="p-1.5 rounded-full bg-slate-800 text-slate-400 hover:text-white cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Viewfinder or Captured Preview */}
-        <div className="relative aspect-[4/3] bg-black rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex items-center justify-center shadow-inner">
+        <div className="relative aspect-[4/3] bg-black rounded-2xl overflow-hidden border border-slate-800 flex items-center justify-center">
           {capturedImage ? (
             <img src={capturedImage} alt="Photo prise" className="w-full h-full object-cover" />
           ) : errorMsg ? (
@@ -151,7 +151,7 @@ export default function CameraModal({ isOpen, onClose, onCapture }) {
               <button 
                 type="button" 
                 onClick={handleRetake} 
-                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition-colors cursor-pointer"
               >
                 Reprendre
               </button>
@@ -169,7 +169,7 @@ export default function CameraModal({ isOpen, onClose, onCapture }) {
                 type="button" 
                 onClick={handleSwitchCamera} 
                 disabled={loading || !!errorMsg}
-                className="p-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 text-slate-800 dark:text-slate-200 rounded-2xl text-xs font-bold flex items-center gap-2 cursor-pointer"
+                className="p-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-200 rounded-2xl text-xs font-bold flex items-center gap-2 cursor-pointer"
                 title="Changer de caméra"
               >
                 <RefreshCw className="w-4 h-4" />
@@ -180,7 +180,7 @@ export default function CameraModal({ isOpen, onClose, onCapture }) {
                 type="button" 
                 onClick={takeSnapshot} 
                 disabled={loading || !!errorMsg}
-                className="w-14 h-14 bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-700 text-slate-950 rounded-full flex items-center justify-center shadow-xl shadow-emerald-500/30 border-4 border-white dark:border-slate-950 transition-transform active:scale-95 cursor-pointer"
+                className="w-14 h-14 bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-700 text-slate-950 rounded-full flex items-center justify-center shadow-xl shadow-emerald-500/30 border-4 border-slate-950 transition-transform active:scale-95 cursor-pointer"
                 title="Prendre la photo"
               >
                 <div className="w-6 h-6 rounded-full bg-slate-950" />

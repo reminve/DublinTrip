@@ -289,8 +289,8 @@ export default function DocumentsTab({ userProfile }) {
                   <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Prendre une photo ou choisir une image</label>
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Direct Mobile Camera */}
-                    <label className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 hover:border-emerald-500/40 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer transition-colors">
-                      <Camera className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+                    <label className="flex items-center gap-1.5 px-3 py-2 bg-slate-950 border border-slate-900 hover:border-emerald-500/40 rounded-xl text-xs font-bold text-slate-200 cursor-pointer transition-colors">
+                      <Camera className="w-4 h-4 text-emerald-400" />
                       <span>Appareil photo</span>
                       <input
                         type="file"
@@ -305,14 +305,14 @@ export default function DocumentsTab({ userProfile }) {
                     <button
                       type="button"
                       onClick={() => setShowCameraModal(true)}
-                      className="flex items-center gap-1.5 px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold hover:bg-emerald-500/20 cursor-pointer transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs font-bold hover:bg-emerald-500/20 cursor-pointer transition-colors"
                     >
                       <Camera className="w-4 h-4" />
                       <span>Caméra Live</span>
                     </button>
 
                     {/* Gallery input */}
-                    <label className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 hover:border-slate-300 dark:hover:border-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer transition-colors">
+                    <label className="flex items-center gap-1.5 px-3 py-2 bg-slate-950 border border-slate-900 hover:border-slate-800 rounded-xl text-xs font-bold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors">
                       <ImageIcon className="w-4 h-4" />
                       <span>Galerie / Fichier</span>
                       <input
@@ -493,29 +493,29 @@ export default function DocumentsTab({ userProfile }) {
       {/* ==================== DOCUMENT VIEWER MODAL (Portal) ==================== */}
       {previewDoc && createPortal(
         <div
-          className="fixed inset-0 z-50 bg-slate-950/80 dark:bg-black/90 backdrop-blur-sm flex flex-col"
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex flex-col"
           onClick={() => setPreviewDoc(null)}
         >
           {/* Toolbar */}
           <div
-            className="flex items-center justify-between px-5 py-3 bg-white/95 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 flex-shrink-0"
+            className="flex items-center justify-between px-5 py-3 bg-slate-950/80 border-b border-slate-800 flex-shrink-0"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3 min-w-0">
               {previewDoc.type === 'pdf'
-                ? <FileText className="w-4 h-4 text-red-500 flex-shrink-0" />
-                : <ImageIcon className="w-4 h-4 text-sky-500 flex-shrink-0" />
+                ? <FileText className="w-4 h-4 text-red-400 flex-shrink-0" />
+                : <ImageIcon className="w-4 h-4 text-sky-400 flex-shrink-0" />
               }
-              <span className="text-sm font-bold text-slate-900 dark:text-slate-200 truncate">{previewDoc.title}</span>
+              <span className="text-sm font-bold text-slate-200 truncate">{previewDoc.title}</span>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
-              {/* Open in new tab */}
+              {/* Open in new tab — hidden on mobile (PDF.js renders inline instead) */}
               {(previewDoc.type !== 'pdf' || window.innerWidth >= 768) && (
                 <a
                   href={previewDoc.file_data}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[10px] font-black uppercase tracking-wider bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white px-3 py-2 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="text-[10px] font-black uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-300 hover:text-white px-3 py-2 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <ExternalLink className="w-3.5 h-3.5" /> Ouvrir
@@ -526,7 +526,7 @@ export default function DocumentsTab({ userProfile }) {
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); handleDownload(previewDoc); }}
-                  className="text-[10px] font-black uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-slate-950 px-3 py-2 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="text-[10px] font-black uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-slate-900 px-3 py-2 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <FileDown className="w-3.5 h-3.5" /> Télécharger
                 </button>
@@ -535,7 +535,7 @@ export default function DocumentsTab({ userProfile }) {
               <button
                 type="button"
                 onClick={() => setPreviewDoc(null)}
-                className="w-9 h-9 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center text-slate-700 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white transition-colors cursor-pointer"
+                className="w-9 h-9 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
