@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
-  UploadCloud, Image, Trash2, X, Heart, MessageSquare, Send
+  UploadCloud, Image, Trash2, X, Heart, MessageSquare, Send, Camera
 } from 'lucide-react';
 import { getSupabase } from '../supabase';
 import { isOnline, addToOfflineQueue } from '../offlineSync';
+import CameraModal from './CameraModal';
 
 export default function GalleryTab({ userProfile }) {
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lightboxPhoto, setLightboxPhoto] = useState(null);
+  const [showCameraModal, setShowCameraModal] = useState(false);
   
   // Comment text input state per photo: { [photoId]: string }
   const [commentTexts, setCommentTexts] = useState({});
@@ -128,12 +130,42 @@ export default function GalleryTab({ userProfile }) {
             } finally {
               setLoading(false);
             }
-          } else {
-            addToOfflineQueue({ type: 'INSERT', table: 'dublin_photos', data: payload });
-            setLoading(false);
           }
         };
       };
+    }
+  };
+
+  const handleDirectPhotoAdd = async (base64) => {
+    if (!userProfile?.is_admin) {
+      alert("Seul le voyageur admin peut ajouter des photos.");
+      return;
+    }
+    setLoading(true);
+    const newPhoto = {
+      id: Math.random().toString(36).substring(2),
+      created_at: new Date().toISOString(),
+      image: base64,
+      likes: [],
+      comments: []
+    };
+    const payload = { image: base64, likes: [], comments: [] };
+    const updated = [newPhoto, ...photos];
+    setPhotos(updated);
+    localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
+
+    if (supabase && isOnline()) {
+      try {
+        const { error } = await supabase.from('dublin_photos').insert([payload]);
+        if (error) throw error;
+      } catch (err) {
+        addToOfflineQueue({ type: 'INSERT', table: 'dublin_photos', data: payload });
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      addToOfflineQueue({ type: 'INSERT', table: 'dublin_photos', data: payload });
+      setLoading(false);
     }
   };
 
@@ -274,24 +306,60 @@ export default function GalleryTab({ userProfile }) {
 
       {/* Upload zone (Admin only) */}
       {userProfile?.is_admin && (
-        <div 
-          onClick={() => document.getElementById('react-file-input').click()}
-          className="border border-dashed border-slate-300 dark:border-slate-800 hover:border-emerald-500/40 rounded-2xl p-6 text-center bg-slate-50 dark:bg-slate-900/10 hover:bg-emerald-500/[0.01] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
-        >
-          <input 
-            type="file" 
-            id="react-file-input" 
-            accept="image/*" 
-            multiple 
-            onChange={handleFileChange}
-            className="hidden" 
-          />
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-10 h-10 bg-slate-100 dark:bg-slate-900/80 rounded-xl flex items-center justify-center border border-slate-200 dark:border-slate-850">
-              <UploadCloud className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
-            </div>
-            <p className="text-xs font-bold text-slate-700 dark:text-slate-350">Ajouter des photos du voyage</p>
-            <p className="text-[10px] text-slate-500">JPG/PNG compressé automatiquement</p>
+        <div className="card-premium p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+              <UploadCloud className="w-4 h-4 text-emerald-400" /> Ajouter des photos au voyage
+            </h4>
+            <span className="text-[10px] text-slate-500">Appareil photo ou Galerie</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Direct Mobile Camera */}
+            <label className="flex flex-col items-center justify-center p-3.5 bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 rounded-2xl cursor-pointer transition-all hover:-translate-y-0.5 text-center group">
+              <Camera className="w-6 h-6 text-emerald-400 mb-1.5 group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-bold text-slate-200">Appareil Photo</span>
+              <span className="text-[9px] text-slate-500">Prise de vue mobile directe</span>
+              <input 
+                type="file" 
+                accept="image/*" 
+                capture="environment" 
+                onChange={(e) => {
+                  if (e.target.files?.[0]) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => handleDirectPhotoAdd(ev.target.result);
+                    reader.readAsDataURL(e.target.files[0]);
+                  }
+                }} 
+                className="hidden" 
+              />
+            </label>
+
+            {/* WebRTC Live Camera Modal */}
+            <button 
+              type="button"
+              onClick={() => setShowCameraModal(true)}
+              className="flex flex-col items-center justify-center p-3.5 bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 rounded-2xl cursor-pointer transition-all hover:-translate-y-0.5 text-center group"
+            >
+              <Camera className="w-6 h-6 text-emerald-400 mb-1.5 group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-bold text-emerald-300">Caméra Live</span>
+              <span className="text-[9px] text-slate-400">Capture vidéo directe</span>
+            </button>
+
+            {/* Gallery Upload */}
+            <label className="flex flex-col items-center justify-center p-3.5 bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 rounded-2xl cursor-pointer transition-all hover:-translate-y-0.5 text-center group">
+              <Image className="w-6 h-6 text-emerald-400 mb-1.5 group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-bold text-slate-200">Galerie / Fichiers</span>
+              <span className="text-[9px] text-slate-500">Importer des fichiers</span>
+              <input 
+                type="file" 
+                id="react-file-input" 
+                accept="image/*" 
+                multiple 
+                onChange={handleFileChange} 
+                className="hidden" 
+              />
+            </label>
           </div>
         </div>
       )}
@@ -469,6 +537,13 @@ export default function GalleryTab({ userProfile }) {
         </div>,
         document.body
       )}
+
+      {/* Camera Modal */}
+      <CameraModal 
+        isOpen={showCameraModal} 
+        onClose={() => setShowCameraModal(false)} 
+        onCapture={handleDirectPhotoAdd} 
+      />
     </div>
   );
 }

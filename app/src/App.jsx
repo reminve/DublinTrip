@@ -633,8 +633,8 @@ export default function App() {
       </header>
 
       {/* ==================== MAIN CONTENT WRAPPER ==================== */}
-      <div className="flex-grow md:ml-64 p-4 md:p-8 max-w-5xl mx-auto w-full z-10">
-        <main className="pb-20 md:pb-0">
+      <div className="flex-1 md:ml-64 min-h-screen flex justify-center p-4 md:p-8 w-full z-10">
+        <main className="w-full max-w-5xl pb-20 md:pb-0">
           {activeTab === 'dashboard' && <DashboardTab userProfile={userProfile} />}
           {activeTab === 'itinerary' && <ItineraryTab />}
           {activeTab === 'journal' && <JournalTab userProfile={userProfile} />}

@@ -4,8 +4,9 @@ import { getSupabase } from '../supabase';
 import { isOnline, addToOfflineQueue } from '../offlineSync';
 import { 
   FileText, CreditCard, Link, FileDown, UploadCloud, 
-  File, Image as ImageIcon, Trash2, X, ZoomIn, ExternalLink
+  File, Image as ImageIcon, Trash2, X, ZoomIn, ExternalLink, Camera
 } from 'lucide-react';
+import CameraModal from './CameraModal';
 
 // ── PDF.js canvas renderer (works on mobile where iframes fail) ──────────────
 function MobilePDFViewer({ dataUrl }) {
@@ -94,6 +95,7 @@ export default function DocumentsTab({ userProfile }) {
 
   // Viewer state
   const [previewDoc, setPreviewDoc] = useState(null); // { title, type, file_data }
+  const [showCameraModal, setShowCameraModal] = useState(false);
 
   const supabase = getSupabase();
 
@@ -282,13 +284,55 @@ export default function DocumentsTab({ userProfile }) {
             </div>
 
             <div className="flex flex-col justify-end">
-              {['pdf', 'image'].includes(docType) ? (
+              {docType === 'image' ? (
+                <div>
+                  <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Prendre une photo ou choisir une image</label>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Direct Mobile Camera */}
+                    <label className="flex items-center gap-1.5 px-3 py-2 bg-slate-950 border border-slate-900 hover:border-emerald-500/40 rounded-xl text-xs font-bold text-slate-200 cursor-pointer transition-colors">
+                      <Camera className="w-4 h-4 text-emerald-400" />
+                      <span>Appareil photo</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {/* WebRTC Live Camera Modal */}
+                    <button
+                      type="button"
+                      onClick={() => setShowCameraModal(true)}
+                      className="flex items-center gap-1.5 px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs font-bold hover:bg-emerald-500/20 cursor-pointer transition-colors"
+                    >
+                      <Camera className="w-4 h-4" />
+                      <span>Caméra Live</span>
+                    </button>
+
+                    {/* Gallery input */}
+                    <label className="flex items-center gap-1.5 px-3 py-2 bg-slate-950 border border-slate-900 hover:border-slate-800 rounded-xl text-xs font-bold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors">
+                      <ImageIcon className="w-4 h-4" />
+                      <span>Galerie / Fichier</span>
+                      <input
+                        id="doc-file-input-tab"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                  {fileBase64 && <p className="text-[10px] text-emerald-400 font-mono mt-1">✓ Photo/Image chargée avec succès</p>}
+                </div>
+              ) : docType === 'pdf' ? (
                 <>
-                  <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Sélectionner le fichier (max 3.5 Mo)</label>
+                  <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Sélectionner le fichier PDF (max 3.5 Mo)</label>
                   <input 
                     id="doc-file-input-tab"
                     type="file"
-                    accept={docType === 'pdf' ? '.pdf' : 'image/*'}
+                    accept=".pdf"
                     onChange={handleFileChange}
                     className="text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-slate-900 file:text-slate-300 hover:file:bg-slate-850 file:cursor-pointer w-full"
                     required
@@ -537,6 +581,13 @@ export default function DocumentsTab({ userProfile }) {
         </div>,
         document.body
       )}
+
+      {/* Camera Modal */}
+      <CameraModal 
+        isOpen={showCameraModal} 
+        onClose={() => setShowCameraModal(false)} 
+        onCapture={(base64) => setFileBase64(base64)} 
+      />
     </div>
   );
 }

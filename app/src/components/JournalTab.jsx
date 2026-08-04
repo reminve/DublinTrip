@@ -6,6 +6,7 @@ import {
   Beer, Edit3, Trash2, Calendar, Smile, Compass, MapPin, 
   Heart, MessageSquare, Send, Camera, Image as ImageIcon, X, ZoomIn
 } from 'lucide-react';
+import CameraModal from './CameraModal';
 
 // Image compression helper
 const compressImage = (file, maxSize = 800, quality = 0.7) => {
@@ -71,6 +72,9 @@ export default function JournalTab({ userProfile }) {
 
   // Lightbox state for photo preview
   const [lightboxImage, setLightboxImage] = useState(null);
+
+  // Camera modal state: 'journal' | 'pint' | null
+  const [cameraTarget, setCameraTarget] = useState(null);
 
   const supabase = getSupabase();
 
@@ -472,30 +476,57 @@ export default function JournalTab({ userProfile }) {
               </div>
 
               {/* Photo Upload Row */}
-              <div className="flex items-center gap-3">
-                <label className="flex items-center gap-2 px-3 py-1.5 bg-slate-950 border border-slate-900 rounded-xl text-[10px] font-bold text-slate-300 hover:border-emerald-500/40 cursor-pointer transition-colors">
-                  <Camera className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>{newEntryPhoto ? 'Changer la photo' : 'Joindre une photo'}</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handlePhotoSelect(e, setNewEntryPhoto)}
-                    className="hidden"
-                  />
-                </label>
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Joindre une photo au souvenir</label>
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Direct Mobile Camera Input */}
+                  <label className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-950 border border-slate-900 hover:border-emerald-500/40 rounded-xl text-[10px] font-bold text-slate-300 cursor-pointer transition-colors">
+                    <Camera className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Appareil photo</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={(e) => handlePhotoSelect(e, setNewEntryPhoto)}
+                      className="hidden"
+                    />
+                  </label>
 
-                {newEntryPhoto && (
-                  <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-emerald-500/50 group">
-                    <img src={newEntryPhoto} alt="Aperçu" className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => setNewEntryPhoto(null)}
-                      className="absolute inset-0 bg-black/60 flex items-center justify-center text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
+                  {/* WebRTC Live Camera Modal Trigger */}
+                  <button
+                    type="button"
+                    onClick={() => setCameraTarget('journal')}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-[10px] font-bold hover:bg-emerald-500/20 cursor-pointer transition-colors"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                    <span>Caméra Live</span>
+                  </button>
+
+                  {/* Gallery Input */}
+                  <label className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-950 border border-slate-900 rounded-xl text-[10px] font-bold text-slate-400 hover:text-slate-200 hover:border-slate-800 cursor-pointer transition-colors">
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>Galerie</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handlePhotoSelect(e, setNewEntryPhoto)}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {newEntryPhoto && (
+                    <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-emerald-500/50 group ml-1">
+                      <img src={newEntryPhoto} alt="Aperçu" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setNewEntryPhoto(null)}
+                        className="absolute inset-0 bg-black/60 flex items-center justify-center text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <button 
@@ -742,30 +773,57 @@ export default function JournalTab({ userProfile }) {
               </div>
 
               {/* Photo Upload Row for Pint */}
-              <div className="flex items-center gap-3">
-                <label className="flex items-center gap-2 px-3 py-1.5 bg-slate-950 border border-slate-900 rounded-xl text-[10px] font-bold text-slate-300 hover:border-amber-500/40 cursor-pointer transition-colors">
-                  <Camera className="w-3.5 h-3.5 text-amber-500" />
-                  <span>{newPintPhoto ? 'Changer la photo' : 'Photo de la pinte / du pub'}</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handlePhotoSelect(e, setNewPintPhoto)}
-                    className="hidden"
-                  />
-                </label>
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Photo de la pinte / du pub</label>
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Direct Mobile Camera */}
+                  <label className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-950 border border-slate-900 hover:border-amber-500/40 rounded-xl text-[10px] font-bold text-slate-300 cursor-pointer transition-colors">
+                    <Camera className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Appareil photo</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={(e) => handlePhotoSelect(e, setNewPintPhoto)}
+                      className="hidden"
+                    />
+                  </label>
 
-                {newPintPhoto && (
-                  <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-amber-500/50 group">
-                    <img src={newPintPhoto} alt="Aperçu pinte" className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => setNewPintPhoto(null)}
-                      className="absolute inset-0 bg-black/60 flex items-center justify-center text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
+                  {/* WebRTC Live Camera Modal Trigger */}
+                  <button
+                    type="button"
+                    onClick={() => setCameraTarget('pint')}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-xl text-[10px] font-bold hover:bg-amber-500/20 cursor-pointer transition-colors"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                    <span>Caméra Live</span>
+                  </button>
+
+                  {/* Gallery Input */}
+                  <label className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-950 border border-slate-900 rounded-xl text-[10px] font-bold text-slate-400 hover:text-slate-200 hover:border-slate-800 cursor-pointer transition-colors">
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>Galerie</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handlePhotoSelect(e, setNewPintPhoto)}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {newPintPhoto && (
+                    <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-amber-500/50 group ml-1">
+                      <img src={newPintPhoto} alt="Aperçu pinte" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setNewPintPhoto(null)}
+                        className="absolute inset-0 bg-black/60 flex items-center justify-center text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <button 
@@ -956,6 +1014,16 @@ export default function JournalTab({ userProfile }) {
         document.body
       )}
 
+      {/* Camera Modal */}
+      <CameraModal 
+        isOpen={!!cameraTarget} 
+        onClose={() => setCameraTarget(null)} 
+        onCapture={(base64) => {
+          if (cameraTarget === 'journal') setNewEntryPhoto(base64);
+          if (cameraTarget === 'pint') setNewPintPhoto(base64);
+          setCameraTarget(null);
+        }} 
+      />
     </div>
   );
 }
