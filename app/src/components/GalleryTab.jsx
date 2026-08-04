@@ -104,9 +104,11 @@ export default function GalleryTab({ userProfile }) {
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
           
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
           
           const newPhoto = {
             id: Math.random().toString(36).substring(2),
@@ -142,31 +144,54 @@ export default function GalleryTab({ userProfile }) {
       return;
     }
     setLoading(true);
-    const newPhoto = {
-      id: Math.random().toString(36).substring(2),
-      created_at: new Date().toISOString(),
-      image: base64,
-      likes: [],
-      comments: []
-    };
-    const payload = { image: base64, likes: [], comments: [] };
-    const updated = [newPhoto, ...photos];
-    setPhotos(updated);
-    localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
 
-    if (supabase && isOnline()) {
-      try {
-        const { error } = await supabase.from('dublin_photos').insert([payload]);
-        if (error) throw error;
-      } catch (err) {
+    const img = new window.Image();
+    img.src = base64;
+    img.onload = async () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width || 1200;
+      let height = img.height || 900;
+      const max_size = 1200;
+      if (width > height) {
+        if (width > max_size) { height *= max_size / width; width = max_size; }
+      } else {
+        if (height > max_size) { width *= max_size / height; height = max_size; }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const cleanBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+      const newPhoto = {
+        id: Math.random().toString(36).substring(2),
+        created_at: new Date().toISOString(),
+        image: cleanBase64,
+        likes: [],
+        comments: []
+      };
+      const payload = { image: cleanBase64, likes: [], comments: [] };
+      const updated = [newPhoto, ...photos];
+      setPhotos(updated);
+      localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
+
+      if (supabase && isOnline()) {
+        try {
+          const { error } = await supabase.from('dublin_photos').insert([payload]);
+          if (error) throw error;
+        } catch (err) {
+          addToOfflineQueue({ type: 'INSERT', table: 'dublin_photos', data: payload });
+        } finally {
+          setLoading(false);
+        }
+      } else {
         addToOfflineQueue({ type: 'INSERT', table: 'dublin_photos', data: payload });
-      } finally {
         setLoading(false);
       }
-    } else {
-      addToOfflineQueue({ type: 'INSERT', table: 'dublin_photos', data: payload });
-      setLoading(false);
-    }
+    };
   };
 
   const deletePhoto = async (id) => {
@@ -384,7 +409,7 @@ export default function GalleryTab({ userProfile }) {
                 className="relative aspect-square rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-900 shadow-md group cursor-pointer active:scale-98 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-350"
               >
                 <img src={photo.src} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                 
                 {/* Overlay Footer: Date & Like/Comment counts */}
                 <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[10px] text-white font-bold drop-shadow">

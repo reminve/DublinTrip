@@ -248,6 +248,9 @@ export default function JournalTab({ userProfile }) {
     } else {
       addToOfflineQueue({ type: 'INSERT', table: 'dublin_pints', data: payload });
     }
+
+    // Notify Dashboard to include new pint in expenses
+    window.dispatchEvent(new CustomEvent('pints-updated'));
   };
 
   // Delete Journal Entry
@@ -282,6 +285,9 @@ export default function JournalTab({ userProfile }) {
     } else {
       addToOfflineQueue({ type: 'DELETE', table: 'dublin_pints', data: { id } });
     }
+
+    // Notify Dashboard to update expenses
+    window.dispatchEvent(new CustomEvent('pints-updated'));
   };
 
   // Like / Unlike Toggle for Journal or Pint

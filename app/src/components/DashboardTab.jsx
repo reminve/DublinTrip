@@ -57,9 +57,16 @@ export default function DashboardTab({ userProfile }) {
 
   const supabase = getSupabase();
 
-  // Load Expenses on mount
+  // Load Expenses on mount + Listen to pint updates
   useEffect(() => {
     loadExpenses();
+    const handlePintsChange = () => loadExpenses();
+    window.addEventListener('pints-updated', handlePintsChange);
+    window.addEventListener('offline-sync-complete', handlePintsChange);
+    return () => {
+      window.removeEventListener('pints-updated', handlePintsChange);
+      window.removeEventListener('offline-sync-complete', handlePintsChange);
+    };
   }, []);
 
   const loadExpenses = async () => {
@@ -68,17 +75,16 @@ export default function DashboardTab({ userProfile }) {
     // 1. Always start with DEFAULT_EXPENSES as the baseline
     let loaded = DEFAULT_EXPENSES;
 
-    // 2. Try to load from Supabase — only override defaults if real rows exist
-    if (supabase) {
+    // 2. Try to load custom expenses
+    if (supabase && isOnline()) {
       try {
         const { data, error } = await supabase
           .from('dublin_expenses')
           .select('*')
           .order('date', { ascending: false });
         if (!error && data && data.length > 0) {
-          loaded = data; // Real data found in DB, use it
+          loaded = data;
         } else if (!error && data && data.length === 0) {
-          // Table exists but is empty — seed it with defaults in background
           const isCleared = localStorage.getItem('dublin_expenses_cleared') === 'true';
           if (!isCleared) {
             const seedData = DEFAULT_EXPENSES.map(e => ({
@@ -87,16 +93,47 @@ export default function DashboardTab({ userProfile }) {
             }));
             supabase.from('dublin_expenses').insert(seedData).catch(() => {});
           } else {
-            loaded = []; // User intentionally cleared, respect that
+            loaded = [];
           }
         }
-        // If error (table not found etc.) — keep defaults
-      } catch (err) {
-        // Network error etc. — keep defaults
-      }
+      } catch (err) {}
+    } else {
+      const local = localStorage.getItem('dublin_expenses_list');
+      if (local) loaded = JSON.parse(local);
     }
 
-    setExpenses(loaded);
+    // 3. Load Pints from Guinness Tracker and add those with price > 0 as expenses
+    let loadedPints = [];
+    if (supabase && isOnline()) {
+      try {
+        const { data: pintData } = await supabase
+          .from('dublin_pints')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (pintData) loadedPints = pintData;
+      } catch (err) {
+        const localP = localStorage.getItem('dublin_pints_list');
+        if (localP) loadedPints = JSON.parse(localP);
+      }
+    } else {
+      const localP = localStorage.getItem('dublin_pints_list');
+      if (localP) loadedPints = JSON.parse(localP);
+    }
+
+    const pintExpenses = (loadedPints || [])
+      .filter(p => parseFloat(p.price) > 0)
+      .map(p => ({
+        id: `pint_${p.id}`,
+        title: `🍺 Pinte Guinness @ ${p.pub || 'Pub'}`,
+        amount: parseFloat(p.price),
+        category: 'on_site',
+        date: p.created_at ? p.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
+        note: p.note ? `Tracker (${p.rating || 5}★) : ${p.note}` : 'Enregistré via Guinness Tracker 🍺',
+        isPint: true
+      }));
+
+    const merged = [...loaded, ...pintExpenses].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    setExpenses(merged);
     setExpensesLoading(false);
   };
 
@@ -127,7 +164,6 @@ export default function DashboardTab({ userProfile }) {
         ]);
         if (error) throw error;
       } catch (err) {
-        // Network or API failure: add to offline queue
         addToOfflineQueue({
           type: 'INSERT',
           table: 'dublin_expenses',
@@ -136,7 +172,6 @@ export default function DashboardTab({ userProfile }) {
         localStorage.setItem('dublin_expenses_list', JSON.stringify(updated));
       }
     } else {
-      // Offline mode: save locally + queue for sync when back online
       addToOfflineQueue({
         type: 'INSERT',
         table: 'dublin_expenses',
@@ -147,6 +182,21 @@ export default function DashboardTab({ userProfile }) {
   };
 
   const handleDeleteExpense = async (id) => {
+    if (id.toString().startsWith('pint_')) {
+      const realPintId = id.toString().replace('pint_', '');
+      const localP = localStorage.getItem('dublin_pints_list');
+      const pintsList = localP ? JSON.parse(localP) : [];
+      const updatedPints = pintsList.filter(p => p.id !== realPintId);
+      localStorage.setItem('dublin_pints_list', JSON.stringify(updatedPints));
+
+      if (supabase && isOnline()) {
+        supabase.from('dublin_pints').delete().eq('id', realPintId).catch(() => {});
+      }
+      window.dispatchEvent(new CustomEvent('pints-updated'));
+      loadExpenses();
+      return;
+    }
+
     const updated = expenses.filter(e => e.id !== id);
     setExpenses(updated);
 
@@ -223,7 +273,8 @@ export default function DashboardTab({ userProfile }) {
       const totalReserved = expenses.filter(e => e.category === 'reserved').reduce((acc, e) => acc + e.amount, 0);
       const totalOnSite = expenses.filter(e => e.category === 'on_site').reduce((acc, e) => acc + e.amount, 0);
 
-      const isLight = document.body.classList.contains('light');
+      const accentRgb = (getComputedStyle(document.body).getPropertyValue('--accent-color') || '16 185 129').trim();
+      const accentHex = `rgb(${accentRgb})`;
 
       chartInstance.current = new Chart(chartRef.current, {
         type: 'doughnut',
@@ -231,7 +282,7 @@ export default function DashboardTab({ userProfile }) {
           labels: ['Réservé', 'Sur place'],
           datasets: [{
             data: [totalReserved, totalOnSite],
-            backgroundColor: ['#10b981', '#fbbf24'],
+            backgroundColor: [accentHex, '#f59e0b'],
             borderWidth: 2,
             borderColor: isLight ? '#ffffff' : '#030712',
             hoverOffset: 4
