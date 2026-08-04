@@ -440,15 +440,15 @@ export default function GalleryTab({ userProfile }) {
       {/* Large Lightbox Modal (Portal) */}
       {lightboxPhoto && createPortal(
         <div 
-          className="fixed inset-0 z-50 bg-slate-950/80 dark:bg-black/95 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
+          className="fixed inset-0 z-50 lightbox-backdrop backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
           onClick={() => setLightboxPhoto(null)}
         >
           <div 
-            className="relative max-w-6xl w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[92vh]"
+            className="relative max-w-6xl w-full lightbox-panel rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[92vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Left: Large Image Container */}
-            <div className="flex-[3] bg-slate-100 dark:bg-black flex items-center justify-center relative p-2 min-h-[350px] md:min-h-[550px] max-h-[65vh] md:max-h-[88vh]">
+            <div className="flex-[3] lightbox-image-box flex items-center justify-center relative p-2 min-h-[350px] md:min-h-[550px] max-h-[65vh] md:max-h-[88vh]">
               <img src={lightboxPhoto.src} alt="" className="max-w-full max-h-[84vh] w-auto h-auto object-contain shadow-2xl rounded-xl" />
               
               {/* Top Action Buttons on Image */}
@@ -457,7 +457,7 @@ export default function GalleryTab({ userProfile }) {
                   <button 
                     type="button"
                     onClick={() => deletePhoto(lightboxPhoto.id)}
-                    className="w-10 h-10 bg-white/90 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-full flex items-center justify-center text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer shadow-lg"
+                    className="w-10 h-10 bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-full flex items-center justify-center text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer shadow-lg"
                     title="Supprimer la photo"
                   >
                     <Trash2 className="w-4.5 h-4.5" />
@@ -466,7 +466,7 @@ export default function GalleryTab({ userProfile }) {
                 <button 
                   type="button"
                   onClick={() => setLightboxPhoto(null)}
-                  className="w-10 h-10 bg-white/90 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white transition-colors cursor-pointer shadow-lg"
+                  className="w-10 h-10 bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white transition-colors cursor-pointer shadow-lg"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -474,11 +474,11 @@ export default function GalleryTab({ userProfile }) {
             </div>
 
             {/* Right Side Panel: Info, Likes & Comments */}
-            <div className="w-full md:w-85 border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-900 p-4 flex flex-col justify-between space-y-4 overflow-y-auto bg-white dark:bg-slate-950">
+            <div className="w-full md:w-85 border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 p-4 flex flex-col justify-between space-y-4 overflow-y-auto lightbox-side-panel">
               
               {/* Header & Likes */}
               <div className="space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-900 pb-3">
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                   <span className="text-xs font-bold text-slate-600 dark:text-slate-400">{lightboxPhoto.date}</span>
                   
                   {/* Like Button */}
@@ -488,7 +488,7 @@ export default function GalleryTab({ userProfile }) {
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                       (lightboxPhoto.likes || []).includes(currentUser)
                         ? 'bg-rose-500/15 border-rose-500/30 text-rose-500 dark:text-rose-400'
-                        : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-850 text-slate-700 dark:text-slate-400 hover:text-rose-500'
+                        : 'lightbox-like-btn'
                     }`}
                   >
                     <Heart className={`w-4 h-4 ${(lightboxPhoto.likes || []).includes(currentUser) ? 'fill-rose-500 text-rose-500' : ''}`} />
@@ -507,7 +507,7 @@ export default function GalleryTab({ userProfile }) {
                     <p className="text-xs text-slate-500 italic py-3 text-center">Aucun commentaire. Soyez le premier à commenter !</p>
                   ) : (
                     (lightboxPhoto.comments || []).map(comment => (
-                      <div key={comment.id} className="bg-slate-100 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-850 rounded-xl p-3 space-y-1">
+                      <div key={comment.id} className="lightbox-comment-card rounded-xl p-3 space-y-1 border">
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{comment.author}</span>
                           <div className="flex items-center gap-2">
@@ -525,7 +525,7 @@ export default function GalleryTab({ userProfile }) {
                             )}
                           </div>
                         </div>
-                        <p className="text-xs text-slate-800 dark:text-slate-200 leading-normal font-medium">{comment.content}</p>
+                        <p className="text-xs leading-normal font-medium">{comment.content}</p>
                       </div>
                     ))
                   )}
@@ -533,7 +533,7 @@ export default function GalleryTab({ userProfile }) {
               </div>
 
               {/* Add Comment Input (Text only) */}
-              <div className="pt-3 border-t border-slate-200 dark:border-slate-900">
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
@@ -544,7 +544,7 @@ export default function GalleryTab({ userProfile }) {
                       [lightboxPhoto.id]: e.target.value
                     }))}
                     onKeyDown={(e) => { if (e.key === 'Enter') handleAddComment(lightboxPhoto.id); }}
-                    className="flex-grow bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-emerald-500/50 font-medium"
+                    className="flex-grow lightbox-comment-input border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 font-medium"
                   />
 
                   <button

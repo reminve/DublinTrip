@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   /* Default Dark theme variables */
@@ -381,3 +382,40 @@ body.light .text-overlay-white {
 body.light .text-overlay-muted {
   color: #cbd5e1 !important;
 }
+
+/* ==================== LIGHTBOX MODAL LIGHT MODE OVERRIDES ==================== */
+body.light .lightbox-backdrop {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+}
+body.light .lightbox-panel {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+body.light .lightbox-image-box {
+  background-color: #f1f5f9 !important;
+}
+body.light .lightbox-side-panel {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+body.light .lightbox-comment-card {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+body.light .lightbox-comment-input {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+body.light .lightbox-comment-input::placeholder {
+  color: #94a3b8 !important;
+}
+body.light .lightbox-like-btn {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
