@@ -214,7 +214,9 @@ export default function App() {
   // Theme configuration effect
   useEffect(() => {
     const body = document.body;
-    body.classList.remove('light');
+    const html = document.documentElement;
+    body.classList.remove('light', 'dark');
+    html.classList.remove('light', 'dark');
     
     let activeTheme = theme;
     if (theme === 'auto') {
@@ -222,9 +224,8 @@ export default function App() {
       activeTheme = systemDark ? 'dark' : 'light';
     }
     
-    if (activeTheme === 'light') {
-      body.classList.add('light');
-    }
+    body.classList.add(activeTheme);
+    html.classList.add(activeTheme);
     
     localStorage.setItem('app-theme', theme);
   }, [theme]);

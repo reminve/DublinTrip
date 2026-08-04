@@ -168,69 +168,68 @@ body.light .bg-emerald-500\/20 {
 /* ==================== GLOBAL LIGHT MODE OVERRIDES ==================== */
 /* Overrides all slate dark classes with warm cream/light modes */
 body.light .bg-slate-950 {
-  background-color: #f3f4f6 !important; 
+  background-color: #f8fafc !important; 
 }
 body.light .bg-slate-900 {
   background-color: #ffffff !important; 
 }
+body.light .bg-slate-850 {
+  background-color: #f1f5f9 !important;
+}
 body.light .bg-slate-800 {
-  background-color: #e5e7eb !important; /* Flight numbers and days badge background */
+  background-color: #e2e8f0 !important;
 }
 body.light .bg-slate-900\/10 {
-  background-color: rgba(243, 244, 246, 0.5) !important;
+  background-color: rgba(241, 245, 249, 0.5) !important;
 }
 body.light .bg-slate-900\/20 {
   background-color: rgba(255, 255, 255, 0.8) !important;
 }
 body.light .bg-slate-900\/40 {
-  background-color: rgba(243, 244, 246, 0.6) !important;
+  background-color: rgba(241, 245, 249, 0.6) !important;
+}
+body.light .bg-slate-900\/50,
+body.light .bg-slate-900\/60,
+body.light .bg-slate-900\/70 {
+  background-color: #f1f5f9 !important;
 }
 body.light .bg-slate-900\/80 {
-  background-color: rgba(243, 244, 246, 0.85) !important; /* J1/J2 closed and photo icon container */
+  background-color: rgba(248, 250, 252, 0.85) !important;
 }
 body.light .bg-slate-900\/90 {
   background-color: rgba(255, 255, 255, 0.95) !important;
 }
 body.light .bg-slate-950\/20 {
-  background-color: rgba(243, 244, 246, 0.4) !important;
+  background-color: rgba(241, 245, 249, 0.4) !important;
 }
 body.light .bg-slate-950\/60 {
-  background-color: rgba(243, 244, 246, 0.7) !important;
+  background-color: rgba(241, 245, 249, 0.7) !important;
 }
 body.light .bg-slate-950\/80 {
-  background-color: rgba(255, 255, 255, 0.85) !important;
+  background-color: rgba(248, 250, 252, 0.9) !important;
 }
+body.light .bg-slate-950\/90,
 body.light .bg-slate-950\/95 {
   background-color: rgba(255, 255, 255, 0.98) !important;
 }
 body.light .bg-gradient-to-br.from-slate-900.to-slate-950 {
-  background-image: linear-gradient(to bottom right, #ffffff, #f3f4f6) !important;
+  background-image: linear-gradient(to bottom right, #ffffff, #f8fafc) !important;
 }
 
 /* Global Light Mode overrides for Slate border classes */
-body.light .border-slate-800 {
-  border-color: #e5e7eb !important;
-}
+body.light .border-slate-800,
+body.light .border-slate-850,
 body.light .border-slate-900 {
-  border-color: #e5e7eb !important;
-}
-body.light .border-slate-850 {
-  border-color: #f3f4f6 !important;
+  border-color: #e2e8f0 !important;
 }
 body.light .border-slate-700 {
-  border-color: #e5e7eb !important; /* Nights badge border */
+  border-color: #cbd5e1 !important;
 }
-body.light .border-slate-800\/60 {
-  border-color: rgba(229, 231, 235, 0.6) !important;
-}
-body.light .border-slate-800\/80 {
-  border-color: rgba(229, 231, 235, 0.8) !important;
-}
-body.light .border-slate-900\/60 {
-  border-color: rgba(229, 231, 235, 0.6) !important;
-}
+body.light .border-slate-800\/60,
+body.light .border-slate-800\/80,
+body.light .border-slate-900\/60,
 body.light .border-slate-900\/80 {
-  border-color: rgba(229, 231, 235, 0.8) !important;
+  border-color: rgba(226, 232, 240, 0.8) !important;
 }
 
 /* Global Light Mode overrides for Slate text classes (High Contrast) */
