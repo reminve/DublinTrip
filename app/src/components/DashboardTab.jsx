@@ -112,12 +112,16 @@ export default function DashboardTab({ userProfile }) {
           .order('created_at', { ascending: false });
         if (pintData) loadedPints = pintData;
       } catch (err) {
-        const localP = localStorage.getItem('dublin_pints_list');
-        if (localP) loadedPints = JSON.parse(localP);
+        try {
+          const localP = localStorage.getItem('dublin_pints_list');
+          if (localP) loadedPints = JSON.parse(localP);
+        } catch (e) {}
       }
     } else {
-      const localP = localStorage.getItem('dublin_pints_list');
-      if (localP) loadedPints = JSON.parse(localP);
+      try {
+        const localP = localStorage.getItem('dublin_pints_list');
+        if (localP) loadedPints = JSON.parse(localP);
+      } catch (e) {}
     }
 
     const pintExpenses = (loadedPints || [])
@@ -273,6 +277,7 @@ export default function DashboardTab({ userProfile }) {
       const totalReserved = expenses.filter(e => e.category === 'reserved').reduce((acc, e) => acc + e.amount, 0);
       const totalOnSite = expenses.filter(e => e.category === 'on_site').reduce((acc, e) => acc + e.amount, 0);
 
+      const isLight = document.body.classList.contains('light');
       const accentRgb = (getComputedStyle(document.body).getPropertyValue('--accent-color') || '16 185 129').trim();
       const accentHex = `rgb(${accentRgb})`;
 
