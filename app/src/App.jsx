@@ -19,6 +19,7 @@ import DocumentsTab from './components/DocumentsTab';
 import TransportTab from './components/TransportTab';
 import AdminTab from './components/AdminTab';
 import SettingsTab from './components/SettingsTab';
+import NotificationCenter from './components/NotificationCenter';
 
 export default function App() {
   const [screen, setScreen] = useState('loading'); // 'loading', 'setup', 'auth', 'app'
@@ -427,12 +428,15 @@ export default function App() {
         <div className="space-y-5">
           
           {/* Sidebar Header */}
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">☘️</span>
-            <div>
-              <h2 className="text-lg font-bold bg-gradient-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent">Dublin 2026</h2>
-              <p className="text-[10px] text-slate-500 font-mono tracking-wider overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">{userProfile?.email}</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">☘️</span>
+              <div>
+                <h2 className="text-lg font-bold bg-gradient-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent">Dublin 2026</h2>
+                <p className="text-[10px] text-slate-500 font-mono tracking-wider overflow-hidden text-ellipsis whitespace-nowrap max-w-[130px]">{userProfile?.email}</p>
+              </div>
             </div>
+            <NotificationCenter />
           </div>
 
           {/* Sync & Network status indicator */}
@@ -604,6 +608,8 @@ export default function App() {
         </div>
         
         <div className="flex items-center gap-2">
+          <NotificationCenter />
+
           <button
             onClick={handleInstallPWA}
             className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1"

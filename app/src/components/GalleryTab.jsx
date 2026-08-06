@@ -6,12 +6,15 @@ import {
 import { getSupabase } from '../supabase';
 import { isOnline, addToOfflineQueue } from '../offlineSync';
 import CameraModal from './CameraModal';
+import LikedByModal from './LikedByModal';
+import { sendNotification } from './NotificationCenter';
 
 export default function GalleryTab({ userProfile }) {
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lightboxPhoto, setLightboxPhoto] = useState(null);
   const [showCameraModal, setShowCameraModal] = useState(false);
+  const [likedByModalState, setLikedByModalState] = useState({ isOpen: false, likes: [], title: '' });
   
   // Comment text input state per photo: { [photoId]: string }
   const [commentTexts, setCommentTexts] = useState({});
@@ -267,6 +270,12 @@ export default function GalleryTab({ userProfile }) {
     setPhotos(updated);
     localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
 
+    sendNotification({
+      type: 'like',
+      author: currentUser,
+      itemTitle: 'une photo de l\'album'
+    });
+
     // Update active lightbox state if open
     if (lightboxPhoto && String(lightboxPhoto.id) === String(photoId)) {
       setLightboxPhoto(prev => {
@@ -313,6 +322,13 @@ export default function GalleryTab({ userProfile }) {
 
     setPhotos(updated);
     localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
+
+    sendNotification({
+      type: 'comment',
+      author: currentUser,
+      text,
+      itemTitle: 'une photo de l\'album'
+    });
 
     if (lightboxPhoto && String(lightboxPhoto.id) === String(photoId)) {
       setLightboxPhoto(prev => ({
@@ -607,6 +623,14 @@ export default function GalleryTab({ userProfile }) {
         </div>,
         document.body
       )}
+
+      {/* LikedBy Modal (Instagram style) */}
+      <LikedByModal 
+        isOpen={likedByModalState.isOpen} 
+        onClose={() => setLikedByModalState({ isOpen: false, likes: [], title: '' })} 
+        likes={likedByModalState.likes} 
+        title={likedByModalState.title} 
+      />
 
       {/* Camera Modal */}
       <CameraModal 

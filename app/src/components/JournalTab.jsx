@@ -7,6 +7,8 @@ import {
   Heart, MessageSquare, Send, Camera, Image as ImageIcon, X, ZoomIn
 } from 'lucide-react';
 import CameraModal from './CameraModal';
+import LikedByModal from './LikedByModal';
+import { sendNotification } from './NotificationCenter';
 
 // Image compression helper
 const compressImage = (file, maxSize = 800, quality = 0.7) => {
@@ -75,6 +77,9 @@ export default function JournalTab({ userProfile }) {
 
   // Camera modal state: 'journal' | 'pint' | null
   const [cameraTarget, setCameraTarget] = useState(null);
+  
+  // Instagram-style LikedBy modal state
+  const [likedByModalState, setLikedByModalState] = useState({ isOpen: false, likes: [], title: '' });
 
   const supabase = getSupabase();
 
@@ -214,9 +219,11 @@ export default function JournalTab({ userProfile }) {
       user_id: userProfile?.id || null
     };
 
-    const updatedEntries = [newEntry, ...journalEntries];
-    setJournalEntries(updatedEntries);
-    localStorage.setItem('dublin_journal_entries', JSON.stringify(updatedEntries));
+    setJournalEntries(prev => {
+      const updated = [newEntry, ...prev];
+      localStorage.setItem('dublin_journal_entries', JSON.stringify(updated));
+      return updated;
+    });
     setNewEntryText('');
     setNewEntryPhoto(null);
 
@@ -224,8 +231,16 @@ export default function JournalTab({ userProfile }) {
 
     if (supabase && isOnline()) {
       try {
-        const { error } = await supabase.from('dublin_journal').insert([payload]);
+        const { data, error } = await supabase.from('dublin_journal').insert([payload]).select();
         if (error) throw error;
+        if (data && data[0]?.id) {
+          const realId = data[0].id;
+          setJournalEntries(prev => {
+            const updated = prev.map(item => String(item.id) === String(newEntry.id) ? { ...item, id: realId } : item);
+            localStorage.setItem('dublin_journal_entries', JSON.stringify(updated));
+            return updated;
+          });
+        }
       } catch (err) {
         addToOfflineQueue({ type: 'INSERT', table: 'dublin_journal', data: payload });
       }
@@ -252,9 +267,11 @@ export default function JournalTab({ userProfile }) {
       user_id: userProfile?.id || null
     };
 
-    const updatedPints = [newPint, ...pints];
-    setPints(updatedPints);
-    localStorage.setItem('dublin_pints_list', JSON.stringify(updatedPints));
+    setPints(prev => {
+      const updated = [newPint, ...prev];
+      localStorage.setItem('dublin_pints_list', JSON.stringify(updated));
+      return updated;
+    });
     setPubName('');
     setPintPrice('');
     setPintNote('');
@@ -264,8 +281,16 @@ export default function JournalTab({ userProfile }) {
 
     if (supabase && isOnline()) {
       try {
-        const { error } = await supabase.from('dublin_pints').insert([payload]);
+        const { data, error } = await supabase.from('dublin_pints').insert([payload]).select();
         if (error) throw error;
+        if (data && data[0]?.id) {
+          const realId = data[0].id;
+          setPints(prev => {
+            const updated = prev.map(item => String(item.id) === String(newPint.id) ? { ...item, id: realId } : item);
+            localStorage.setItem('dublin_pints_list', JSON.stringify(updated));
+            return updated;
+          });
+        }
       } catch (err) {
         addToOfflineQueue({ type: 'INSERT', table: 'dublin_pints', data: payload });
       }
@@ -279,11 +304,11 @@ export default function JournalTab({ userProfile }) {
 
   // Delete Journal Entry
   const handleDeleteEntry = async (id) => {
-    const updated = journalEntries.filter(entry => entry.id !== id);
+    const updated = journalEntries.filter(entry => String(entry.id) !== String(id));
     setJournalEntries(updated);
     localStorage.setItem('dublin_journal_entries', JSON.stringify(updated));
 
-    if (supabase && isOnline()) {
+    if (supabase && isOnline() && !String(id).startsWith('off_')) {
       try {
         await supabase.from('dublin_journal').delete().eq('id', id);
       } catch (err) {
@@ -296,11 +321,11 @@ export default function JournalTab({ userProfile }) {
 
   // Delete Pint Entry
   const handleDeletePint = async (id) => {
-    const updated = pints.filter(pint => pint.id !== id);
+    const updated = pints.filter(pint => String(pint.id) !== String(id));
     setPints(updated);
     localStorage.setItem('dublin_pints_list', JSON.stringify(updated));
 
-    if (supabase && isOnline()) {
+    if (supabase && isOnline() && !String(id).startsWith('off_')) {
       try {
         await supabase.from('dublin_pints').delete().eq('id', id);
       } catch (err) {
@@ -317,12 +342,15 @@ export default function JournalTab({ userProfile }) {
   // Like / Unlike Toggle for Journal or Pint
   const handleToggleLike = async (id, type) => {
     const list = type === 'journal' ? journalEntries : pints;
+    let targetItem = null;
+
     const updated = list.map(item => {
-      if (item.id === id) {
+      if (String(item.id) === String(id)) {
         const likes = Array.isArray(item.likes) ? item.likes : [];
         const hasLiked = likes.includes(currentUser);
         const newLikes = hasLiked ? likes.filter(u => u !== currentUser) : [...likes, currentUser];
-        return { ...item, likes: newLikes };
+        targetItem = { ...item, likes: newLikes };
+        return targetItem;
       }
       return item;
     });
@@ -335,12 +363,19 @@ export default function JournalTab({ userProfile }) {
       localStorage.setItem('dublin_pints_list', JSON.stringify(updated));
     }
 
-    // Attempt DB update
-    if (supabase) {
-      const target = updated.find(i => i.id === id);
+    if (targetItem) {
+      sendNotification({
+        type: 'like',
+        author: currentUser,
+        itemTitle: type === 'journal' ? (targetItem.content ? `"${targetItem.content.substring(0, 20)}..."` : 'un billet') : `la pinte à ${targetItem.pub}`
+      });
+    }
+
+    if (supabase && isOnline() && targetItem && !String(targetItem.id).startsWith('off_')) {
       const table = type === 'journal' ? 'dublin_journal' : 'dublin_pints';
       try {
-        await supabase.from(table).update({ likes: target.likes }).eq('id', id);
+        const { error } = await supabase.from(table).update({ likes: targetItem.likes }).eq('id', targetItem.id);
+        if (error) console.warn("DB like update warning:", error.message);
       } catch (err) {
         console.warn("DB like update error:", err);
       }
@@ -349,6 +384,8 @@ export default function JournalTab({ userProfile }) {
 
   // Add Comment to Post
   const handleAddComment = async (postId, type) => {
+    const inputState = commentInputs[postId] || {};
+    const text = inputState.text || '';
     if (!text.trim()) return;
 
     const newComment = {
@@ -360,10 +397,13 @@ export default function JournalTab({ userProfile }) {
     };
 
     const list = type === 'journal' ? journalEntries : pints;
+    let targetItem = null;
+
     const updated = list.map(item => {
-      if (item.id === postId) {
+      if (String(item.id) === String(postId)) {
         const currentComments = Array.isArray(item.comments) ? item.comments : [];
-        return { ...item, comments: [...currentComments, newComment] };
+        targetItem = { ...item, comments: [...currentComments, newComment] };
+        return targetItem;
       }
       return item;
     });
@@ -376,15 +416,23 @@ export default function JournalTab({ userProfile }) {
       localStorage.setItem('dublin_pints_list', JSON.stringify(updated));
     }
 
+    if (targetItem) {
+      sendNotification({
+        type: 'comment',
+        author: currentUser,
+        text,
+        itemTitle: type === 'journal' ? (targetItem.content ? `"${targetItem.content.substring(0, 20)}..."` : 'un billet') : `la pinte à ${targetItem.pub}`
+      });
+    }
+
     // Reset comment input state for this post
     setCommentInputs(prev => ({ ...prev, [postId]: { text: '', photo: null } }));
 
-    // Attempt DB update
-    if (supabase) {
-      const target = updated.find(i => i.id === postId);
+    if (supabase && isOnline() && targetItem && !String(targetItem.id).startsWith('off_')) {
       const table = type === 'journal' ? 'dublin_journal' : 'dublin_pints';
       try {
-        await supabase.from(table).update({ comments: target.comments }).eq('id', postId);
+        const { error } = await supabase.from(table).update({ comments: targetItem.comments }).eq('id', targetItem.id);
+        if (error) console.warn("DB comment update warning:", error.message);
       } catch (err) {
         console.warn("DB comment update error:", err);
       }
@@ -394,10 +442,13 @@ export default function JournalTab({ userProfile }) {
   // Delete Comment from Post
   const handleDeleteComment = async (postId, commentId, type) => {
     const list = type === 'journal' ? journalEntries : pints;
+    let targetItem = null;
+
     const updated = list.map(item => {
-      if (item.id === postId) {
+      if (String(item.id) === String(postId)) {
         const filtered = (item.comments || []).filter(c => c.id !== commentId);
-        return { ...item, comments: filtered };
+        targetItem = { ...item, comments: filtered };
+        return targetItem;
       }
       return item;
     });
@@ -410,11 +461,11 @@ export default function JournalTab({ userProfile }) {
       localStorage.setItem('dublin_pints_list', JSON.stringify(updated));
     }
 
-    if (supabase) {
-      const target = updated.find(i => i.id === postId);
+    if (supabase && isOnline() && targetItem && !String(targetItem.id).startsWith('off_')) {
       const table = type === 'journal' ? 'dublin_journal' : 'dublin_pints';
       try {
-        await supabase.from(table).update({ comments: target.comments }).eq('id', postId);
+        const { error } = await supabase.from(table).update({ comments: targetItem.comments }).eq('id', targetItem.id);
+        if (error) console.warn("DB comment delete warning:", error.message);
       } catch (err) {
         console.warn("DB comment delete error:", err);
       }
@@ -640,6 +691,16 @@ export default function JournalTab({ userProfile }) {
                             <Heart className={`w-4 h-4 ${isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
                             <span>{likes.length}</span>
                           </button>
+
+                          {likes.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => setLikedByModalState({ isOpen: true, likes, title: 'Mentions J\'aime (Journal)' })}
+                              className="text-[9px] text-slate-400 hover:text-emerald-400 underline cursor-pointer"
+                            >
+                              Voir qui a aimé
+                            </button>
+                          )}
 
                           <button
                             type="button"
@@ -1043,6 +1104,14 @@ export default function JournalTab({ userProfile }) {
         </div>,
         document.body
       )}
+
+      {/* LikedBy Modal (Instagram style) */}
+      <LikedByModal 
+        isOpen={likedByModalState.isOpen} 
+        onClose={() => setLikedByModalState({ isOpen: false, likes: [], title: '' })} 
+        likes={likedByModalState.likes} 
+        title={likedByModalState.title} 
+      />
 
       {/* Camera Modal */}
       <CameraModal 
