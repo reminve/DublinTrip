@@ -384,7 +384,8 @@ export default function JournalTab({ userProfile }) {
 
   // Add Comment to Post
   const handleAddComment = async (postId, type) => {
-    const inputState = commentInputs[postId] || {};
+    const key = String(postId);
+    const inputState = commentInputs[key] || commentInputs[postId] || {};
     const text = inputState.text || '';
     if (!text.trim()) return;
 
@@ -635,7 +636,7 @@ export default function JournalTab({ userProfile }) {
                   const comments = Array.isArray(entry.comments) ? entry.comments : [];
                   const isLiked = likes.includes(currentUser);
                   const showComments = !!expandedComments[entry.id];
-                  const cInput = commentInputs[entry.id] || { text: '', photo: null };
+                  const cInput = commentInputs[String(entry.id)] || commentInputs[entry.id] || { text: '', photo: null };
 
                   return (
                     <div key={entry.id} className="relative pl-6">
@@ -750,10 +751,10 @@ export default function JournalTab({ userProfile }) {
                               <input
                                 type="text"
                                 placeholder="Ajouter un commentaire..."
-                                value={cInput.text}
+                                value={cInput.text || ''}
                                 onChange={(e) => setCommentInputs(prev => ({
                                   ...prev,
-                                  [entry.id]: { ...prev[entry.id], text: e.target.value }
+                                  [String(entry.id)]: { ...prev[String(entry.id)], text: e.target.value }
                                 }))}
                                 onKeyDown={(e) => { if (e.key === 'Enter') handleAddComment(entry.id, 'journal'); }}
                                 className="flex-grow bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl px-3 py-1.5 text-[10px] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-emerald-500/50 font-medium"
@@ -942,7 +943,7 @@ export default function JournalTab({ userProfile }) {
                   const comments = Array.isArray(pint.comments) ? pint.comments : [];
                   const isLiked = likes.includes(currentUser);
                   const showComments = !!expandedComments[pint.id];
-                  const cInput = commentInputs[pint.id] || { text: '', photo: null };
+                  const cInput = commentInputs[String(pint.id)] || commentInputs[pint.id] || { text: '', photo: null };
 
                   return (
                     <div key={pint.id} className="card-premium p-4 space-y-3">
@@ -1056,10 +1057,10 @@ export default function JournalTab({ userProfile }) {
                               <input
                                 type="text"
                                 placeholder="Ajouter un commentaire sur ce pub..."
-                                value={cInput.text}
+                                value={cInput.text || ''}
                                 onChange={(e) => setCommentInputs(prev => ({
                                   ...prev,
-                                  [pint.id]: { ...prev[pint.id], text: e.target.value }
+                                  [String(pint.id)]: { ...prev[String(pint.id)], text: e.target.value }
                                 }))}
                                 onKeyDown={(e) => { if (e.key === 'Enter') handleAddComment(pint.id, 'pints'); }}
                                 className="flex-grow bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl px-3 py-1.5 text-[10px] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-amber-500/50 font-medium"
