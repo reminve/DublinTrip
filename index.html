@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Dublin 2026</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     
@@ -28,18 +31,25 @@
   <body class="bg-slate-950 text-slate-50 min-h-screen">
     <div id="root"></div>
     
-    <!-- Service Worker Registration -->
+    <!-- Force Cache Purge and SW Refresh Script -->
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then(reg => {
-              console.log('[PWA] Service Worker enregistré:', reg.scope);
-              reg.update();
-            })
-            .catch(err => console.warn('[PWA] Échec enregistrement SW:', err));
-        });
-      }
+      (function() {
+        var BUILD_VERSION = "2026-08-06-v5";
+        if (localStorage.getItem('app_build_version') !== BUILD_VERSION) {
+          localStorage.setItem('app_build_version', BUILD_VERSION);
+          if ('caches' in window) {
+            caches.keys().then(function(names) {
+              for (let name of names) caches.delete(name);
+            });
+          }
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+              for (let reg of registrations) reg.unregister();
+            });
+          }
+        }
+      })();
     </script>
+
   </body>
 </html>
