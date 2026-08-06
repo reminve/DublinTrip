@@ -138,8 +138,16 @@ export default function GalleryTab({ userProfile }) {
 
         if (supabase && isOnline()) {
           try {
-            const { error } = await supabase.from('dublin_photos').insert([payload]);
+            const { data, error } = await supabase.from('dublin_photos').insert([payload]).select();
             if (error) throw error;
+            if (data && data[0]?.id) {
+              const realId = data[0].id;
+              setPhotos(prev => {
+                const updated = prev.map(p => String(p.id) === String(newPhoto.id) ? { ...p, id: realId } : p);
+                localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
+                return updated;
+              });
+            }
           } catch (err) {
             addToOfflineQueue({ type: 'INSERT', table: 'dublin_photos', data: payload });
           }
@@ -194,14 +202,24 @@ export default function GalleryTab({ userProfile }) {
         comments: []
       };
       const payload = { image: cleanBase64 };
-      const updated = [newPhoto, ...photos];
-      setPhotos(updated);
-      localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
+      setPhotos(prev => {
+        const updated = [newPhoto, ...prev];
+        localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
+        return updated;
+      });
 
       if (supabase && isOnline()) {
         try {
-          const { error } = await supabase.from('dublin_photos').insert([payload]);
+          const { data, error } = await supabase.from('dublin_photos').insert([payload]).select();
           if (error) throw error;
+          if (data && data[0]?.id) {
+            const realId = data[0].id;
+            setPhotos(prev => {
+              const updated = prev.map(p => String(p.id) === String(newPhoto.id) ? { ...p, id: realId } : p);
+              localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
+              return updated;
+            });
+          }
         } catch (err) {
           addToOfflineQueue({ type: 'INSERT', table: 'dublin_photos', data: payload });
         } finally {
