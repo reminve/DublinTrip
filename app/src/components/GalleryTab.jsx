@@ -35,16 +35,17 @@ export default function GalleryTab({ userProfile }) {
 
           loadedPhotos = data.map(p => {
             const local = localMap.get(String(p.id)) || (localPhotos || []).find(lp => lp.src === p.image || lp.image === p.image);
-            const likesFromDB = Array.isArray(p.likes) ? p.likes : (p.likes ? JSON.parse(p.likes) : null);
-            const commentsFromDB = Array.isArray(p.comments) ? p.comments : (p.comments ? JSON.parse(p.comments) : null);
+            
+            const likesFromDB = Array.isArray(p.likes) && p.likes.length > 0 ? p.likes : (typeof p.likes === 'string' && p.likes.length > 2 ? JSON.parse(p.likes) : null);
+            const commentsFromDB = Array.isArray(p.comments) && p.comments.length > 0 ? p.comments : (typeof p.comments === 'string' && p.comments.length > 2 ? JSON.parse(p.comments) : null);
 
             return {
               id: p.id,
               src: p.image,
               date: new Date(p.created_at).toLocaleString('fr-FR'),
               created_at: p.created_at,
-              likes: likesFromDB || local?.likes || [],
-              comments: commentsFromDB || local?.comments || []
+              likes: likesFromDB || (local?.likes && local.likes.length > 0 ? local.likes : []),
+              comments: commentsFromDB || (local?.comments && local.comments.length > 0 ? local.comments : [])
             };
           });
           localStorage.setItem('dublin_gallery_photos', JSON.stringify(loadedPhotos));
@@ -258,12 +259,14 @@ export default function GalleryTab({ userProfile }) {
       });
     }
 
-    if (supabase) {
+    if (supabase && isOnline()) {
       const target = updated.find(p => p.id === photoId);
-      try {
-        await supabase.from('dublin_photos').update({ likes: target.likes }).eq('id', photoId);
-      } catch (err) {
-        console.warn("DB like photo update error:", err);
+      if (target && !String(target.id).startsWith('off_')) {
+        try {
+          await supabase.from('dublin_photos').update({ likes: target.likes }).eq('id', target.id);
+        } catch (err) {
+          console.warn("DB like photo update error:", err);
+        }
       }
     }
   };
@@ -301,12 +304,14 @@ export default function GalleryTab({ userProfile }) {
 
     setCommentTexts(prev => ({ ...prev, [photoId]: '' }));
 
-    if (supabase) {
+    if (supabase && isOnline()) {
       const target = updated.find(p => p.id === photoId);
-      try {
-        await supabase.from('dublin_photos').update({ comments: target.comments }).eq('id', photoId);
-      } catch (err) {
-        console.warn("DB comment photo update error:", err);
+      if (target && !String(target.id).startsWith('off_')) {
+        try {
+          await supabase.from('dublin_photos').update({ comments: target.comments }).eq('id', target.id);
+        } catch (err) {
+          console.warn("DB comment photo update error:", err);
+        }
       }
     }
   };
@@ -331,12 +336,14 @@ export default function GalleryTab({ userProfile }) {
       }));
     }
 
-    if (supabase) {
+    if (supabase && isOnline()) {
       const target = updated.find(p => p.id === photoId);
-      try {
-        await supabase.from('dublin_photos').update({ comments: target.comments }).eq('id', photoId);
-      } catch (err) {
-        console.warn("DB comment delete error:", err);
+      if (target && !String(target.id).startsWith('off_')) {
+        try {
+          await supabase.from('dublin_photos').update({ comments: target.comments }).eq('id', target.id);
+        } catch (err) {
+          console.warn("DB comment delete error:", err);
+        }
       }
     }
   };

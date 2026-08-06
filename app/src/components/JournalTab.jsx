@@ -99,13 +99,13 @@ export default function JournalTab({ userProfile }) {
           
           loadedEntries = [...unsyncedLocal, ...data].map(e => {
             const local = localMap.get(String(e.id)) || (localEntries || []).find(le => le.content === e.content);
-            const likesFromDB = Array.isArray(e.likes) ? e.likes : (e.likes ? JSON.parse(e.likes) : null);
-            const commentsFromDB = Array.isArray(e.comments) ? e.comments : (e.comments ? JSON.parse(e.comments) : null);
+            const likesFromDB = Array.isArray(e.likes) && e.likes.length > 0 ? e.likes : (typeof e.likes === 'string' && e.likes.length > 2 ? JSON.parse(e.likes) : null);
+            const commentsFromDB = Array.isArray(e.comments) && e.comments.length > 0 ? e.comments : (typeof e.comments === 'string' && e.comments.length > 2 ? JSON.parse(e.comments) : null);
 
             return {
               ...e,
-              likes: likesFromDB || local?.likes || [],
-              comments: commentsFromDB || local?.comments || []
+              likes: likesFromDB || (local?.likes && local.likes.length > 0 ? local.likes : []),
+              comments: commentsFromDB || (local?.comments && local.comments.length > 0 ? local.comments : [])
             };
           });
           localStorage.setItem('dublin_journal_entries', JSON.stringify(loadedEntries));
@@ -153,13 +153,13 @@ export default function JournalTab({ userProfile }) {
           
           loadedPints = [...unsyncedLocal, ...data].map(p => {
             const local = localMap.get(String(p.id)) || (localPints || []).find(lp => lp.pub === p.pub && lp.note === p.note);
-            const likesFromDB = Array.isArray(p.likes) ? p.likes : (p.likes ? JSON.parse(p.likes) : null);
-            const commentsFromDB = Array.isArray(p.comments) ? p.comments : (p.comments ? JSON.parse(p.comments) : null);
+            const likesFromDB = Array.isArray(p.likes) && p.likes.length > 0 ? p.likes : (typeof p.likes === 'string' && p.likes.length > 2 ? JSON.parse(p.likes) : null);
+            const commentsFromDB = Array.isArray(p.comments) && p.comments.length > 0 ? p.comments : (typeof p.comments === 'string' && p.comments.length > 2 ? JSON.parse(p.comments) : null);
 
             return {
               ...p,
-              likes: likesFromDB || local?.likes || [],
-              comments: commentsFromDB || local?.comments || []
+              likes: likesFromDB || (local?.likes && local.likes.length > 0 ? local.likes : []),
+              comments: commentsFromDB || (local?.comments && local.comments.length > 0 ? local.comments : [])
             };
           });
           localStorage.setItem('dublin_pints_list', JSON.stringify(loadedPints));
