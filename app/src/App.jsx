@@ -627,6 +627,15 @@ export default function App() {
           <NotificationCenter />
 
           <button
+            type="button"
+            onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
+            className="p-2 rounded-xl bg-slate-800/80 text-amber-400 hover:text-amber-300 transition-colors border border-slate-700/50 cursor-pointer"
+            title="Basculeur Thème Clair/Sombre"
+          >
+            {theme === 'dark' ? <Moon className="w-4 h-4 text-indigo-400" /> : <Sun className="w-4 h-4 text-amber-400" />}
+          </button>
+
+          <button
             onClick={handleInstallPWA}
             className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1"
             title="Installer l'App"
