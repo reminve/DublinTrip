@@ -1,4 +1,3 @@
-# GitHub Actions Pages Deployment Pipeline - Trigger Run 2026-08-06
 name: Deploy React app to Pages
 
 on:
