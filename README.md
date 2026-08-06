@@ -273,4 +273,3 @@ Le projet utilise GitHub Actions pour un déploiement continu à chaque Push.
    git push
    ```
    La pipeline compilera automatiquement l'application et la publiera sur `https://reminve.github.io/DublinTrip/`.
-
