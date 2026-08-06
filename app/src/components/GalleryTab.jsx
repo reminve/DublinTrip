@@ -29,14 +29,24 @@ export default function GalleryTab({ userProfile }) {
           .order('created_at', { ascending: false });
           
         if (!error && data) {
-          loadedPhotos = data.map(p => ({
-            id: p.id,
-            src: p.image,
-            date: new Date(p.created_at).toLocaleString('fr-FR'),
-            created_at: p.created_at,
-            likes: Array.isArray(p.likes) ? p.likes : (p.likes ? JSON.parse(p.likes) : []),
-            comments: Array.isArray(p.comments) ? p.comments : (p.comments ? JSON.parse(p.comments) : [])
-          }));
+          const localRaw = localStorage.getItem('dublin_gallery_photos');
+          const localPhotos = localRaw ? JSON.parse(localRaw) : [];
+          const localMap = new Map((localPhotos || []).map(lp => [String(lp.id), lp]));
+
+          loadedPhotos = data.map(p => {
+            const local = localMap.get(String(p.id)) || (localPhotos || []).find(lp => lp.src === p.image || lp.image === p.image);
+            const likesFromDB = Array.isArray(p.likes) ? p.likes : (p.likes ? JSON.parse(p.likes) : null);
+            const commentsFromDB = Array.isArray(p.comments) ? p.comments : (p.comments ? JSON.parse(p.comments) : null);
+
+            return {
+              id: p.id,
+              src: p.image,
+              date: new Date(p.created_at).toLocaleString('fr-FR'),
+              created_at: p.created_at,
+              likes: likesFromDB || local?.likes || [],
+              comments: commentsFromDB || local?.comments || []
+            };
+          });
           localStorage.setItem('dublin_gallery_photos', JSON.stringify(loadedPhotos));
         } else {
           throw new Error(error?.message || "Table not found");
