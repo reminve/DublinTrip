@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Camera, X, RefreshCw, Check, AlertTriangle } from 'lucide-react';
+import { Camera, X, RefreshCw, Check, AlertTriangle, Smartphone } from 'lucide-react';
 
 export default function CameraModal({ isOpen, onClose, onCapture }) {
   const videoRef = useRef(null);
+  const fileInputRef = useRef(null);
   const [stream, setStream] = useState(null);
   const [facingMode, setFacingMode] = useState('environment'); // 'environment' or 'user'
   const [errorMsg, setErrorMsg] = useState('');
@@ -18,25 +19,38 @@ export default function CameraModal({ isOpen, onClose, onCapture }) {
 
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error("L'accès direct à la caméra n'est pas disponible sur ce navigateur.");
+        throw new Error("L'accès direct WebRTC à la caméra n'est pas disponible sur ce navigateur.");
       }
 
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: mode },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        },
-        audio: false
-      });
+      let mediaStream = null;
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: mode } },
+          audio: false
+        });
+      } catch (err1) {
+        // Fallback to basic video constraint
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false
+        });
+      }
 
       setStream(mediaStream);
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        videoRef.current.setAttribute('playsinline', 'true');
+        videoRef.current.setAttribute('muted', 'true');
+        videoRef.current.setAttribute('autoplay', 'true');
+        try {
+          await videoRef.current.play();
+        } catch (playErr) {
+          console.warn("Video play error:", playErr);
+        }
       }
     } catch (err) {
       console.warn("Camera stream error:", err);
-      setErrorMsg(err.message || "Impossible d'accéder à l'appareil photo.");
+      setErrorMsg(err.message || "Impossible d'accéder à l’appareil photo en direct.");
     } finally {
       setLoading(false);
     }
@@ -67,16 +81,24 @@ export default function CameraModal({ isOpen, onClose, onCapture }) {
   const takeSnapshot = () => {
     if (!videoRef.current) return;
     const video = videoRef.current;
+    
+    // Fallback dimensions if videoWidth is not immediately ready
+    const width = video.videoWidth || 1200;
+    const height = video.videoHeight || 900;
+
     const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth || 800;
-    canvas.height = video.videoHeight || 600;
+    canvas.width = width;
+    canvas.height = height;
 
     const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+
     if (facingMode === 'user') {
       ctx.translate(canvas.width, 0);
       ctx.scale(-1, 1);
     }
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(video, 0, 0, width, height);
 
     const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
     setCapturedImage(dataUrl);
@@ -94,10 +116,31 @@ export default function CameraModal({ isOpen, onClose, onCapture }) {
     setCapturedImage(null);
   };
 
+  const handleFallbackFileSelect = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        onCapture(ev.target.result);
+        stopCamera();
+        onClose();
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+      <input 
+        type="file"
+        ref={fileInputRef}
+        accept="image/*"
+        capture="environment"
+        onChange={handleFallbackFileSelect}
+        className="hidden"
+      />
+
       <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col space-y-4 p-5 relative">
         
         {/* Header */}
@@ -122,9 +165,17 @@ export default function CameraModal({ isOpen, onClose, onCapture }) {
           {capturedImage ? (
             <img src={capturedImage} alt="Photo prise" className="w-full h-full object-cover" />
           ) : errorMsg ? (
-            <div className="p-6 text-center text-slate-400 space-y-3">
-              <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto" />
-              <p className="text-xs">{errorMsg}</p>
+            <div className="p-6 text-center text-slate-400 space-y-4">
+              <AlertTriangle className="w-10 h-10 text-amber-400 mx-auto" />
+              <p className="text-xs font-medium text-slate-300">{errorMsg}</p>
+              
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-2 mx-auto shadow cursor-pointer"
+              >
+                <Smartphone className="w-4 h-4" /> Utiliser l'appareil photo du téléphone
+              </button>
             </div>
           ) : (
             <video 

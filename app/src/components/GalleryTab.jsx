@@ -60,79 +60,94 @@ export default function GalleryTab({ userProfile }) {
     return () => window.removeEventListener('offline-sync-complete', handleSyncComplete);
   }, []);
 
-  const handleFileChange = (e) => {
-    if (e.target.files.length > 0) {
-      uploadFiles(e.target.files);
-    }
-  };
-
-  const uploadFiles = (files) => {
-    setLoading(true);
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+  const compressFileToBase64 = (file, maxDimension = 1000, quality = 0.75) => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.readAsDataURL(file);
-      
       reader.onload = (event) => {
         const img = new window.Image();
-        img.src = event.target.result;
-        
-        img.onload = async () => {
+        img.onload = () => {
           const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-          const max_size = 1200;
-          
+          let width = img.width || 800;
+          let height = img.height || 600;
+
           if (width > height) {
-            if (width > max_size) {
-              height *= max_size / width;
-              width = max_size;
+            if (width > maxDimension) {
+              height *= maxDimension / width;
+              width = maxDimension;
             }
           } else {
-            if (height > max_size) {
-              width *= max_size / height;
-              height = max_size;
+            if (height > maxDimension) {
+              width *= maxDimension / height;
+              height = maxDimension;
             }
           }
-          
+
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
-          
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
-          
-          const newPhoto = {
-            id: 'off_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-            created_at: new Date().toISOString(),
-            image: compressedBase64,
-            likes: [],
-            comments: []
-          };
 
-          const payload = { image: compressedBase64 };
-          const updated = [newPhoto, ...photos];
-          setPhotos(updated);
-          localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
-
-          if (supabase && isOnline()) {
-            try {
-              const { error } = await supabase.from('dublin_photos').insert([payload]);
-              if (error) throw error;
-            } catch (err) {
-              addToOfflineQueue({ type: 'INSERT', table: 'dublin_photos', data: payload });
-            } finally {
-              setLoading(false);
-            }
-          } else {
-            addToOfflineQueue({ type: 'INSERT', table: 'dublin_photos', data: payload });
-            setLoading(false);
-          }
+          resolve(canvas.toDataURL('image/jpeg', quality));
         };
+        img.onerror = () => reject(new Error("Impossible de lire ce fichier d'image."));
+        img.src = event.target.result;
       };
+      reader.onerror = () => reject(new Error("Erreur lors de la lecture du fichier."));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const uploadFiles = async (fileList) => {
+    if (!fileList || fileList.length === 0) return;
+    setLoading(true);
+
+    const filesArray = Array.from(fileList);
+
+    for (const file of filesArray) {
+      try {
+        const compressedBase64 = await compressFileToBase64(file);
+        
+        const newPhoto = {
+          id: 'off_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+          created_at: new Date().toISOString(),
+          image: compressedBase64,
+          likes: [],
+          comments: []
+        };
+
+        const payload = { image: compressedBase64 };
+
+        setPhotos(prev => {
+          const updated = [newPhoto, ...prev];
+          localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
+          return updated;
+        });
+
+        if (supabase && isOnline()) {
+          try {
+            const { error } = await supabase.from('dublin_photos').insert([payload]);
+            if (error) throw error;
+          } catch (err) {
+            addToOfflineQueue({ type: 'INSERT', table: 'dublin_photos', data: payload });
+          }
+        } else {
+          addToOfflineQueue({ type: 'INSERT', table: 'dublin_photos', data: payload });
+        }
+      } catch (err) {
+        console.warn("[Gallery] Échec chargement photo:", err);
+        alert(`Échec pour l'image "${file.name}": Format non pris en charge ou fichier corrompu.`);
+      }
+    }
+
+    setLoading(false);
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      uploadFiles(e.target.files);
+      e.target.value = '';
     }
   };
 
