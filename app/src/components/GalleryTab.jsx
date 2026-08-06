@@ -237,7 +237,7 @@ export default function GalleryTab({ userProfile }) {
     if (e) e.stopPropagation();
 
     const updated = photos.map(p => {
-      if (p.id === photoId) {
+      if (String(p.id) === String(photoId)) {
         const likes = Array.isArray(p.likes) ? p.likes : [];
         const hasLiked = likes.includes(currentUser);
         const newLikes = hasLiked ? likes.filter(u => u !== currentUser) : [...likes, currentUser];
@@ -250,9 +250,9 @@ export default function GalleryTab({ userProfile }) {
     localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
 
     // Update active lightbox state if open
-    if (lightboxPhoto && lightboxPhoto.id === photoId) {
+    if (lightboxPhoto && String(lightboxPhoto.id) === String(photoId)) {
       setLightboxPhoto(prev => {
-        const likes = Array.isArray(prev.likes) ? prev.likes : [];
+        const likes = Array.isArray(prev?.likes) ? prev.likes : [];
         const hasLiked = likes.includes(currentUser);
         const newLikes = hasLiked ? likes.filter(u => u !== currentUser) : [...likes, currentUser];
         return { ...prev, likes: newLikes };
@@ -260,10 +260,11 @@ export default function GalleryTab({ userProfile }) {
     }
 
     if (supabase && isOnline()) {
-      const target = updated.find(p => p.id === photoId);
+      const target = updated.find(p => String(p.id) === String(photoId));
       if (target && !String(target.id).startsWith('off_')) {
         try {
-          await supabase.from('dublin_photos').update({ likes: target.likes }).eq('id', target.id);
+          const { error } = await supabase.from('dublin_photos').update({ likes: target.likes }).eq('id', target.id);
+          if (error) console.warn("DB like photo update warning:", error.message);
         } catch (err) {
           console.warn("DB like photo update error:", err);
         }
@@ -285,7 +286,7 @@ export default function GalleryTab({ userProfile }) {
     };
 
     const updated = photos.map(p => {
-      if (p.id === photoId) {
+      if (String(p.id) === String(photoId)) {
         const comments = Array.isArray(p.comments) ? p.comments : [];
         return { ...p, comments: [...comments, newComment] };
       }
@@ -295,20 +296,21 @@ export default function GalleryTab({ userProfile }) {
     setPhotos(updated);
     localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
 
-    if (lightboxPhoto && lightboxPhoto.id === photoId) {
+    if (lightboxPhoto && String(lightboxPhoto.id) === String(photoId)) {
       setLightboxPhoto(prev => ({
         ...prev,
-        comments: [...(prev.comments || []), newComment]
+        comments: [...(prev?.comments || []), newComment]
       }));
     }
 
     setCommentTexts(prev => ({ ...prev, [photoId]: '' }));
 
     if (supabase && isOnline()) {
-      const target = updated.find(p => p.id === photoId);
+      const target = updated.find(p => String(p.id) === String(photoId));
       if (target && !String(target.id).startsWith('off_')) {
         try {
-          await supabase.from('dublin_photos').update({ comments: target.comments }).eq('id', target.id);
+          const { error } = await supabase.from('dublin_photos').update({ comments: target.comments }).eq('id', target.id);
+          if (error) console.warn("DB comment photo update warning:", error.message);
         } catch (err) {
           console.warn("DB comment photo update error:", err);
         }
@@ -319,7 +321,7 @@ export default function GalleryTab({ userProfile }) {
   // Delete Comment from a Photo
   const handleDeleteComment = async (photoId, commentId) => {
     const updated = photos.map(p => {
-      if (p.id === photoId) {
+      if (String(p.id) === String(photoId)) {
         const filtered = (p.comments || []).filter(c => c.id !== commentId);
         return { ...p, comments: filtered };
       }
@@ -329,18 +331,19 @@ export default function GalleryTab({ userProfile }) {
     setPhotos(updated);
     localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
 
-    if (lightboxPhoto && lightboxPhoto.id === photoId) {
+    if (lightboxPhoto && String(lightboxPhoto.id) === String(photoId)) {
       setLightboxPhoto(prev => ({
         ...prev,
-        comments: (prev.comments || []).filter(c => c.id !== commentId)
+        comments: (prev?.comments || []).filter(c => c.id !== commentId)
       }));
     }
 
     if (supabase && isOnline()) {
-      const target = updated.find(p => p.id === photoId);
+      const target = updated.find(p => String(p.id) === String(photoId));
       if (target && !String(target.id).startsWith('off_')) {
         try {
-          await supabase.from('dublin_photos').update({ comments: target.comments }).eq('id', target.id);
+          const { error } = await supabase.from('dublin_photos').update({ comments: target.comments }).eq('id', target.id);
+          if (error) console.warn("DB comment delete warning:", error.message);
         } catch (err) {
           console.warn("DB comment delete error:", err);
         }
