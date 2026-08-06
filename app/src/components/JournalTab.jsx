@@ -96,28 +96,17 @@ export default function JournalTab({ userProfile }) {
           .order('created_at', { ascending: false });
         
         if (!error && data) {
-          const localRaw = localStorage.getItem('dublin_journal_entries');
-          const localEntries = localRaw ? JSON.parse(localRaw) : [];
-          const localMap = new Map((localEntries || []).map(le => [String(le.id), le]));
-          const dbContents = new Set(data.map(d => d.content));
-          const unsyncedLocal = localEntries.filter(e => e.id && e.id.startsWith('off_') && !dbContents.has(e.content));
-          
-          loadedEntries = [...unsyncedLocal, ...data].map(e => {
-            const local = localMap.get(String(e.id)) || (localEntries || []).find(le => le.content === e.content);
-            const likesFromDB = Array.isArray(e.likes) && e.likes.length > 0 ? e.likes : (typeof e.likes === 'string' && e.likes.length > 2 ? JSON.parse(e.likes) : null);
-            const commentsFromDB = Array.isArray(e.comments) && e.comments.length > 0 ? e.comments : (typeof e.comments === 'string' && e.comments.length > 2 ? JSON.parse(e.comments) : null);
-
-            return {
-              ...e,
-              likes: likesFromDB || (local?.likes && local.likes.length > 0 ? local.likes : []),
-              comments: commentsFromDB || (local?.comments && local.comments.length > 0 ? local.comments : [])
-            };
-          });
+          loadedEntries = data.map(e => ({
+            ...e,
+            likes: Array.isArray(e.likes) ? e.likes : (typeof e.likes === 'string' && e.likes.startsWith('[') ? JSON.parse(e.likes) : []),
+            comments: Array.isArray(e.comments) ? e.comments : (typeof e.comments === 'string' && e.comments.startsWith('[') ? JSON.parse(e.comments) : [])
+          }));
           localStorage.setItem('dublin_journal_entries', JSON.stringify(loadedEntries));
         } else {
-          throw new Error(error?.message || "Table not found");
+          console.warn("[Journal] DB load error:", error?.message);
         }
       } catch (err) {
+        console.warn("[Journal] Exception loading DB journal:", err);
         const local = localStorage.getItem('dublin_journal_entries');
         if (local) loadedEntries = JSON.parse(local);
       }
@@ -126,14 +115,7 @@ export default function JournalTab({ userProfile }) {
       if (local) loadedEntries = JSON.parse(local);
     }
     
-    // Normalize likes & comments
-    const normalized = loadedEntries.map(e => ({
-      ...e,
-      likes: Array.isArray(e.likes) ? e.likes : (e.likes ? JSON.parse(e.likes) : []),
-      comments: Array.isArray(e.comments) ? e.comments : (e.comments ? JSON.parse(e.comments) : [])
-    }));
-    
-    setJournalEntries(normalized);
+    setJournalEntries(loadedEntries);
     setJournalLoading(false);
   };
 
@@ -150,28 +132,17 @@ export default function JournalTab({ userProfile }) {
           .order('created_at', { ascending: false });
         
         if (!error && data) {
-          const localRaw = localStorage.getItem('dublin_pints_list');
-          const localPints = localRaw ? JSON.parse(localRaw) : [];
-          const localMap = new Map((localPints || []).map(lp => [String(lp.id), lp]));
-          const dbPubNotes = new Set(data.map(d => `${d.pub}_${d.note || ''}`));
-          const unsyncedLocal = localPints.filter(p => p.id && p.id.startsWith('off_') && !dbPubNotes.has(`${p.pub}_${p.note || ''}`));
-          
-          loadedPints = [...unsyncedLocal, ...data].map(p => {
-            const local = localMap.get(String(p.id)) || (localPints || []).find(lp => lp.pub === p.pub && lp.note === p.note);
-            const likesFromDB = Array.isArray(p.likes) && p.likes.length > 0 ? p.likes : (typeof p.likes === 'string' && p.likes.length > 2 ? JSON.parse(p.likes) : null);
-            const commentsFromDB = Array.isArray(p.comments) && p.comments.length > 0 ? p.comments : (typeof p.comments === 'string' && p.comments.length > 2 ? JSON.parse(p.comments) : null);
-
-            return {
-              ...p,
-              likes: likesFromDB || (local?.likes && local.likes.length > 0 ? local.likes : []),
-              comments: commentsFromDB || (local?.comments && local.comments.length > 0 ? local.comments : [])
-            };
-          });
+          loadedPints = data.map(p => ({
+            ...p,
+            likes: Array.isArray(p.likes) ? p.likes : (typeof p.likes === 'string' && p.likes.startsWith('[') ? JSON.parse(p.likes) : []),
+            comments: Array.isArray(p.comments) ? p.comments : (typeof p.comments === 'string' && p.comments.startsWith('[') ? JSON.parse(p.comments) : [])
+          }));
           localStorage.setItem('dublin_pints_list', JSON.stringify(loadedPints));
         } else {
-          throw new Error(error?.message || "Table not found");
+          console.warn("[Pints] DB load error:", error?.message);
         }
       } catch (err) {
+        console.warn("[Pints] Exception loading DB pints:", err);
         const local = localStorage.getItem('dublin_pints_list');
         if (local) loadedPints = JSON.parse(local);
       }
@@ -180,14 +151,7 @@ export default function JournalTab({ userProfile }) {
       if (local) loadedPints = JSON.parse(local);
     }
 
-    // Normalize likes & comments
-    const normalized = loadedPints.map(p => ({
-      ...p,
-      likes: Array.isArray(p.likes) ? p.likes : (p.likes ? JSON.parse(p.likes) : []),
-      comments: Array.isArray(p.comments) ? p.comments : (p.comments ? JSON.parse(p.comments) : [])
-    }));
-    
-    setPints(normalized);
+    setPints(loadedPints);
     setPintLoading(false);
   };
 

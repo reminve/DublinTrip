@@ -17,21 +17,25 @@
   --accent-glow-3: rgba(99, 102, 241, 0.05);
 }
 
-body.light {
-  /* Light theme variables */
-  --bg-color: #faf9f6; /* warm soft cream */
-  --text-color: #1f2937; /* slate-800 */
-  --card-bg: rgba(255, 255, 255, 0.85);
-  --card-border: rgba(229, 231, 235, 1); /* gray-200 */
-  --card-hover-border: rgba(156, 163, 175, 0.5);
-  --inner-bg: #f3f4f6; /* gray-100 */
-  --accent-glow-1: rgba(var(--accent-color), 0.05);
-  --accent-glow-2: rgba(245, 158, 11, 0.03);
-  --accent-glow-3: rgba(99, 102, 241, 0.03);
+html.dark, body.dark {
+  --bg-color: #030712;
+  --text-color: #f3f4f6;
+  background-color: #030712 !important;
+  color: #f3f4f6 !important;
+}
+
+html.light, body.light {
+  --bg-color: #faf9f6;
+  --text-color: #1f2937;
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --card-border: rgba(229, 231, 235, 1);
+  --inner-bg: #f3f4f6;
+  background-color: #faf9f6 !important;
+  color: #1f2937 !important;
 }
 
 @layer base {
-  body {
+  html, body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: var(--bg-color);
     background-image: 
