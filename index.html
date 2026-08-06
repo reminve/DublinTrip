@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -25,31 +25,24 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <script>
+      // Hard reset all PWA service worker caches on load
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (let reg of registrations) reg.unregister();
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          for (let name of names) caches.delete(name);
+        });
+      }
+    </script>
     <script type="module" crossorigin src="./assets/index-C2N76Mc2.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-CYmlNo0G.css">
   </head>
   <body class="min-h-screen">
     <div id="root"></div>
-    
-    <!-- Force Cache Purge and SW Refresh Script -->
-    <script>
-      (function() {
-        var BUILD_VERSION = "2026-08-06-v5";
-        if (localStorage.getItem('app_build_version') !== BUILD_VERSION) {
-          localStorage.setItem('app_build_version', BUILD_VERSION);
-          if ('caches' in window) {
-            caches.keys().then(function(names) {
-              for (let name of names) caches.delete(name);
-            });
-          }
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(registrations) {
-              for (let reg of registrations) reg.unregister();
-            });
-          }
-        }
-      })();
-    </script>
-
   </body>
 </html>
