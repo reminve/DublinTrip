@@ -258,12 +258,14 @@ export default function GalleryTab({ userProfile }) {
       });
     }
 
-    if (supabase) {
+    if (supabase && isOnline()) {
       const target = updated.find(p => p.id === photoId);
-      try {
-        await supabase.from('dublin_photos').update({ likes: target.likes }).eq('id', photoId);
-      } catch (err) {
-        console.warn("DB like photo update error:", err);
+      if (target && !String(target.id).startsWith('off_')) {
+        try {
+          await supabase.from('dublin_photos').update({ likes: target.likes }).eq('id', target.id);
+        } catch (err) {
+          console.warn("DB like photo update error:", err);
+        }
       }
     }
   };
@@ -301,12 +303,14 @@ export default function GalleryTab({ userProfile }) {
 
     setCommentTexts(prev => ({ ...prev, [photoId]: '' }));
 
-    if (supabase) {
+    if (supabase && isOnline()) {
       const target = updated.find(p => p.id === photoId);
-      try {
-        await supabase.from('dublin_photos').update({ comments: target.comments }).eq('id', photoId);
-      } catch (err) {
-        console.warn("DB comment photo update error:", err);
+      if (target && !String(target.id).startsWith('off_')) {
+        try {
+          await supabase.from('dublin_photos').update({ comments: target.comments }).eq('id', target.id);
+        } catch (err) {
+          console.warn("DB comment photo update error:", err);
+        }
       }
     }
   };
@@ -331,12 +335,14 @@ export default function GalleryTab({ userProfile }) {
       }));
     }
 
-    if (supabase) {
+    if (supabase && isOnline()) {
       const target = updated.find(p => p.id === photoId);
-      try {
-        await supabase.from('dublin_photos').update({ comments: target.comments }).eq('id', photoId);
-      } catch (err) {
-        console.warn("DB comment delete error:", err);
+      if (target && !String(target.id).startsWith('off_')) {
+        try {
+          await supabase.from('dublin_photos').update({ comments: target.comments }).eq('id', target.id);
+        } catch (err) {
+          console.warn("DB comment delete error:", err);
+        }
       }
     }
   };
