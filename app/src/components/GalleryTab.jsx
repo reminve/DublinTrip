@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
-  UploadCloud, Image, Trash2, X, Heart, MessageSquare, Send, Camera
+  UploadCloud, Image, Trash2, X, Heart, MessageSquare, Send, Camera, RefreshCw
 } from 'lucide-react';
 import { getSupabase } from '../supabase';
 import { isOnline, addToOfflineQueue } from '../offlineSync';
@@ -69,9 +69,23 @@ export default function GalleryTab({ userProfile }) {
 
   useEffect(() => {
     fetchPhotos();
+
+    let channel = null;
+    if (supabase) {
+      channel = supabase
+        .channel('public_dublin_photos')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'dublin_photos' }, () => {
+          fetchPhotos();
+        })
+        .subscribe();
+    }
+
     const handleSyncComplete = () => fetchPhotos();
     window.addEventListener('offline-sync-complete', handleSyncComplete);
-    return () => window.removeEventListener('offline-sync-complete', handleSyncComplete);
+    return () => {
+      window.removeEventListener('offline-sync-complete', handleSyncComplete);
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
 
   const compressFileToBase64 = (file, maxDimension = 1000, quality = 0.75) => {

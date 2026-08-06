@@ -212,28 +212,43 @@ export default function App() {
     checkSession();
   }, []);
 
-  // Theme configuration effect
+  // Theme configuration effect (support live mediaQuery listener for 'auto' mode)
   useEffect(() => {
     const body = document.body;
     const html = document.documentElement;
-    body.classList.remove('light', 'dark');
-    html.classList.remove('light', 'dark');
-    
-    let activeTheme = theme;
-    if (theme === 'auto') {
-      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      activeTheme = systemDark ? 'dark' : 'light';
-    }
-    
-    body.classList.add(activeTheme);
-    html.classList.add(activeTheme);
-    
+
+    const applyTheme = () => {
+      body.classList.remove('light', 'dark');
+      html.classList.remove('light', 'dark');
+      
+      let activeTheme = theme;
+      if (theme === 'auto') {
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        activeTheme = systemDark ? 'dark' : 'light';
+      }
+      
+      body.classList.add(activeTheme);
+      html.classList.add(activeTheme);
+    };
+
+    applyTheme();
     localStorage.setItem('app-theme', theme);
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = () => {
+      if (theme === 'auto') applyTheme();
+    };
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleSystemThemeChange);
+      return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    }
   }, [theme]);
 
-  // Accent color configuration effect
+  // Accent color configuration effect (apply to both root & body)
   useEffect(() => {
     const body = document.body;
+    const html = document.documentElement;
     const rgbColors = {
       emerald: '16 185 129',
       amber: '245 158 11',
@@ -243,6 +258,7 @@ export default function App() {
     };
     const colorVal = rgbColors[accent] || '16 185 129';
     body.style.setProperty('--accent-color', colorVal);
+    html.style.setProperty('--accent-color', colorVal);
     
     body.className = body.className.replace(/\baccent-\S+/g, '');
     body.classList.add(`accent-${accent}`);
@@ -765,6 +781,18 @@ export default function App() {
                 <span className="text-[10px] font-bold text-center">Réglages</span>
               </button>
             )}
+
+            {/* Mobile Theme & Accent Switcher Row */}
+            <div className="col-span-3 pt-2.5 mt-1 border-t border-slate-800 flex items-center justify-between px-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Couleur</span>
+                <ColorSwitcher />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Thème</span>
+                <ThemeSwitcher />
+              </div>
+            </div>
           </div>
         )}
       </nav>

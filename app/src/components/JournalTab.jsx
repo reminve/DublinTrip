@@ -195,12 +195,35 @@ export default function JournalTab({ userProfile }) {
     loadJournal();
     loadPints();
 
+    let channelJournal = null;
+    let channelPints = null;
+
+    if (supabase) {
+      channelJournal = supabase
+        .channel('public_dublin_journal')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'dublin_journal' }, () => {
+          loadJournal();
+        })
+        .subscribe();
+
+      channelPints = supabase
+        .channel('public_dublin_pints')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'dublin_pints' }, () => {
+          loadPints();
+        })
+        .subscribe();
+    }
+
     const handleSyncComplete = () => {
       loadJournal();
       loadPints();
     };
     window.addEventListener('offline-sync-complete', handleSyncComplete);
-    return () => window.removeEventListener('offline-sync-complete', handleSyncComplete);
+    return () => {
+      window.removeEventListener('offline-sync-complete', handleSyncComplete);
+      if (channelJournal) supabase.removeChannel(channelJournal);
+      if (channelPints) supabase.removeChannel(channelPints);
+    };
   }, []);
 
   // Save Journal Entry
