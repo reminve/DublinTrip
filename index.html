@@ -22,8 +22,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    <script type="module" crossorigin src="./assets/index-D6ZSHKHo.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-C1BxPMHm.css">
+    <script type="module" crossorigin src="./assets/index-difELfwe.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Bm1hMu64.css">
   </head>
   <body class="bg-slate-950 text-slate-50 min-h-screen">
     <div id="root"></div>
@@ -33,7 +33,10 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('[PWA] Service Worker enregistré:', reg.scope))
+            .then(reg => {
+              console.log('[PWA] Service Worker enregistré:', reg.scope);
+              reg.update();
+            })
             .catch(err => console.warn('[PWA] Échec enregistrement SW:', err));
         });
       }
