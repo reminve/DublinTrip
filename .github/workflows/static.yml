@@ -1,4 +1,4 @@
-# Workflow for building and deploying Vite React app to GitHub Pages
+# Workflow for building and deploying Vite React app to GitHub Pages - Restored Original Pipeline
 name: Deploy React app to Pages
 
 on:
