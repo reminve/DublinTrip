@@ -36,7 +36,9 @@ export default function GalleryTab({ userProfile }) {
           const localPhotos = localRaw ? JSON.parse(localRaw) : [];
           const localMap = new Map((localPhotos || []).map(lp => [String(lp.id), lp]));
 
-          loadedPhotos = data.map(p => {
+          const unsyncedLocal = (localPhotos || []).filter(lp => lp.id && String(lp.id).startsWith('off_'));
+
+          const dbPhotos = data.map(p => {
             const local = localMap.get(String(p.id)) || (localPhotos || []).find(lp => lp.src === p.image || lp.image === p.image);
             
             const likesFromDB = Array.isArray(p.likes) && p.likes.length > 0 ? p.likes : (typeof p.likes === 'string' && p.likes.length > 2 ? JSON.parse(p.likes) : null);
@@ -44,13 +46,15 @@ export default function GalleryTab({ userProfile }) {
 
             return {
               id: p.id,
-              src: p.image,
+              src: p.image || p.photo || p.src,
               date: new Date(p.created_at).toLocaleString('fr-FR'),
               created_at: p.created_at,
               likes: likesFromDB || (local?.likes && local.likes.length > 0 ? local.likes : []),
               comments: commentsFromDB || (local?.comments && local.comments.length > 0 ? local.comments : [])
             };
           });
+
+          loadedPhotos = [...unsyncedLocal, ...dbPhotos];
           localStorage.setItem('dublin_gallery_photos', JSON.stringify(loadedPhotos));
         } else {
           throw new Error(error?.message || "Table not found");

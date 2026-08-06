@@ -55,6 +55,41 @@ export const clearOfflineQueue = () => {
 };
 
 /**
+ * Synchronize any unsynced local photos (starting with off_) to Supabase Cloud
+ */
+export const syncLocalPhotosToSupabase = async () => {
+  if (!isOnline()) return;
+  const supabase = getSupabase();
+  if (!supabase) return;
+
+  try {
+    const raw = localStorage.getItem('dublin_gallery_photos');
+    if (!raw) return;
+    const photos = JSON.parse(raw);
+    const unsynced = photos.filter(p => p.id && String(p.id).startsWith('off_') && (p.src || p.image));
+
+    if (unsynced.length === 0) return;
+
+    console.log(`[OfflineSync] Synchro de ${unsynced.length} photo(s) locale(s) vers Supabase Cloud...`);
+
+    for (const photo of unsynced) {
+      const payload = { image: photo.src || photo.image };
+      const { data, error } = await supabase.from('dublin_photos').insert([payload]).select();
+      if (!error && data && data[0]?.id) {
+        const realId = data[0].id;
+        const currentRaw = localStorage.getItem('dublin_gallery_photos');
+        const currentPhotos = currentRaw ? JSON.parse(currentRaw) : [];
+        const updated = currentPhotos.map(p => String(p.id) === String(photo.id) ? { ...p, id: realId, src: photo.src || photo.image } : p);
+        localStorage.setItem('dublin_gallery_photos', JSON.stringify(updated));
+      }
+    }
+    window.dispatchEvent(new CustomEvent('offline-sync-complete'));
+  } catch (err) {
+    console.warn('[OfflineSync] Erreur synchro photos locales:', err);
+  }
+};
+
+/**
  * Process and synchronize all queued offline items with Supabase
  */
 export const syncOfflineQueue = async () => {
@@ -68,6 +103,9 @@ export const syncOfflineQueue = async () => {
     console.log('[OfflineSync] Supabase non configuré. Mode local uniquement.');
     return { success: false, syncedCount: 0, reason: 'no-supabase' };
   }
+
+  // Also sync any local photos waiting in localStorage
+  await syncLocalPhotosToSupabase();
 
   const queue = getOfflineQueue();
   if (queue.length === 0) {
