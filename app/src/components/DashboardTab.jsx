@@ -72,10 +72,13 @@ export default function DashboardTab({ userProfile }) {
   const loadExpenses = async () => {
     setExpensesLoading(true);
 
-    // 1. Always start with DEFAULT_EXPENSES as the baseline
-    let loaded = DEFAULT_EXPENSES;
+    // 1. Fixed Baseline Official Bookings
+    const baselineReserved = DEFAULT_EXPENSES.filter(e => e.category === 'reserved');
+    const baselineOnSite = DEFAULT_EXPENSES.filter(e => e.category === 'on_site');
 
-    // 2. Try to load custom expenses
+    let customExpenses = [];
+
+    // 2. Try to load custom expenses from Supabase
     if (supabase && isOnline()) {
       try {
         const { data, error } = await supabase
@@ -83,23 +86,14 @@ export default function DashboardTab({ userProfile }) {
           .select('*')
           .order('date', { ascending: false });
         if (!error && data && data.length > 0) {
-          loaded = data;
-        } else if (!error && data && data.length === 0) {
-          const isCleared = localStorage.getItem('dublin_expenses_cleared') === 'true';
-          if (!isCleared) {
-            const seedData = DEFAULT_EXPENSES.map(e => ({
-              title: e.title, amount: e.amount,
-              category: e.category, date: e.date, note: e.note
-            }));
-            supabase.from('dublin_expenses').insert(seedData).catch(() => {});
-          } else {
-            loaded = [];
-          }
+          customExpenses = data;
         }
       } catch (err) {}
     } else {
-      const local = localStorage.getItem('dublin_expenses_list');
-      if (local) loaded = JSON.parse(local);
+      try {
+        const local = localStorage.getItem('dublin_expenses_list');
+        if (local) customExpenses = JSON.parse(local);
+      } catch (e) {}
     }
 
     // 3. Load Pints from Guinness Tracker and add those with price > 0 as expenses
@@ -136,7 +130,25 @@ export default function DashboardTab({ userProfile }) {
         isPint: true
       }));
 
-    const merged = [...loaded, ...pintExpenses].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    // Merge baseline official expenses + custom user expenses + pint expenses (deduplicated by normalized title/id)
+    const baseMap = new Map();
+    
+    // Add baseline reserved and on_site first
+    DEFAULT_EXPENSES.forEach(exp => {
+      baseMap.set(exp.title.toLowerCase().trim(), exp);
+    });
+
+    // Merge in custom expenses from DB (updating amounts or adding new items)
+    customExpenses.forEach(exp => {
+      baseMap.set((exp.title || '').toLowerCase().trim(), exp);
+    });
+
+    // Merge in pint expenses
+    pintExpenses.forEach(exp => {
+      baseMap.set(exp.id, exp);
+    });
+
+    const merged = Array.from(baseMap.values()).sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
     setExpenses(merged);
     setExpensesLoading(false);
   };
