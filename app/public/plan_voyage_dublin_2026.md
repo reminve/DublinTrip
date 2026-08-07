@@ -1,126 +1,115 @@
-# ✈️ FEUILLE DE ROUTE & PLAN DE VOYAGE : CLERMONT-FERRAND ➔ DUBLIN
+# 🇮🇪 FEUILLE DE ROUTE OFFICIELLE – DUBLIN 2026
 
-**Dates :** Du 6 au 12 août 2026 (7 jours / 6 nuits)  
-**Voyageur :** Rémi Neveu (Solo)  
-**Hébergement :** aparto Binary Hub Apartments (Dublin 8) — Chambre individuelle avec salle de bain privée
-
----
-
-## 📊 1. RÉCAPITULATIF FINANCIER & ÉCHÉANCIER DE PAIEMENT
-
-### 💳 A. Réservations Payées / Effectuées : 742,53 €
-
-| Poste de Dépense | Détails & Logistique | Montant | Numéro de Dossier / Statut |
-| :--- | :--- | :---: | :---: |
-| **Train Clermont ↔ Lyon** | TER / Intercités A/R (09h02 Aller / 11h34 Retour) | 22,00 € | SNCF Connect |
-| **Rhônexpress Lyon Part-Dieu ↔ LYS** | Tram-train express (Tarif Jeune 12-25 ans A/R) | 19,90 € | Rhônexpress |
-| **Vol Aer Lingus A/R** | Lyon (16h45) ↔ Dublin T2 (06h15) + Bagage 10kg soute + Petit sac cabine | 340,22 € | Vol EI 553 / EI 550 |
-| **Hébergement (6 nuits)** | aparto Binary Hub (Chambre + SDB privée - Tarif Mobile) | 327,41 € | Booking.com n° 5694634506 (Code: 9401) |
-| **Navette Aéroport A/R** | Dublin Express 782 (Usher's Quay ↔ Terminal 2 - 6 € Aller / 6 € Retour) | 12,00 € | Dublin Express |
-| **Visite Book of Kells** | Trinity Visit (Book of Kells + Old Library + Red Pavilion) — 7 août à 12h30 | 21,00 € | Billet Étudiant (Carte physique requise) |
-| **SUBTOTAL PAYÉ** | **Ensemble des prestations bloquées** | **742,53 €** | **Confirmé** |
-
-### 💵 B. Budget Prévisionnel Sur Place : 255,50 €
-
-| Poste de Dépense | Détails & Logistique | Montant Estimé | Mode de Paiement |
-| :--- | :--- | :---: | :---: |
-| **Visite Guinness Storehouse** | Créneau matin (St James's Gate) | 22,50 € | Sur place / Réservation en ligne |
-| **Visite Kilmainham Gaol** | Prison historique (Achat J-28 ou matin même 09h15) | 8,00 € | En ligne |
-| **Transports Locaux** | Carte TFI Leap Visitor Card (DART Howth + Bus) | 25,00 € | Borne Aéroport / Comptoir à l'arrivée |
-| **Excursion Glendalough** | Car St. Kevin's Bus A/R | 25,00 € | Chauffeur ou en ligne |
-| **Nourriture & Repas** | Meal Deals midi (4,50 €/j) + Pubs & Snacks soir | 175,00 € | Carte bancaire au fil des jours |
-| **SUBTOTAL SUR PLACE** | **Argent de poche & vie quotidienne du 6 au 12 août** | **255,50 €** | **—** |
-
-💰 **TOTAL GLOBAL DU SÉJOUR : ~998,03 € (Tout compris)**
+**Voyageur :** Rémi Neveu  
+**Dates :** Du jeudi 6 août au mercredi 12 août 2026 (6 nuits)  
+**Hébergement :** aparto Binary Hub (Bonham Street, Dublin 8)  
 
 ---
 
-## 📑 2. PROCÉDURES ET PRÉPARATIFS AVANT LE DÉPART
+## 📌 1. RÉSERVATIONS CONFIRMÉES & LOGISTIQUE
 
-### 🪪 1. Papiers d'Identité & Carte Étudiant
-* **Pièce d'identité :** Carte Nationale d'Identité (CNI) ou Passeport en cours de validité (L'Irlande est dans l'UE, pas de passeport obligatoire).
-* **Carte d'Étudiant PHYSIQUE :** Indispensable ! À présenter à l'entrée du Trinity College le 7 août à 12h30 pour valider le tarif réduit de 21,00 € (Book of Kells).
-
-### 💶 2. Monnaie & Carte Bancaire : EURO (€)
-* **Monnaie :** Euro (€) en République d'Irlande. Aucun frais de change.
-* **Paiements :** Sans contact / Apple Pay / Google Pay acceptés absolument partout. Conserver seulement ~20 à 30 € en liquide pour dépanner.
-
-### 🎒 3. Politique de Bagages Aer Lingus
-* **1 Bagage de 10 kg (Enregistrement en soute inclus) :**
-  * Dimensions max : 55 x 40 x 24 cm.
-  * Procédure : À déposer impérativement au comptoir d'enregistrement (Check-in) de l'aéroport avant de passer les contrôles de sécurité.
-* **1 Petit Bagage Personnel (Sous le siège) :**
-  * Dimensions max : 40 x 30 x 20 cm.
-  * Procédure : À garder avec vous en cabine, placed sous le siège devant vous (papiers, téléphone, chargeurs, batterie externe).
-
-### 🔌 4. Adaptateur Électrique (Type G)
-* Prises électriques britanniques à 3 broches rectangulaires (Type G).
-* Prévoir un adaptateur secteur France ➔ Irlande/UK et une multiprise.
-
-### 📱 5. Téléphone & Roaming
-* Les appels, SMS et données 4G/5G de votre forfait français fonctionnent en Irlande sans surcoût (penser à activer le roaming à l'arrivée).
+| Prestation | Prestataire / Lieu | Détails & Identifiants | Montant & Statut |
+| :--- | :--- | :--- | :--- |
+| **Hébergement** | Binary Hub - Aparto | Bonham Street, Dublin<br>N° réservation : **5694634506** \| Code confidentiel : **9401**<br>Tél : +44 131 210 0050<br>• Check-in : 06/08 à 19h00–20h00<br>• Check-out : 12/08 à 03h00 (Approuvé, réception 24/7) | **327,41 €**<br>*(Payé)* |
+| **Vols A/R** | Aer Lingus | Terminal 2 (T2)<br>Vol Aller EI 553 (06/08) \| Vol Retour EI 550 (12/08)<br>• 1 petit sac sous le siège (40 x 30 x 20 cm)<br>• 1 bagage en soute 10 kg (55 x 40 x 24 cm) | **340,22 €**<br>*(Payé)* |
+| **Navette Aéroport** | Dublin Express 782 | A/R entre T2 (Zone 21) et Usher's Quay (à 3 min du logement) | **12,00 €**<br>*(Payé)* |
+| **Attraction 1** | Trinity Visit (Book of Kells) | **Vendredi 7 août 2026 à 12h30**<br>Manuscrit, Old Library Long Room & Red Pavilion<br>⚠️ Présenter la carte d'étudiant physique à l'entrée | **21,00 €**<br>*(Payé)* |
+| **Attraction 2** | Pearse Lyons Distillery | **Lundi 10 août 2026 à 11h00**<br>Visite guidée de la distillerie dans l'église St. James<br>📍 121–125 James's Street (à 3 min à pied du logement) | **25,00 €**<br>*(Payé)* |
 
 ---
 
-## 🏠 3. LOGISTIQUE HÉBERGEMENT (aparto Binary Hub)
+## 📅 2. ITINÉRAIRE DÉTAILLÉ JOUR PAR JOUR
 
-* **Adresse :** Roe Lane, Bonham Street, Dublin 8 (Quartier The Liberties).
-* **Numéro de réservation Booking.com :** 5694634506 | **Code confidentiel :** 9401
-* **Contact établissement :** +44 131 210 0050
-* **Arrivée (Check-in) le 6 août :** Confirmée pour la tranche 19h00 – 20h00.
-* **Départ Nocturne (Check-out) le 12 août à 03h00 du matin :**
-  * Validé par Kyla (Équipe Binary Hub) : L'équipe est présente 24h/24 à l'accueil.
-  * Procédure à 03h00 : Remettre simplement votre clé/badge au gardien à la réception avant de sortir.
-* **Navette Aéroport Dublin Express 782 :**
-  * Arrêt : Usher's Quay (situé à 3 minutes à pied de Binary Hub).
-  * Terminal Aéroport : Sélectionner le Terminal 2 (T2) pour l'aller et le retour.
+### 🔹 Jour 1 : Jeudi 6 Août 2026 – Arrivée & Installation
+* **Après-midi :** Vol Aer Lingus EI 553 depuis Lyon (LYS) vers l'Aéroport de Dublin (T2).
+* **Transfert :** Récupération de la valise de 10 kg en soute. Navette Dublin Express 782 (Zone 21) ➔ Arrêt Usher's Quay.
+* **19h00 – 20h00 :** Check-in et installation à Binary Hub - Aparto (Bonham Street).
+* **Soirée :** Courses au supermarché voisin (Centra/Lidl/Tesco), promenade sur les bords de la Liffey.
 
 ---
 
-## 🗓️ 4. ITINÉRAIRE DÉTAILLÉ DE A à Z (JOUR PAR JOUR)
+### 🔹 Jour 2 : Vendredi 7 Août 2026 – Centre Historique & Trinity Visit
+* **Matin :** Achat de la Leap Card au Centra / SPAR (Thomas Street). Petit-déjeuner en chemin (Manning's Bakery ou Queen of Tarts).
+* **Visites gratuites de substitution :**
+  * Chester Beatty Library & Dubh Linn Garden (Musée gratuit dans les jardins du château).
+  * National Gallery of Ireland (Merrion Square, gratuit).
+  * St Audoen's Park & vestiges des murailles médiévales.
+* **12h30 (RÉSERVÉ & PAYÉ) :** Trinity Visit – Book of Kells Experience (Carte d'étudiant obligatoire).
+* **Après-midi :** Promenade sur Grafton Street, pause détente à St Stephen's Green / Iveagh Gardens, verre au Kavanagh's Pub.
+* **Soirée :** Découverte de Temple Bar ou dîner tranquille.
 
-### 🟢 Jour 1 : Jeudi 6 août — Trajet & Installation
-* **09h02 – 11h26 :** TER Clermont-Ferrand ➔ Lyon Part-Dieu.
-* **14h30 – 15h00 :** Tram Rhônexpress vers l'aéroport Saint-Exupéry.
-* **16h45 – 18h05 :** Vol Aer Lingus EI 553 Lyon ➔ Dublin (Terminal 2). (Heure locale, -1h de décalage).
-* **18h30 – 19h15 :** Récupération du bagage de soute (10kg) et montée dans la navette Dublin Express 782 (Zone 21).
-* **19h30 :** Débarquement à Usher's Quay, 3 min de marche.
-* **19h40 :** Check-in à aparto Binary Hub et installation en chambre privative.
-* **20h00 :** Courses de provisions au supermarché voisin et première balade relax le long de la Liffey.
+---
 
-### 🟢 Jour 2 : Vendredi 7 août — Cœur Historique & Book of Kells
-* **09h30 – 11h00 :** Promenade extérieure vers Christ Church Cathedral et St Patrick's Cathedral.
-* **11h00 – 12h15 :** Entrée gratuite à la Chester Beatty Library (Château de Dublin).
-* **12h30 (RÉSERVÉ - 21,00 €) :** **Trinity Visit – Book of Kells Experience**
-  * Visite du manuscrit du VIIIe siècle, passage dans la Long Room de la Old Library et exposition immersive Red Pavilion.
-  * *(Avoir sa carte d'étudiant physique avec soi).*
-* **14h30 – 17h00 :** Flânerie sur Grafton Street et pause à St Stephen's Green.
-* **19h00 :** Soirée dans le quartier animé de Temple Bar.
+### 🔹 Jour 3 : Samedi 8 Août 2026 – Randonnée à Howth & Domaine de Malahide
+* **08h30 – 09h00 :** Départ du Binary Hub. Bus G1 (ou marche) jusqu'à Connolly/Tara St Station, puis train DART vers Howth (couvert par le forfait 2,00 € TFI / Leap Card).
+* **09h30 – 12h30 :** Randonnée des Falaises de Howth (Trace Komoot) : parcours littoral du Howth Cliff Walk avec vues sur la baie et le Baily Lighthouse.
+* **12h30 – 13h30 :** Pause repas / Fish & Chips sur le port de pêche (Beshoff Bros ou Leo Burdock).
+* **13h30 – 14h15 :** Trajet en Bus 102 direct (ou DART via Howth Junction) depuis Howth jusqu'à Malahide.
+* **14h30 – 17h00 :** Visite du parc, des jardins botaniques et de l'extérieur du Malahide Castle, promenade sur la marina et le front de mer.
+* **17h15 – 18h00 :** Retour en DART direct depuis Malahide vers le centre de Dublin.
+* **Soirée :** Repas libre et verre dans un pub traditionnel (ex: The Brazen Head).
 
-### 🟢 Jour 3 : Samedi 8 août — Guinness & Culture
-* **09h30 – 12h00 :** **Guinness Storehouse** (St James's Gate, à 8 min à pied du logement). Visite des 7 étages et dégustation au Gravity Bar avec vue à 360°.
-* **13h30 – 16h30 :** Visite de *14 Henrietta Street* ou du *National Museum of Ireland – Collins Barracks* (à 5 min du logement).
-* **20h00 :** Dîner au pub historique *The Brazen Head* (le plus ancien d'Irlande, situé à 4 minutes du logement).
+---
 
-### 🟢 Jour 4 : Dimanche 9 août — Phoenix Park & Jardin Botanique
-* **09h00 – 12h00 :** **Phoenix Park** (à 12 min à pied de Binary Hub). Balade devant la résidence présidentielle et observation de la troupe de cerfs sauvages en liberté.
-* **13h30 – 16h30 :** **National Botanic Gardens** de Glasnevin (accès gratuit, serres victoriennes).
-* **18h00 :** Soirée au calme au bord du Grand Canal.
+### 🔹 Jour 4 : Dimanche 9 Août 2026 – Vallée Glaciaire & Lacs de Glendalough
+* **10h40 :** Présence à l'arrêt St. Stephen's Green North (Ligne St. Kevin's Bus 181, face au parc) pour assurer sa place.
+* **11h00 :** Départ du bus vers Glendalough (~15–20 € A/R auprès du chauffeur).
+* **12h20 :** Arrivée au Glendalough Visitor Centre (~5h00 de temps libre sur place).
+* **12h20 – 13h00 :** Visite de la cité monastique (Tour ronde, ruines) et marche le long du Lower Lake vers l'Upper Lake.
+* **13h00 – 13h30 :** Pause pique-nique au bord de l'Upper Lake.
+* **13h30 – 16h00 :** Randonnée du Spinc / White Route (Trace Komoot) : boucle de ~9 km (380 m D+) via Poulanass Waterfall, les passerelles en bois sur les crêtes et le Miner's Village.
+* **16h00 – 17h20 :** Redescente, pause boisson au Visitor Centre.
+* **17h40 :** Bus retour depuis le Visitor Centre vers Dublin St. Stephen's Green.
+* **Soirée :** Arrivée vers 19h00 à Dublin, dîner libre et repos.
 
-### 🟢 Jour 5 : Lundi 10 août — Histoire & Docklands
-* **09h15 :** Tentative d'achat de billets de dernière minute pour la prison historique de *Kilmainham Gaol* sur le site officiel.
-* **11h00 – 16h00 :** Découverte des Docklands, traversée du pont Samuel Beckett et visite d'EPIC (Irish Emigration Museum).
-* **19h00 :** Balade photo au coucher du soleil autour du Ha'penny Bridge.
+---
 
-### 🟢 Jour 6 : Mardi 11 août — Les Falaises de Howth & Préparatifs
-* **09h30 – 10h00 :** Train DART de Tara Street vers Howth.
-* **10h15 – 13h30 :** **Randonnée des Falaises de Howth (Howth Cliff Walk)** — Parcours en boucle au-dessus de la mer avec vues sur le Baily Lighthouse.
-* **13h30 – 15h00 :** Fish & Chips traditionnel sur le port de Howth.
-* **18h30 :** Retour au logement, rangement du sac de soute (10 kg) et pré-réveil pour le départ nocturne.
+### 🔹 Jour 5 : Lundi 10 Août 2026 – Phoenix Park, Collins Barracks & The Liberties
+* **08h30 – 10h45 :** Promenade matinale à Phoenix Park (Farmleigh House, observation des daims) puis visite du National Museum of Ireland – Decorative Arts & History à Collins Barracks (gratuit, juste en face du logement).
+* **11h00 (RÉSERVÉ & PAYÉ - 25 €) :** Pearse Lyons Distillery Tour (121–125 James's Street). Visite de la distillerie artisanale dans l'église St. James.
+* **12h30 – 13h30 :** Déjeuner libre dans le quartier de St James / Thomas Street.
+* **13h30 (RÉSERVÉ) :** Guinness Storehouse (St James's Gate). Expérience sur 7 étages et dégustation d'une pinte au Gravity Bar (vue à 360°).
+* **Soirée :** Coucher de soleil au Ha'penny Bridge, balade au bord du fleuve et dîner libre.
 
-### 🟢 Jour 7 : Mercredi 12 août — Retour en France
-* **03h00 :** Check-out rapide à la réception 24h/24 de Binary Hub (remise du badge au gardien).
-* **03h30 :** Prise de la navette Dublin Express 782 à l'arrêt Usher's Quay.
-* **04h00 :** Arrivée au Terminal 2 de l'Aéroport de Dublin. Dépose du bagage 10kg en soute.
-* **06h15 – 09h30 :** Vol Aer Lingus EI 550 Dublin T2 ➔ Lyon Saint-Exupéry.
-* **11h34 – 13h59 :** TER retour Lyon Part-Dieu ➔ Clermont-Ferrand.
+---
+
+### 🔹 Jour 6 : Mardi 11 Août 2026 – Dún Laoghaire & Musée d'Archéologie
+* **Matin :** Trajet en DART vers la côte sud à Dún Laoghaire. Promenade sur la grande jetée (East Pier), vue sur la baie et marche littorale jusqu'au spot mythique de Forty Foot à Sandycove.
+* **Après-midi :** Retour au centre de Dublin pour la visite du National Museum of Ireland – Archaeology (Kildare Street, entrée gratuite). Découverte des trésors d'or celtiques, de la Broche de Tara et des corps préservés des tourbières (Bog Bodies).
+* **Soirée :** Retour au logement, bouclage des bagages et repos avant le check-out nocturne.
+
+---
+
+### 🔹 Jour 7 : Mercredi 12 Août 2026 – Départ Matinal
+* **03h00 :** Check-out au Binary Hub (remise du badge à la réception 24/7).
+* **03h30 :** Navette Dublin Express 782 depuis Usher's Quay vers le Terminal 2 de l'Aéroport.
+* **Matin :** Vol Aer Lingus EI 550 vers Lyon (LYS).
+
+---
+
+## 💶 3. BUDGET RÉCAPITULATIF
+
+| Poste de Dépense | Détails | Statut | Montant (€) |
+| :--- | :--- | :--- | :--- |
+| **Vol Aer Lingus A/R** | Vol + Bagage soute 10 kg | Payé | 340,22 € |
+| **Binary Hub - Aparto** | 6 nuits chambre privative | Payé | 327,41 € |
+| **Dublin Express 782** | Navette A/R aéroport | Payé | 12,00 € |
+| **Trinity Visit (Book of Kells)** | Billet étudiant (07/08 à 12h30) | Payé | 21,00 € |
+| **Pearse Lyons Distillery** | Visite guidée (10/08 à 11h00) | Payé | 25,00 € |
+| **Guinness Storehouse** | Réservé (10/08 à 13h30) | À payer sur place | ~22,50 € |
+| **Bus Glendalough A/R** | Navette A/R Wicklow (St. Kevin's) | À prévoir | ~20,00 € |
+| **Leap Card (Transports)** | Pass DART + Bus | À acheter le 07/08 | ~25,00 € |
+| **Restauration & Courses** | 6 jours sur place | Estimé | ~240,00 € |
+| **TOTAL ESTIMÉ** | **Ensemble du séjour** | **Budget Global** | **~1 033,13 €** |
+
+💡 **Total déjà réglé : 725,63 €** *(Vols + Logement + Navette + Book of Kells + Pearse Lyons)*.  
+Il reste environ **307,50 €** à prévoir sur place *(Guinness, bus Glendalough, Leap Card et repas)*.
+
+---
+
+## 🧰 4. RAPPELS PRATIQUES
+
+* **🔌 Adaptateur électrique :** Prises de Type G (3 broches carrées).
+* **🪪 Documents indispensables :** CNI / Passeport + **Carte d'étudiant physique** (pour la réduction Trinity Book of Kells).
+* **🚌 Bus Glendalough (Dimanche) :** Arriver vers 10h40 à St. Stephen's Green North pour le départ de 11h00.
+* **📞 Contacts utiles :** Réception Binary Hub (+44 131 210 0050) \| Urgences Irlande (112 ou 999).
