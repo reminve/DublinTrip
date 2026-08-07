@@ -358,11 +358,11 @@ export default function App() {
 
   // Common UI Theme Switcher
   const ThemeSwitcher = () => (
-    <div className="flex bg-slate-950 border border-slate-900 rounded-xl p-1 items-center gap-1 w-fit shadow-inner">
+    <div className="flex bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-1 items-center gap-1 w-fit shadow-inner">
       <button 
         type="button" 
         onClick={() => setTheme('light')} 
-        className={`p-1.5 rounded-lg transition-all cursor-pointer ${theme === 'light' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-500 hover:text-slate-300'}`}
+        className={`p-1.5 rounded-lg transition-all cursor-pointer ${theme === 'light' ? 'bg-amber-500 text-slate-950 font-black shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'}`}
         title="Mode Clair"
       >
         <Sun className="w-3.5 h-3.5" />
@@ -370,7 +370,7 @@ export default function App() {
       <button 
         type="button" 
         onClick={() => setTheme('dark')} 
-        className={`p-1.5 rounded-lg transition-all cursor-pointer ${theme === 'dark' ? 'bg-indigo-500 text-slate-200 font-bold shadow' : 'text-slate-500 hover:text-slate-300'}`}
+        className={`p-1.5 rounded-lg transition-all cursor-pointer ${theme === 'dark' ? 'bg-indigo-500 text-slate-100 font-black shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'}`}
         title="Mode Sombre"
       >
         <Moon className="w-3.5 h-3.5" />
@@ -378,7 +378,7 @@ export default function App() {
       <button 
         type="button" 
         onClick={() => setTheme('auto')} 
-        className={`p-1.5 rounded-lg transition-all cursor-pointer ${theme === 'auto' ? 'bg-emerald-500 text-slate-950 font-bold shadow' : 'text-slate-500 hover:text-slate-300'}`}
+        className={`p-1.5 rounded-lg transition-all cursor-pointer ${theme === 'auto' ? 'bg-emerald-500 text-slate-950 font-black shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'}`}
         title="Thème Auto"
       >
         <Sparkles className="w-3.5 h-3.5" />
@@ -614,12 +614,12 @@ export default function App() {
       </aside>
 
       {/* ==================== HEADER (MOBILE ONLY) ==================== */}
-      <header className="md:hidden flex items-center justify-between p-4 border-b border-slate-200/60 dark:border-slate-900/60 bg-white/80 dark:bg-slate-950/80 backdrop-blur sticky top-0 z-35">
+      <header className="md:hidden flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800/80 bg-white/95 dark:bg-slate-950/90 backdrop-blur sticky top-0 z-35 shadow-sm">
         <div className="flex items-center gap-2.5">
           <span className="text-2xl">☘️</span>
           <div>
-            <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Dublin 2026</h2>
-            <p className="text-[9px] text-slate-400 dark:text-slate-500 font-mono tracking-wider overflow-hidden text-ellipsis whitespace-nowrap max-w-[120px]">{userProfile?.email}</p>
+            <h2 className="text-base font-extrabold text-slate-900 dark:text-slate-100">Dublin 2026</h2>
+            <p className="text-[9px] text-slate-500 dark:text-slate-400 font-mono tracking-wider overflow-hidden text-ellipsis whitespace-nowrap max-w-[120px]">{userProfile?.email}</p>
           </div>
         </div>
         
@@ -629,15 +629,16 @@ export default function App() {
           <button
             type="button"
             onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
-            className="p-2 rounded-xl bg-slate-800/80 text-amber-400 hover:text-amber-300 transition-colors border border-slate-700/50 cursor-pointer"
+            className="p-2 rounded-xl bg-white dark:bg-slate-800/80 text-amber-500 dark:text-amber-400 hover:bg-slate-50 dark:hover:bg-slate-700/80 transition-all border border-slate-200 dark:border-slate-700/50 shadow-sm cursor-pointer active:scale-95"
             title="Basculeur Thème Clair/Sombre"
+            aria-label="Basculer le thème"
           >
-            {theme === 'dark' ? <Moon className="w-4 h-4 text-indigo-400" /> : <Sun className="w-4 h-4 text-amber-400" />}
+            {theme === 'dark' ? <Moon className="w-4 h-4 text-indigo-400" /> : <Sun className="w-4 h-4 text-amber-500 fill-amber-500" />}
           </button>
 
           <button
             onClick={handleInstallPWA}
-            className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1"
+            className="bg-emerald-500/15 border border-emerald-500/40 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm active:scale-95 transition-all"
             title="Installer l'App"
           >
             <Smartphone className="w-3 h-3" /> App
@@ -645,7 +646,7 @@ export default function App() {
 
           <div 
             onClick={handleForceSync}
-            className="flex items-center gap-1.5 bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-full px-2.5 py-1 shadow-sm backdrop-blur cursor-pointer"
+            className="flex items-center gap-1.5 bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-full px-2.5 py-1 shadow-sm backdrop-blur cursor-pointer active:scale-95 transition-all"
           >
             {isSyncing ? (
               <RefreshCw className="w-3 h-3 text-amber-500 animate-spin" />
